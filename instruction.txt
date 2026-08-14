@@ -1,0 +1,11 @@
+laravel:
+    cd api
+    composer install
+    create db 
+    run php artisan migrate and php artisan serve
+
+react native:
+    cd mobile
+    npx expo install 
+    npx expo start
+NOTE: THE APP WILL ONLY RUN IN EMULATOR AS THE API IS LOCAL.
