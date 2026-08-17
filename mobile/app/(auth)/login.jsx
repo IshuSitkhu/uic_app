@@ -5,7 +5,7 @@ import { router } from "expo-router";
 import authStyles from '../../styles/authStyles';
 import API_URL from '../../services/api';
 import Toast from 'react-native-toast-message';
-import home from '../(dashboard)/home';
+
 
 
 

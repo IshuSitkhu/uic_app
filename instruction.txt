@@ -1,11 +1,27 @@
-laravel:
-    cd api
-    composer install
-    create db 
-    run php artisan migrate and php artisan serve
+### Laravel Backend
 
-react native:
-    cd mobile
-    npx expo install 
-    npx expo start
-NOTE: THE APP WILL ONLY RUN IN EMULATOR AS THE API IS LOCAL.
+cd api
+composer install
+
+# Create the database and configure the .env file
+
+php artisan migrate
+php artisan serve --host=0.0.0.0 --port=8000
+
+
+### React Native / Expo
+
+cd mobile
+npm expo install
+npx expo start
+
+# Press "a" to run the app on the Android Emulator
+
+
+### Note
+
+The app is configured to use the local Laravel API:
+http://10.0.2.2:8000/api
+
+Therefore, the app is currently intended to run on the Android Emulator.
+A physical device will require a different API URL using the laptop's local IP address.
