@@ -5,9 +5,12 @@ import { router } from "expo-router";
 import authStyles from '../../styles/authStyles';
 import API_URL from '../../services/api';
 import Toast from 'react-native-toast-message';
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 const Register = () => {
+    const insets = useSafeAreaInsets();
     const [name, setName] = useState("");
     const [username, setUsername] = useState("");
     const [mobileNumber, setMobileNumber] = useState("");
@@ -83,118 +86,126 @@ const Register = () => {
     }
   return (
     <>
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex:1}}>
-        <ScrollView contentContainerStyle={{ paddingBottom: 5 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex:1}}>
+            <ScrollView
+                style={authStyles.container}
+                contentContainerStyle={{
+                    paddingBottom: insets.bottom,
+                }}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+            >
 
 
-            <View style={authStyles.topSection}>
-                {/* Logo */}
-                <View style={authStyles.logoCircle}>
-                <Image
-                    source={require("../../assets/images/icon.png")}
-                    style={authStyles.logo}
-                />
-                </View>
-            </View>
-
-            {/* Heading section */}
-            <View style={authStyles.headingSection}>
-                <Text style={authStyles.title}>Create your <Text style={authStyles.redText}>Account</Text></Text>
-                <Text style={authStyles.subtitle}>
-                Be the part of something great. Sign up now!
-                </Text>
-                <View style={authStyles.dividerContainer}>
-                    <View style={authStyles.line} />
-
-                    <Ionicons name="add-outline" size={34} color="#ac0a0aa8" />
-
-                    <View style={authStyles.line} />
-                </View>
-
-            </View>
-
-            {/* Form Section */}
-            <View style={authStyles.form}>
-                <View style={authStyles.inputContainer}>
-                    <Text style={authStyles.label}>Full Name</Text>
-                    <View style={authStyles.inputWrapper}>
-                        <Ionicons name="person-outline" size={20} color="#999" />
-                        <TextInput style={authStyles.input} placeholder="Enter your name" placeholderTextColor="#999" value={name} onChangeText={setName}/>
+                <View style={authStyles.topSection}>
+                    {/* Logo */}
+                    <View style={authStyles.logoCircle}>
+                    <Image
+                        source={require("../../assets/images/icon.png")}
+                        style={authStyles.logo}
+                    />
                     </View>
                 </View>
 
-                <View style={authStyles.inputContainer}>
-                    <Text style={authStyles.label}>Username</Text>
-                    <View style={authStyles.inputWrapper}>
-                        <Ionicons name="person-outline" size={20} color="#999" />
-                        <TextInput style={authStyles.input} placeholder="Enter your username" placeholderTextColor="#999" value={username} onChangeText={setUsername} />
-                    </View>
-                </View>
-
-                <View style={authStyles.inputContainer}>
-                    <Text style={authStyles.label}>Mobile Number</Text>
-                    <View style={authStyles.inputWrapper}>
-                        <Ionicons  name="phone-portrait-outline" size={20} color="#999" />
-                        <TextInput style={authStyles.input} placeholder="Enter your number" placeholderTextColor="#999" value={mobileNumber} onChangeText={setMobileNumber}/>
-                    </View>
-                </View>
-
-                <View style={authStyles.inputContainer}>
-                    <Text style={authStyles.label}>Email</Text>
-                    <View style={authStyles.inputWrapper}>
-                        <Ionicons  name="mail-outline" size={20} color="#999" />
-                        <TextInput style={authStyles.input} placeholder="Enter your email" placeholderTextColor="#999" value={email} onChangeText={setEmail}/>
-                    </View>
-                </View>
-
-                <View style={authStyles.inputContainer}>
-                    <Text style={authStyles.label}>Password</Text>
-                    <View style={authStyles.inputWrapper}>
-                        <Ionicons  name="lock-closed-outline" size={20} color="#999" />
-                        <TextInput style={authStyles.input} placeholder="Enter your password" placeholderTextColor="#999" value={password} onChangeText={setPassword} secureTextEntry={!showPassword} />
-                        {/* Show/Hide password icon */}
-                        <Pressable onPress={() => setShowPassword(prev => !prev)}>
-                            <Ionicons
-                                name={showPassword ? "eye-outline" : "eye-off-outline"}
-                                size={20}
-                                color="#999"
-                            />
-                        </Pressable>
-                    </View>
-                </View>
-
-                <View style={authStyles.inputContainer}>
-                    <Text style={authStyles.label}>Confirm Password</Text>
-                    <View style={authStyles.inputWrapper}>
-                        <Ionicons  name="lock-closed-outline" size={20} color="#999" />
-                        <TextInput style={authStyles.input} placeholder="Confirm your password" placeholderTextColor="#999"  value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry={!showConfirmPassword} />
-                        <Pressable onPress={() => setShowConfirmPassword(prev => !prev)}>
-                            <Ionicons
-                                name={showConfirmPassword ? "eye-outline" : "eye-off-outline"}
-                                size={20}
-                                color="#999"
-                            />
-                        </Pressable>
-                    </View>
-                </View>
-
-                {/* Create Account Button */}
-                <TouchableOpacity style={authStyles.button} onPress={handleRegister}>
-                    <Text style={authStyles.buttonText} >
-                        Create Account
+                {/* Heading section */}
+                <View style={authStyles.headingSection}>
+                    <Text style={authStyles.title}>Create your <Text style={authStyles.redText}>Account</Text></Text>
+                    <Text style={authStyles.subtitle}>
+                    Be the part of something great. Sign up now!
                     </Text>
-                </TouchableOpacity>
+                    <View style={authStyles.dividerContainer}>
+                        <View style={authStyles.line} />
 
-                <Text style={authStyles.text}>
-                    Already have an account?  
-                    <Text style={authStyles.redText} onPress={() => router.push("/(auth)/login")}>
-                         Sign in here
+                        <Ionicons name="add-outline" size={34} color="#ac0a0aa8" />
+
+                        <View style={authStyles.line} />
+                    </View>
+
+                </View>
+
+                {/* Form Section */}
+                <View style={authStyles.form}>
+                    <View style={authStyles.inputContainer}>
+                        <Text style={authStyles.label}>Full Name</Text>
+                        <View style={authStyles.inputWrapper}>
+                            <Ionicons name="person-outline" size={20} color="#999" />
+                            <TextInput style={authStyles.input} placeholder="Enter your name" placeholderTextColor="#999" value={name} onChangeText={setName}/>
+                        </View>
+                    </View>
+
+                    <View style={authStyles.inputContainer}>
+                        <Text style={authStyles.label}>Username</Text>
+                        <View style={authStyles.inputWrapper}>
+                            <Ionicons name="person-outline" size={20} color="#999" />
+                            <TextInput style={authStyles.input} placeholder="Enter your username" placeholderTextColor="#999" value={username} onChangeText={setUsername} />
+                        </View>
+                    </View>
+
+                    <View style={authStyles.inputContainer}>
+                        <Text style={authStyles.label}>Mobile Number</Text>
+                        <View style={authStyles.inputWrapper}>
+                            <Ionicons  name="phone-portrait-outline" size={20} color="#999" />
+                            <TextInput style={authStyles.input} placeholder="Enter your number" placeholderTextColor="#999" value={mobileNumber} onChangeText={setMobileNumber}/>
+                        </View>
+                    </View>
+
+                    <View style={authStyles.inputContainer}>
+                        <Text style={authStyles.label}>Email</Text>
+                        <View style={authStyles.inputWrapper}>
+                            <Ionicons  name="mail-outline" size={20} color="#999" />
+                            <TextInput style={authStyles.input} placeholder="Enter your email" placeholderTextColor="#999" value={email} onChangeText={setEmail}/>
+                        </View>
+                    </View>
+
+                    <View style={authStyles.inputContainer}>
+                        <Text style={authStyles.label}>Password</Text>
+                        <View style={authStyles.inputWrapper}>
+                            <Ionicons  name="lock-closed-outline" size={20} color="#999" />
+                            <TextInput style={authStyles.input} placeholder="Enter your password" placeholderTextColor="#999" value={password} onChangeText={setPassword} secureTextEntry={!showPassword} />
+                            {/* Show/Hide password icon */}
+                            <Pressable onPress={() => setShowPassword(prev => !prev)}>
+                                <Ionicons
+                                    name={showPassword ? "eye-outline" : "eye-off-outline"}
+                                    size={20}
+                                    color="#999"
+                                />
+                            </Pressable>
+                        </View>
+                    </View>
+
+                    <View style={authStyles.inputContainer}>
+                        <Text style={authStyles.label}>Confirm Password</Text>
+                        <View style={authStyles.inputWrapper}>
+                            <Ionicons  name="lock-closed-outline" size={20} color="#999" />
+                            <TextInput style={authStyles.input} placeholder="Confirm your password" placeholderTextColor="#999"  value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry={!showConfirmPassword} />
+                            <Pressable onPress={() => setShowConfirmPassword(prev => !prev)}>
+                                <Ionicons
+                                    name={showConfirmPassword ? "eye-outline" : "eye-off-outline"}
+                                    size={20}
+                                    color="#999"
+                                />
+                            </Pressable>
+                        </View>
+                    </View>
+
+                    {/* Create Account Button */}
+                    <TouchableOpacity style={authStyles.button} onPress={handleRegister}>
+                        <Text style={authStyles.buttonText} >
+                            Create Account
+                        </Text>
+                    </TouchableOpacity>
+
+                    <Text style={authStyles.text}>
+                        Already have an account?  
+                        <Text style={authStyles.redText} onPress={() => router.push("/(auth)/login")}>
+                            Sign in here
+                        </Text>
                     </Text>
-                </Text>
-            </View>
-        </ScrollView>
-    </KeyboardAvoidingView>
-        
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
+    </SafeAreaView>
         
     </>
     
