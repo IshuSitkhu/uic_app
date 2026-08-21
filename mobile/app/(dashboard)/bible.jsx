@@ -3,6 +3,8 @@ import { StyleSheet, Text, View, TouchableOpacity, FlatList, Modal, ScrollView, 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import API_URL from '../../services/api';
 import { Ionicons } from '@expo/vector-icons';
+import { TabView, TabBar } from "react-native-tab-view";
+import { Dimensions } from "react-native";
 
 const translations = [
   { code: 'kjv', name: 'King James Version', shortName: 'KJV' },
@@ -108,7 +110,54 @@ const Bible = () => {
   const [verses, setVerses] = useState({});
   
   const [modalStep, setModalStep] = useState(null);
-  const [showTranslationSheet, setShowTranslationSheet ] = useState(false);
+  
+  const [index, setIndex] = useState(0);
+
+  const [routes] = useState([
+    { key: "old", title: "Old Testament" },
+    { key: "new", title: "New Testament" },
+  ]);
+
+  const renderScene = ({ route }) => {
+    switch (route.key) {
+      case "old":
+        return (
+          <ScrollView>
+            {books.oldTestament.map((book) => (
+              <TouchableOpacity
+                key={book}
+                style={styles.bookItem}
+                onPress={() => fetchChapters(book)}
+              >
+                <Text style={styles.bookText}>
+                  {book}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        );
+
+      case "new":
+        return (
+          <ScrollView>
+            {books.newTestament.map((book) => (
+              <TouchableOpacity
+                key={book}
+                style={styles.bookItem}
+                onPress={() => fetchChapters(book)}
+              >
+                <Text style={styles.bookText}>
+                  {book}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        );
+
+      default:
+        return null;
+    }
+  };
   
   const fetchBooks = async (language) => {
     try {
@@ -324,7 +373,7 @@ return (
           {selectedLanguage
             ? translations.find(
                 (item) => item.code === selectedLanguage
-              )?.name
+              )?.shortName
             : 'Select Translation'}
         </Text>
       </TouchableOpacity>
@@ -349,6 +398,8 @@ return (
         </TouchableOpacity>
       )}
 
+      
+
     </View>
     <View style={styles.versesContainer}>
 
@@ -372,52 +423,6 @@ return (
         </Text>
       </ScrollView>
     </View>
-
-    {/* <Modal
-          visible={showTranslationSheet}
-          transparent
-          animationType="slide"
-          onRequestClose={() => setShowTranslationSheet(false)}
-        >
-          <View style={styles.modalOverlay}>
-    
-            <View style={styles.bottomSheet}>
-    
-              <View style={styles.sheetHeader}>
-                  <Text style={styles.heading}>
-                      Select Translation
-                  </Text>
-
-                  <TouchableOpacity onPress={() => setModalStep(null)} >
-                  <Text style={styles.closeText}>
-                      ✕
-                  </Text>
-                  </TouchableOpacity>
-                </View>
-                <FlatList
-                    data={translations}
-                    keyExtractor={(item) => item.code}
-                    renderItem={({ item }) => (
-                    <TouchableOpacity
-                        style={[ styles.translationItem, selectedLanguage === item.code && styles.selectedItem,]}
-                        onPress={() => handleLanguagePress(item.code)}
-                    >
-                        <Text style={styles.translationName}>
-                        {item.name}
-                        </Text>
-
-                        <Text style={styles.shortName}>
-                        {item.shortName}
-                        </Text>
-                    </TouchableOpacity>
-                    )}
-                />
-
-    
-            </View>
-    
-          </View>
-    </Modal> */}
 
     <Modal
       visible={modalStep !== null}
@@ -480,11 +485,23 @@ return (
                 </TouchableOpacity>
               </View>
 
-              <ScrollView>
-                <Text style={styles.testamentTitle}>
-                  <Ionicons  name="add-outline" size={24} color="#AC0A0A" />
-                  {' '}OLD TESTAMENT
-                </Text>
+              {/* <ScrollView>
+                <View style={styles.testament}>
+                  <View style={styles.testamentButton}>
+                    <Text style={styles.testamentTitle}>
+                      <Ionicons  name="add-outline" size={24} color="#AC0A0A" />
+                      {' '}OLD TESTAMENT
+                    </Text>
+                  </View>
+                  <View style={styles.testamentButton}>
+                    <Text style={styles.testamentTitle}>
+                      <Ionicons name="add-outline" size={24} color="#AC0A0A" />
+                      {' '}NEW TESTAMENT
+                    </Text>
+                  </View>
+                  
+                </View>
+                
 
                 {books.oldTestament.map((book) => (
                   <TouchableOpacity key={book} style={styles.bookItem} onPress={() => fetchChapters(book)} >
@@ -495,7 +512,7 @@ return (
                 ))}
 
                 <Text style={styles.testamentTitle}>
-                  <Ionicons name="add-outline" size={24} color="#AC0A0A" />
+                  <Ionicons name="add-outline" size={24} color="#ddd" />
                   {' '}NEW TESTAMENT
                 </Text>
 
@@ -506,7 +523,25 @@ return (
                     </Text>
                   </TouchableOpacity>
                 ))}
-              </ScrollView>
+              </ScrollView> */}
+
+              <TabView
+                navigationState={{ index, routes }}
+                renderScene={renderScene}
+                onIndexChange={setIndex}
+                initialLayout={{
+                  width: Dimensions.get("window").width,
+                }}
+                renderTabBar={(props) => (
+                  <TabBar
+                    {...props}
+                    style={styles.tabBar}
+                    indicatorStyle={styles.indicator}
+                    activeColor="#AC0A0A"
+                    inactiveColor="#999"
+                  />
+                )}
+              />
             </>
           )}
           {modalStep === 'chapters' && (
@@ -602,6 +637,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
+    marginBottom:6,
   },
 
   // Bottom sheet
@@ -634,26 +670,53 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 
+  testament:{
+    flexDirection:"row",
+    
+    
+  },
+  testamentButton:{
+    width:'50%',
+    backgroundColor:"#AC0A0A",
+    borderWidth: 1,
+    borderColor: '#121212',
+     borderRadius:25,
+     marginTop:20,
+  },
+
   // OLD / NEW TESTAMENT title
   testamentTitle: {
-    fontSize: 20,
+    fontSize: 15,
     fontWeight: 'bold',
-    marginTop: 18,
-    marginBottom: 8,
-    color:"#AC0A0A",
+    color:"#ddd",
+    paddingVertical:6,
+    alignItems: 'center',
+    
   },
 
   // Individual book
-  bookItem: {
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
 
-  bookText: {
-    fontSize: 16,
-  },
+
+    tabBar: {
+      backgroundColor: "#fff",
+      elevation: 0,
+    },
+
+    indicator: {
+      backgroundColor: "#AC0A0A",
+      height: 3,
+    },
+
+    bookItem: {
+      paddingVertical: 16,
+      paddingHorizontal: 20,
+      borderBottomWidth: 1,
+      borderBottomColor: "#eee",
+    },
+
+    bookText: {
+      fontSize: 16,
+    },
 
   chapterHeading: {
     fontSize: 18,
@@ -675,6 +738,10 @@ const styles = StyleSheet.create({
   chapterText: {
     fontSize: 16,
     fontWeight: '600',
+  },
+
+  verseCountText:{
+      fontSize: 12,
   },
 
   openTranslationButton: {
@@ -711,5 +778,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     lineHeight: 30,
   },
+
+  //Testement
+
 
 });

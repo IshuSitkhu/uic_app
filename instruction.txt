@@ -1,16 +1,12 @@
 ### Laravel Backend
-
 cd api
 composer install
-
 # Create the database and configure the .env file
-
 php artisan migrate
 php artisan serve --host=0.0.0.0 --port=8000
 
 
 ### React Native / Expo
-
 cd mobile
 npm expo install
 npx expo start
