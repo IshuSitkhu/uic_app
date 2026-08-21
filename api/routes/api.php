@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\User\BibleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,17 @@ Route::prefix('auth')->group(function (){
         Route::get('/me', [AuthController::class, 'me']);
     });
 });
+
+Route::prefix('bible')->group(function () {
+
+        Route::get('/books/{language}', [BibleController::class, 'getAllBooks']);
+
+        Route::get('/{language}/{book}', [BibleController::class, 'getBook']);
+
+        Route::get('/{language}/{book}/{chapter}', [BibleController::class, 'getChapter']);
+
+        Route::get('/{language}/{book}/{chapter}/{verse}', [BibleController::class, 'getVerse']);
+    });
 
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
