@@ -126,8 +126,10 @@ const Bible = () => {
   const renderScene = ({ route }) => {
     switch (route.key) {
       case "old":
+        console.log("OLD BOOKS:", books.oldTestament);
+
         return (
-          <ScrollView>
+          <ScrollView style={{ flex: 1 }}>
             {books.oldTestament.map((book) => (
               <TouchableOpacity
                 key={book}
@@ -143,8 +145,10 @@ const Bible = () => {
         );
 
       case "new":
+        console.log("NEW BOOKS:", books.newTestament);
+
         return (
-          <ScrollView>
+          <ScrollView style={{ flex: 1 }}>
             {books.newTestament.map((book) => (
               <TouchableOpacity
                 key={book}
@@ -168,30 +172,40 @@ const Bible = () => {
     try {
       const url = `${API_URL}/bible/books/${language}`;
 
-      console.log('Fetching:', url);
+      console.log("FETCHING BOOKS URL:", url);
 
       const response = await fetch(url, {
         headers: {
-          Accept: 'application/json',
+          Accept: "application/json",
         },
       });
 
+      console.log("BOOKS RESPONSE STATUS:", response.status);
+
       const data = await response.json();
 
+      console.log("FETCHED BOOK DATA:", data);
+
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to fetch books');
+        throw new Error(data.message || "Failed to fetch books");
       }
 
-      setBooks(data);
+      setBooks({
+        oldTestament: data.oldTestament || [],
+        newTestament: data.newTestament || [],
+      });
 
-      // Move to the books screen inside the same modal
-      setModalStep('books');
+      console.log("SETTING BOOKS:", {
+        oldTestament: data.oldTestament || [],
+        newTestament: data.newTestament || [],
+      });
+
+      setModalStep("books");
 
     } catch (error) {
-      console.error('Error fetching books:', error.message);
+      console.error("ERROR FETCHING BOOKS:", error.message);
     }
   };
-
   const fetchChapters = async (book) => {
     try {
       const languageToUse = tempLanguage || selectedLanguage;
@@ -226,6 +240,33 @@ const Bible = () => {
 
     } catch (error) {
       console.error('Error fetching chapters:', error.message);
+    }
+  };
+
+  const fetchChaptersForNavigation = async (book, language) => {
+    try {
+      const url = `${API_URL}/bible/${language}/${encodeURIComponent(book)}`;
+
+      const response = await fetch(url, {
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch chapters');
+      }
+
+      // ONLY save chapters for Previous / Next navigation
+      setChapters(data.chapters);
+
+    } catch (error) {
+      console.error(
+        'Error fetching chapters for navigation:',
+        error.message
+      );
     }
   };
 
@@ -275,6 +316,11 @@ const Bible = () => {
       setSelectedChapter(chapter);
 
       setVerses(data.verses);
+
+      await fetchChaptersForNavigation(
+        bookToUse,
+        languageToUse
+      );
 
       const currentVerse = String(selectedVerse);
 
@@ -331,6 +377,8 @@ const Bible = () => {
       setSelectedVerse(null);
       setVerseText('');
       setReadAllVerses(true);
+
+      await fetchChaptersForNavigation(data.book, 'nasb');
 
     } catch (error) {
       console.error('Error fetching default verse:', error.message);
@@ -449,29 +497,29 @@ const Bible = () => {
     }
   };
 
-const goToPreviousChapter = async () => {
-  const currentIndex = chapters.findIndex(
-    (item) => String(item.chapter) === String(selectedChapter)
-  );
+  const goToPreviousChapter = async () => {
+    const currentIndex = chapters.findIndex(
+      (item) => String(item.chapter) === String(selectedChapter)
+    );
 
-  if (currentIndex > 0) {
-    const previousChapter = chapters[currentIndex - 1].chapter;
+    if (currentIndex > 0) {
+      const previousChapter = chapters[currentIndex - 1].chapter;
 
-    await fetchVerses(previousChapter);
-  }
-};
+      await fetchVerses(previousChapter);
+    }
+  };
 
-const goToNextChapter = async () => {
-  const currentIndex = chapters.findIndex(
-    (item) => String(item.chapter) === String(selectedChapter)
-  );
+  const goToNextChapter = async () => {
+    const currentIndex = chapters.findIndex(
+      (item) => String(item.chapter) === String(selectedChapter)
+    );
 
-  if (currentIndex < chapters.length - 1) {
-    const nextChapter = chapters[currentIndex + 1].chapter;
+    if (currentIndex < chapters.length - 1) {
+      const nextChapter = chapters[currentIndex + 1].chapter;
 
-    await fetchVerses(nextChapter);
-  }
-};
+      await fetchVerses(nextChapter);
+    }
+  };
 
 return (
   <SafeAreaView style={styles.container}>
@@ -487,7 +535,7 @@ return (
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.openTranslationButton}  onPress={() => setModalStep('books')} >
+      <TouchableOpacity style={styles.openTranslationButton}  onPress={() => fetchBooks(selectedLanguage)} >
         <Text style={styles.openTranslationText}>
           {selectedChapter ? selectedBook : 'Select Book'}
         </Text>
@@ -783,7 +831,7 @@ return (
                     {...props}
                     style={styles.tabBar}
                     indicatorStyle={styles.indicator}
-                    activeColor="#AC0A0A"
+                    activeColor={COLORS.primary}
                     inactiveColor="#999"
                   />
                 )}
@@ -794,7 +842,7 @@ return (
             <>
               <View style={styles.sheetHeader}>
 
-                <TouchableOpacity onPress={() => setModalStep('books')} >
+                <TouchableOpacity onPress={() => fetchBooks(selectedLanguage)} >
                   <Ionicons name="arrow-back-outline" size={24} color="#000" />
                 </TouchableOpacity>
 
