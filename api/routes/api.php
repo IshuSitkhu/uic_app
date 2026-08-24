@@ -40,7 +40,7 @@ Route::prefix('bible')->group(function () {
 //             'id' => $user->id,
 //             'name' => $user->name,
 //             'username' => $user->username,
-//             'mobile_number' => $user->mobile_number,
+//             'phone_number' => $user->phone_number,
 //             'email' => $user->email,
 //         ],
 //     ]);

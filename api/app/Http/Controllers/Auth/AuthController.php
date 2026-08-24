@@ -22,7 +22,7 @@ class AuthController extends Controller
         $validated =$request->validate([
             'name' => ['required', 'string','min:3', 'max:255'],
             'username' =>['required', 'string', 'min:3','max:255', 'unique:users,username',],
-            'mobile_number' =>['required', 'regex:/^9[678]\d{8}$/', 'digits:10', 'unique:users,mobile_number',],
+            'phone_number' =>['required', 'regex:/^9[678]\d{8}$/', 'digits:10', 'unique:users,phone_number',],
             'email' =>['required', 'string', 'email:rfc,dns','max:255','unique:users,email',],
             'password' => ['required', 'confirmed',
                             Password::min(8)
@@ -36,10 +36,9 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $validated['name'],
             'username' => $validated['username'],
-            'mobile_number' => $validated['mobile_number'],
+            'phone_number' => $validated['phone_number'],
             'email' => $validated['email'],
             'password'=> Hash::make($validated['password']),
-            'role' => 'user',
             'status' => 'active',
         ]);
 
@@ -53,7 +52,7 @@ class AuthController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'username' => $user->username,
-                'mobile_number' => $user->mobile_number,
+                'phone_number' => $user->phone_number,
                 'email' => $user->email,
             ],
 
@@ -91,9 +90,8 @@ class AuthController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'username' => $user->username,
-                'mobile_number' => $user->mobile_number,
+                'phone_number' => $user->phone_number,
                 'email' => $user->email,
-                'role' => $user->role,
                 'status' => $user->status,
             ],
         ]);
@@ -103,9 +101,9 @@ class AuthController extends Controller
     {
         $accessToken = $request->user()->currentAccessToken();
 
-        // if($accessToken && method_exists($accessToken, 'delete')){
-        //     $accessToken->delete();
-        // }
+        if ($accessToken) {
+            $accessToken->delete();
+        }
 
         return response()->json([
             'message' => 'Logged out successfully'
@@ -121,9 +119,8 @@ class AuthController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'username' => $user->username,
-                'mobile_number' => $user->mobile_number,
+                'phone_number' => $user->phone_number,
                 'email' => $user->email,
-                'role' => $user->role,
                 'status' => $user->status,
 
                 'profile' => $user->profile ? [
@@ -149,11 +146,11 @@ class AuthController extends Controller
                 'unique:users,username,' . $user->id,
             ],
 
-            'mobile_number' => [
+            'phone_number' => [
                 'required',
                 'regex:/^9[678]\d{8}$/',
                 'digits:10',
-                'unique:users,mobile_number,' . $user->id,
+                'unique:users,phone_number,' . $user->id,
             ],
 
             'email' => [
@@ -185,7 +182,7 @@ class AuthController extends Controller
         // Update users table
         $user->update([
             'username' => $validated['username'],
-            'mobile_number' => $validated['mobile_number'],
+            'phone_number' => $validated['phone_number'],
             'email' => $validated['email'],
         ]);
 
@@ -210,9 +207,8 @@ class AuthController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'username' => $user->username,
-                'mobile_number' => $user->mobile_number,
+                'phone_number' => $user->phone_number,
                 'email' => $user->email,
-                'role' => $user->role,
                 'status' => $user->status,
 
                 'profile' => $user->profile ? [
@@ -239,17 +235,13 @@ class AuthController extends Controller
             ], 404);
         }
 
-        // Generate a 6-digit OTP
+        // Generate 6-digit OTP
         $otp = (string) random_int(100000, 999999);
 
-        // Delete previous OTP
-        PasswordResetOtp::where('email', $user->email)->delete();
-
-        // Store new OTP
-        PasswordResetOtp::create([
-            'email' => $user->email,
-            'otp' => $otp,
-            'expires_at' => Carbon::now()->addMinutes(10),
+        // Store OTP directly in users table
+        $user->update([
+            'otp_code' => $otp,
+            'otp_expires_at' => Carbon::now()->addMinutes(10),
         ]);
 
         // Send OTP email
@@ -262,7 +254,6 @@ class AuthController extends Controller
         ]);
     }
 
-
     public function verifyOtp(Request $request)
     {
         $validated = $request->validate([
@@ -270,36 +261,32 @@ class AuthController extends Controller
             'otp' => ['required', 'digits:6'],
         ]);
 
-        //Find a matching OTP
-        $resetOtp = PasswordResetOtp::where('email', $validated['email'])
-            ->where('otp', $validated['otp'])
+        $user = User::where('email', $validated['email'])
+            ->where('otp_code', $validated['otp'])
             ->first();
 
-        if (!$resetOtp) {
+        if (!$user) {
             return response()->json([
                 'message' => 'Invalid verification code.',
             ], 422);
         }
 
-        //check wheather otp expried
-        if ($resetOtp->expires_at->isPast()) {
-            $resetOtp->delete();
+        if (
+            !$user->otp_expires_at ||
+            $user->otp_expires_at->isPast()
+        ) {
+            $user->update([
+                'otp_code' => null,
+                'otp_expires_at' => null,
+            ]);
 
             return response()->json([
                 'message' => 'This verification code has expired.',
             ], 422);
         }
 
-        // Generate temporary reset token
-        $resetToken = Str::random(64);
-
-        $resetOtp->update([
-            'token' => $resetToken,
-        ]);
-
         return response()->json([
             'message' => 'OTP verified successfully.',
-            'reset_token' => $resetToken,
         ]);
     }
 
@@ -307,7 +294,7 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'email' => ['required', 'email', 'max:255'],
-            'reset_token' => ['required', 'string'],
+            'otp' => ['required', 'digits:6'],
             'password' => [
                 'required',
                 'confirmed',
@@ -318,31 +305,26 @@ class AuthController extends Controller
             ],
         ]);
 
-        // Find the reset request
-        $resetOtp = PasswordResetOtp::where('email', $validated['email'])
-            ->where('token', $validated['reset_token'])
+        $user = User::where('email', $validated['email'])
+            ->where('otp_code', $validated['otp'])
             ->first();
-
-        if (!$resetOtp) {
-            return response()->json([
-                'message' => 'Invalid or expired password reset request.',
-            ], 422);
-        }
-
-        if ($resetOtp->expires_at->isPast()) {
-            $resetOtp->delete();
-
-            return response()->json([
-                'message' => 'The password reset request has expired.',
-            ], 422);
-        }
-
-        $user = User::where('email', $validated['email'])->first();
 
         if (!$user) {
             return response()->json([
-                'message' => 'User not found.',
-            ], 404);
+                'message' => 'Invalid password reset request.',
+            ], 422);
+        }
+
+        if (!$user->otp_expires_at || Carbon::parse($user->otp_expires_at)->isPast()) {
+
+            $user->update([
+                'otp_code' => null,
+                'otp_expires_at' => null,
+            ]);
+
+            return response()->json([
+                'message' => 'The password reset code has expired.',
+            ], 422);
         }
 
         if (Hash::check($validated['password'], $user->password)) {
@@ -353,10 +335,9 @@ class AuthController extends Controller
 
         $user->update([
             'password' => Hash::make($validated['password']),
+            'otp_code' => null,
+            'otp_expires_at' => null,
         ]);
-
-        // Delete the reset OTP/token so it cannot be reused
-        $resetOtp->delete();
 
         return response()->json([
             'message' => 'Password reset successfully.',
