@@ -13,6 +13,7 @@ import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import API_URL from "../../services/api";
 import { Image } from "react-native";
+import {COLORS} from '../../constants/colors';
 
 const You = () => {
     const [user, setUser] = useState(null);
@@ -89,7 +90,7 @@ const You = () => {
                         <Ionicons
                             name="person-outline"
                             size={45}
-                            color="#ac0a0aa8"
+                            color={COLORS.primary}
                         />
                     </View>
 
@@ -261,7 +262,7 @@ const styles = StyleSheet.create({
 
     loginButton: {
         width: "100%",
-        backgroundColor: "#ac0a0aa8",
+        backgroundColor:  COLORS.primary,
         paddingVertical: 14,
         borderRadius: 10,
         alignItems: "center",
@@ -286,7 +287,7 @@ const styles = StyleSheet.create({
     },
 
     registerLink: {
-        color: "#ac0a0aa8",
+        color:  COLORS.primary,
         fontSize: 14,
         fontWeight: "700",
         marginLeft: 5,
@@ -317,7 +318,7 @@ const styles = StyleSheet.create({
         height: 105,
         borderRadius: 52.5,
 
-        backgroundColor: "#ac0a0a",
+        backgroundColor:COLORS.primary,
 
         justifyContent: "center",
         alignItems: "center",

@@ -8,6 +8,7 @@ import Toast from 'react-native-toast-message';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SafeAreaView } from "react-native-safe-area-context";
+import {COLORS} from '../../constants/colors';
 
 const Login = () => {
     // const insets = useSafeAreaInsets();
@@ -88,7 +89,6 @@ const Login = () => {
                 showsVerticalScrollIndicator={false}
             >
                 <View style={authStyles.topSection}>
-                {/* Logo */}
                 <View style={authStyles.logoCircle}>
                 <Image
                     source={require("../../assets/images/icon.png")}
@@ -97,7 +97,6 @@ const Login = () => {
                 </View>
                 </View>
 
-                {/* Heading section */}
                 <View style={authStyles.headingSection}>
                     <Text style={authStyles.title}>Welcome <Text style={authStyles.redText}>Back !</Text></Text>
                     <Text style={authStyles.subtitle}>
@@ -106,7 +105,7 @@ const Login = () => {
                     <View style={authStyles.dividerContainer}>
                         <View style={authStyles.line} />
 
-                        <Ionicons name="add-outline" size={34} color="#ac0a0aa8" />
+                        <Ionicons name="add-outline" size={34} color={COLORS.primary} />
 
                         <View style={authStyles.line} />
                     </View>
@@ -197,7 +196,7 @@ const styles = StyleSheet.create({
         width: 20,
         height: 20,
         borderWidth: 1,
-        borderColor: "#ac0a0aa8",
+        borderColor: COLORS.secondary,
         borderRadius: 6,
         justifyContent: "center",
         alignItems: "center",
@@ -211,7 +210,7 @@ const styles = StyleSheet.create({
 
     forgotText: {
         fontSize: 16,
-        color: "#ac0a0aa8",
+        color: COLORS.secondary,
         fontWeight: "600",
     },
 })

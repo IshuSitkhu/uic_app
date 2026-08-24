@@ -7,6 +7,7 @@ import API_URL from '../../services/api';
 import Toast from 'react-native-toast-message';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SafeAreaView } from "react-native-safe-area-context";
+import {COLORS} from '../../constants/colors';
 
 
 const Register = () => {
@@ -38,7 +39,7 @@ const Register = () => {
                 body: JSON.stringify({
                     name,
                     username,
-                    mobile_number: mobileNumber,
+                    phone_number: mobileNumber, 
                     email,
                     password,
                     password_confirmation: confirmPassword,
@@ -99,7 +100,7 @@ const Register = () => {
 
 
                 <View style={authStyles.topSection}>
-                    {/* Logo */}
+
                     <View style={authStyles.logoCircle}>
                     <Image
                         source={require("../../assets/images/icon.png")}
@@ -108,7 +109,6 @@ const Register = () => {
                     </View>
                 </View>
 
-                {/* Heading section */}
                 <View style={authStyles.headingSection}>
                     <Text style={authStyles.title}>Create your <Text style={authStyles.redText}>Account</Text></Text>
                     <Text style={authStyles.subtitle}>
@@ -117,7 +117,7 @@ const Register = () => {
                     <View style={authStyles.dividerContainer}>
                         <View style={authStyles.line} />
 
-                        <Ionicons name="add-outline" size={34} color="#ac0a0aa8" />
+                        <Ionicons name="add-outline" size={34} color={COLORS.primary} />
 
                         <View style={authStyles.line} />
                     </View>

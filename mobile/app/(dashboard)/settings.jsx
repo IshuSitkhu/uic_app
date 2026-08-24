@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import API_URL from "../../services/api";
+import {COLORS} from '../../constants/colors';
 
 const Settings = () => {
 
@@ -84,7 +85,7 @@ const Settings = () => {
                     >
                         <View style={styles.rowLeft}>
                             <View style={styles.iconBox}>
-                                <Ionicons  name="person-outline" size={21} color="#ac0a0a"  />
+                                <Ionicons  name="person-outline" size={21} color={COLORS.primary}   />
                             </View>
 
                             <View>
@@ -116,7 +117,7 @@ const Settings = () => {
                                 <Ionicons
                                     name="notifications-outline"
                                     size={21}
-                                    color="#ac0a0a"
+                                    color={COLORS.primary}
                                 />
                             </View>
 
@@ -227,7 +228,7 @@ const Settings = () => {
                 >
                     <View style={styles.signOutLeft}>
                         <View style={styles.signOutIcon}>
-                            <Ionicons name="log-out-outline"  size={22} color="#ac0a0a"  />
+                            <Ionicons name="log-out-outline"  size={22} color={COLORS.primary}  />
                         </View>
 
                         <View>
@@ -241,7 +242,7 @@ const Settings = () => {
                         </View>
                     </View>
 
-                    <Ionicons name="chevron-forward"  size={20}  color="#ac0a0a"  />
+                    <Ionicons name="chevron-forward"  size={20}   color={COLORS.primary}  />
                 </Pressable>
 
             </ScrollView>
@@ -468,7 +469,7 @@ const styles = StyleSheet.create({
     signOut: {
         fontSize: 16,
         fontWeight: "700",
-        color: "#ac0a0a",
+        color: COLORS.primary,
     },
 
     signOutSubText: {

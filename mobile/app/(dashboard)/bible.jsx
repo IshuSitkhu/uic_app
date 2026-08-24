@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { TabView, TabBar } from "react-native-tab-view";
 import { Dimensions } from "react-native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import {COLORS} from '../../constants/colors';
 
 const translations = [
   { code: 'kjv', name: 'King James Version', shortName: 'KJV' },
@@ -970,7 +971,7 @@ const styles = StyleSheet.create({
   },
   testamentButton:{
     width:'50%',
-    backgroundColor:"#AC0A0A",
+    backgroundColor:COLORS.secondary,
     borderWidth: 1,
     borderColor: '#121212',
      borderRadius:25,
@@ -996,7 +997,7 @@ const styles = StyleSheet.create({
     },
 
     indicator: {
-      backgroundColor: "#AC0A0A",
+      backgroundColor:COLORS.secondary,
       height: 3,
     },
 
@@ -1082,7 +1083,7 @@ const styles = StyleSheet.create({
   },
 
   selectedVerseItem: {
-    backgroundColor: '#AC0A0A',
+    backgroundColor: COLORS.secondary,
   },
 
   verseItemText: {
@@ -1112,7 +1113,7 @@ const styles = StyleSheet.create({
   verseReference:{
     fontSize:18,
     fontWeight:'700',
-    color: '#AC0A0A',
+    color: COLORS.secondary,
     textAlign: 'center',
     marginBottom: 12,
   },
@@ -1133,7 +1134,7 @@ const styles = StyleSheet.create({
   readAllButtonText:{
     fontSize:18,
     fontWeight:'700',
-    color: '#AC0A0A',
+    color: COLORS.secondary,
     textAlign: 'left',
     marginBottom: 12,
   },

@@ -73,7 +73,7 @@ const VerifyOtp = () => {
                         pathname: "/(auth)/reset-password",
                         params: {
                             email,
-                            resetToken: data.reset_token,
+                            otp: otp.trim(),
                         },
                     });
                 }, 1200);

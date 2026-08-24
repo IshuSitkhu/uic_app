@@ -2,6 +2,7 @@ import { Tabs } from "expo-router";
 import { Platform, StyleSheet } from "react-native";
 import AnimatedTabIcon from "../../components/AnimatedTabIcon";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {COLORS} from '../../constants/colors';
 
 export default function DashboardLayout() {
     const isIOS = Platform.OS === "ios";
@@ -16,7 +17,7 @@ export default function DashboardLayout() {
 
                 tabBarLabelStyle: styles.tabBarLabel,
 
-                tabBarActiveTintColor: "#ac0a0a",
+                tabBarActiveTintColor: COLORS.primary,
                 tabBarInactiveTintColor: "#3b3a3a",
 
                 //Hide tab bar when keyboard opens
