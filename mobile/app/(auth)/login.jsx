@@ -70,6 +70,7 @@ const Login = () => {
                 text2: 'Unable to connect to the server.',
                 position: 'top',
             });
+            console.log(error);
         }finally {
         setLoading(false);
     }

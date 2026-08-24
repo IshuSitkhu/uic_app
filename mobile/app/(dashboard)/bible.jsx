@@ -5,6 +5,7 @@ import API_URL from '../../services/api';
 import { Ionicons } from '@expo/vector-icons';
 import { TabView, TabBar } from "react-native-tab-view";
 import { Dimensions } from "react-native";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 const translations = [
   { code: 'kjv', name: 'King James Version', shortName: 'KJV' },
@@ -92,9 +93,9 @@ const bookMapReverse = Object.fromEntries(
 );
 
 const Bible = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState(null);
-  const [selectedBook, setSelectedBook] = useState(null);
-  const [selectedChapter, setSelectedChapter] = useState(null);
+  const [selectedLanguage, setSelectedLanguage] = useState('nasb');
+  const [selectedBook, setSelectedBook] = useState('Genesis');
+  const [selectedChapter, setSelectedChapter] = useState(1);
 
   const [tempLanguage, setTempLanguage] = useState(null);
   const [tempBook, setTempBook] = useState(null);
@@ -113,10 +114,13 @@ const Bible = () => {
   
   const [index, setIndex] = useState(0);
 
+  const [readAllVerses, setReadAllVerses] = useState(true);
+
   const [routes] = useState([
     { key: "old", title: "Old Testament" },
     { key: "new", title: "New Testament" },
   ]);
+
 
   const renderScene = ({ route }) => {
     switch (route.key) {
@@ -210,6 +214,8 @@ const Bible = () => {
         throw new Error(data.message || 'Failed to fetch chapters');
       }
 
+
+
       // TEMPORARY only
       setTempBook(data.book);
       setChapters(data.chapters);
@@ -220,6 +226,21 @@ const Bible = () => {
     } catch (error) {
       console.error('Error fetching chapters:', error.message);
     }
+  };
+
+  const selectVerse = (verseNumber) => {
+    setSelectedVerse(verseNumber);
+    setVerseText(verses[verseNumber]);
+    setReadAllVerses(false);
+
+    // Close the modal
+    setModalStep(null);
+  };
+
+  const readAllChapter = () => {
+    setReadAllVerses(true);
+    setSelectedVerse(null);
+    setVerseText('');
   };
 
   const fetchVerses = async (chapter) => {
@@ -254,6 +275,20 @@ const Bible = () => {
 
       setVerses(data.verses);
 
+      const currentVerse = String(selectedVerse);
+
+      if (selectedVerse && data.verses[currentVerse]) {
+        // Same verse number exists in the new chapter
+        setSelectedVerse(currentVerse);
+        setVerseText(data.verses[currentVerse]);
+        setReadAllVerses(false);
+      } else {
+        // No selected verse, or that verse doesn't exist
+        setSelectedVerse(null);
+        setVerseText('');
+        setReadAllVerses(true);
+      }
+
       // Clear temporary selections
       setTempLanguage(null);
       setTempBook(null);
@@ -268,7 +303,7 @@ const Bible = () => {
 
   const fetchDefaultVerse = async () => {
     try {
-      const url = `${API_URL}/bible/nasb/Jeremiah/29/11`;
+      const url = `${API_URL}/bible/nasb/Genesis/1`;
 
       console.log('Fetching default verse:', url);
 
@@ -289,18 +324,22 @@ const Bible = () => {
       setSelectedLanguage('nasb');
       setSelectedBook(data.book);
       setSelectedChapter(data.chapter);
-      setSelectedVerse(data.verse);
-      setVerseText(data.text);
+      setVerses(data.verses);
+
+       // No individual verse selected initially
+      setSelectedVerse(null);
+      setVerseText('');
+      setReadAllVerses(true);
 
     } catch (error) {
       console.error('Error fetching default verse:', error.message);
     }
   };
 
-  // useEffect(() => {
-  //   fetchDefaultVerse();
-  //   // fetchBooks('nasb');
-  // }, []);
+  useEffect(() => {
+    fetchDefaultVerse();
+    // fetchBooks('nasb');
+  }, []);
 
   const closeModal = () => {
   // Discard temporary changes
@@ -311,6 +350,7 @@ const Bible = () => {
   };
 
   const handleLanguagePress = async (language) => {
+    
     setTempLanguage(language);
 
     // If a book and chapter are already selected,
@@ -349,7 +389,25 @@ const Bible = () => {
 
         // Only apply the new language after successful fetch
         setSelectedLanguage(language);
+        // Apply new language and book
+        setSelectedLanguage(language);
+        setSelectedBook(newSelectedBook);
         setVerses(data.verses);
+
+        // Keep the same verse if it exists
+        const currentVerse = String(selectedVerse);
+
+        if (selectedVerse && data.verses[currentVerse]) {
+          setSelectedVerse(currentVerse);
+          setVerseText(data.verses[currentVerse]);
+          setReadAllVerses(false);
+        } else {
+          // If there was no selected verse,
+          // or the verse doesn't exist
+          setSelectedVerse(null);
+          setVerseText('');
+          setReadAllVerses(true);
+        }
 
         setModalStep(null);
 
@@ -360,9 +418,59 @@ const Bible = () => {
       return;
     }
 
+
     // No complete book/chapter selection yet
     fetchBooks(language);
   };
+
+  const goToPreviousVerse = () => {
+    const verseNumbers = Object.keys(verses);
+    const currentIndex = verseNumbers.indexOf(String(selectedVerse));
+
+    if (currentIndex > 0) {
+      const previousVerse = verseNumbers[currentIndex - 1];
+
+      setSelectedVerse(previousVerse);
+      setVerseText(verses[previousVerse]);
+    }
+  };
+
+
+  const goToNextVerse = () => {
+    const verseNumbers = Object.keys(verses);
+    const currentIndex = verseNumbers.indexOf(String(selectedVerse));
+
+    if (currentIndex < verseNumbers.length - 1) {
+      const nextVerse = verseNumbers[currentIndex + 1];
+
+      setSelectedVerse(nextVerse);
+      setVerseText(verses[nextVerse]);
+    }
+  };
+
+const goToPreviousChapter = async () => {
+  const currentIndex = chapters.findIndex(
+    (item) => String(item.chapter) === String(selectedChapter)
+  );
+
+  if (currentIndex > 0) {
+    const previousChapter = chapters[currentIndex - 1].chapter;
+
+    await fetchVerses(previousChapter);
+  }
+};
+
+const goToNextChapter = async () => {
+  const currentIndex = chapters.findIndex(
+    (item) => String(item.chapter) === String(selectedChapter)
+  );
+
+  if (currentIndex < chapters.length - 1) {
+    const nextChapter = chapters[currentIndex + 1].chapter;
+
+    await fetchVerses(nextChapter);
+  }
+};
 
 return (
   <SafeAreaView style={styles.container}>
@@ -398,30 +506,167 @@ return (
         </TouchableOpacity>
       )}
 
-      
+      {selectedChapter && (
+        <TouchableOpacity
+          style={styles.openTranslationButton}
+          onPress={() => setModalStep('verseId')}
+        >
+          <Text style={styles.openTranslationText}>
+            {selectedVerse
+              ? `Verse: ${selectedChapter}.${selectedVerse}`
+              : 'Select Verse'}
+          </Text>
+        </TouchableOpacity>
+      )}
 
     </View>
     <View style={styles.versesContainer}>
-
-      <Text style={styles.verseReference}>
-        {selectedBook} {selectedChapter}:{selectedVerse}
-      </Text>
-
-      <Text style={styles.verseText}>
-        {verseText}
-      </Text>
-      <ScrollView>
-        <Text style={styles.verseText}>
-          {Object.entries(verses).map(([verseNumber, text]) => (
-            <React.Fragment key={verseNumber}>
-              <Text style={styles.verseNumber}>
-                {verseNumber}{' '}
+      {/* {selectedVerse && (
+        <View style={styles.selectedVerseBox}>
+              <Text style={styles.verseReference}>
+                {selectedBook} {selectedChapter}:{selectedVerse}
               </Text>
-              {text}{' '}
-            </React.Fragment>
-          ))}
-        </Text>
-      </ScrollView>
+        
+              <Text style={styles.selectedVerseText}>
+                {verseText}
+              </Text>
+        
+              <View style={styles.navigationButtons}>
+                <TouchableOpacity onPress={goToPreviousVerse} disabled={selectedVerse === '1'} >
+                  <MaterialIcons name="navigate-before" size={24} color="black" />
+                
+                </TouchableOpacity>
+        
+                <TouchableOpacity onPress={goToNextVerse} disabled={
+                    selectedVerse === String(Object.keys(verses).length)
+                  }>
+                  <MaterialIcons name="navigate-next" size={24} color="black" />
+                 
+                </TouchableOpacity>
+              </View>
+        </View>
+      )} */}
+
+      {selectedVerse && !readAllVerses ? (
+        <>
+          {/* Selected verse */}
+          <View style={styles.selectedVerseBox}>
+            <Text style={styles.verseReference}>
+              {selectedBook} {selectedChapter}:{selectedVerse}
+            </Text>
+
+            <Text style={styles.selectedVerseText}>
+              {verseText}
+            </Text>
+
+            <TouchableOpacity style={styles.readAllButton} onPress={readAllChapter}>
+              <Text style={styles.readAllButtonText}>
+                Read All Chapter...
+              </Text>
+          </TouchableOpacity>
+          
+
+            {/* Previous / Next Verse */}
+            <View style={styles.navigationButtons}>
+                  <TouchableOpacity 
+                    style={[
+                      styles.navigationButton,
+                      selectedVerse === '1' && styles.disabledNavigationButton,
+                    ]}  
+                    onPress={goToPreviousVerse} disabled={selectedVerse === '1'} >
+                  <MaterialIcons name="navigate-before" size={18} color="black" style={styles.previousIcon} />
+                  {/* <Text> Previous</Text> */}
+                  </TouchableOpacity>
+          
+                  <TouchableOpacity 
+                    style={[
+                      styles.navigationButton,
+                      selectedVerse === String(Object.keys(verses).length) &&
+                        styles.disabledNavigationButton,
+                    ]}  
+                    onPress={goToNextVerse} disabled={
+                      selectedVerse === String(Object.keys(verses).length)
+                  }>
+                  <MaterialIcons name="navigate-next" size={18} color="black"  style={styles.nextIcon} />
+                  {/* <Text>Next </Text> */}
+                  </TouchableOpacity>
+              </View>
+          </View>
+          
+        </>
+      ) : (
+        <>
+          <ScrollView>
+
+            <Text style={styles.verseText}>
+
+              {Object.entries(verses).map(
+                ([verseNumber, text]) => (
+
+                  <React.Fragment key={verseNumber}>
+
+                    <Text style={styles.verseNumber}>
+                      {verseNumber}{' '}
+                    </Text>
+
+                    {text}{' '}
+
+                  </React.Fragment>
+
+                )
+              )}
+
+            </Text>
+
+            {Object.keys(verses).length > 0 && (
+            <View style={styles.navigationButtons}>
+
+              
+              <TouchableOpacity
+                style={styles.navigationButton}
+                onPress={goToPreviousChapter}
+                disabled={
+                  chapters.length === 0 ||
+                  String(selectedChapter) ===
+                    String(chapters[0]?.chapter)
+                }
+              >
+                <MaterialIcons
+                  name="navigate-before"
+                  size={28}
+                  color="black"
+                />
+              </TouchableOpacity>
+
+
+              
+              <TouchableOpacity
+                style={styles.navigationButton}
+                onPress={goToNextChapter}
+                disabled={
+                  chapters.length === 0 ||
+                  String(selectedChapter) ===
+                    String(
+                      chapters[chapters.length - 1]?.chapter
+                    )
+                }
+              >
+                <MaterialIcons
+                  name="navigate-next"
+                  size={28}
+                  color="black"
+                />
+              </TouchableOpacity>
+
+            </View>
+             )}
+
+             
+
+          </ScrollView>
+        </>
+  
+      )}
     </View>
 
     <Modal
@@ -585,6 +830,54 @@ return (
               />
             </>
           )}
+
+          {modalStep === 'verseId'  && (
+              <>
+                <View style={styles.sheetHeader}>
+                  <TouchableOpacity onPress={() => setModalStep(null)} >
+                    <Ionicons name="arrow-back-outline" size={24} color="#000" />
+                  </TouchableOpacity>
+            
+                  <Text style={styles.sheetTitle}>
+                    {selectedBook} {selectedChapter}
+                  </Text>
+            
+                  <TouchableOpacity onPress={closeModal}>
+                    <Text style={styles.closeText}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+            
+                <Text style={styles.chapterHeading}>
+                  Select Verse
+                </Text>
+            
+                <FlatList
+                  data={Object.keys(verses)}
+                  keyExtractor={(item) => item}
+                  numColumns={4}
+                  renderItem={({ item: verseNumber }) => (
+                    <TouchableOpacity
+                      style={[
+                        styles.verseItem,
+                        selectedVerse === verseNumber &&
+                          styles.selectedVerseItem,
+                      ]}
+                      onPress={() => selectVerse(verseNumber)}
+                    >
+                      <Text
+                        style={[
+                          styles.verseItemText,
+                          selectedVerse === verseNumber &&
+                            styles.selectedVerseItemText,
+                        ]}
+                      >
+                        {selectedChapter}.{verseNumber}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                />
+              </>
+          )}
         </View>
       </View>
     </Modal>
@@ -643,7 +936,7 @@ const styles = StyleSheet.create({
   // Bottom sheet
   bottomSheet: {
     backgroundColor: '#fff',
-    height: '85%',
+    height: '80%',
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     padding: 20,
@@ -745,14 +1038,14 @@ const styles = StyleSheet.create({
   },
 
   openTranslationButton: {
-    padding: 16,
+    padding: 10,
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 10,
   },
 
   openTranslationText: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: '600',
   },
 
@@ -779,7 +1072,111 @@ const styles = StyleSheet.create({
     lineHeight: 30,
   },
 
-  //Testement
+  verseItem: {
+    flex: 1,
+    margin: 10,
+    paddingVertical: 15,
+    borderRadius: 10,
+    backgroundColor: '#e1dfdf',
+    alignItems: 'center',
+  },
+
+  selectedVerseItem: {
+    backgroundColor: '#AC0A0A',
+  },
+
+  verseItemText: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#333',
+  },
+
+  selectedVerseItemText: {
+    color: '#FFF',
+  },
+
+  //vERSE
+  selectedVerseBox:{
+    marginHorizontal:16,
+    marginTop:12,
+    padding:18,
+    backgroundColor: '#FFFFFF',
+    borderRadius:18,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    
+
+  },
+
+  verseReference:{
+    fontSize:18,
+    fontWeight:'700',
+    color: '#AC0A0A',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+
+  selectedVerseText:{
+    fontSize: 17,
+    lineHeight: 28,
+    color: '#222',
+    marginBottom: 20,
+  },
+
+  readAllButton:{
+    height: 48,
+    borderRadius: 14,
+
+  },
+
+  readAllButtonText:{
+    fontSize:18,
+    fontWeight:'700',
+    color: '#AC0A0A',
+    textAlign: 'left',
+    marginBottom: 12,
+  },
+
+  
+  navigationButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 4,
+    gap: 80,
+    marginHorizontal:10,
+    
+  },
+
+  disabledNavigationButton: {
+    opacity: 0.3,
+  },
+
+  navigationButton: {
+
+    flex: 1,
+    height: 48,
+    borderRadius: 14,
+    // backgroundColor: '#F7F7F7',
+
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    borderWidth: 1,
+    borderColor: '#E8E8E8',
+  },
+
+
+  previousIcon: {
+    marginRight: 7,
+  },
+
+  nextIcon: {
+    marginLeft: 7,
+  },
+
 
 
 });
