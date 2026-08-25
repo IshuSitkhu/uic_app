@@ -121,10 +121,10 @@ const styles = StyleSheet.create({
 
         backgroundColor: "#fff",
 
-        borderTopWidth: 1,
-        borderTopColor: "#eee",
+        borderTopWidth: 0,
+        // borderTopColor: "#eee",
 
-        elevation: 5,
+        elevation: 0,
 
         paddingTop: 0,
         paddingBottom: 0,

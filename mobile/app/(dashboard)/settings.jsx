@@ -5,8 +5,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import API_URL from "../../services/api";
 import {COLORS} from '../../constants/colors';
+import { useAuth } from "../../context/AuthContext";
 
 const Settings = () => {
+    const { logout } = useAuth();
 
     const handleLogout = async () => {
         try {
@@ -23,15 +25,20 @@ const Settings = () => {
             }
 
             //removes the token from the device.
-            await AsyncStorage.removeItem("token");
+            // await AsyncStorage.removeItem("token");
 
-            router.replace("/(dashboard)/you");
+            // router.replace("/(dashboard)/you");
 
         } catch (error) {
             console.log("Logout error:", error);
 
             // Even if API logout fails, remove local token
-            await AsyncStorage.removeItem("token");
+            // await AsyncStorage.removeItem("token");
+
+            // router.replace("/(dashboard)/you");
+        } finally {
+            // Always remove local login data
+            await logout();
 
             router.replace("/(dashboard)/you");
         }

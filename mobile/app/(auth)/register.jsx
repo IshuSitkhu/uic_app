@@ -100,6 +100,9 @@ const Register = () => {
 
 
                 <View style={authStyles.topSection}>
+                    <TouchableOpacity style={authStyles.backButton} onPress={() => router.back()}>
+                    <Ionicons name="arrow-back" size={24} color="#333" />
+                    </TouchableOpacity>
 
                     <View style={authStyles.logoCircle}>
                     <Image

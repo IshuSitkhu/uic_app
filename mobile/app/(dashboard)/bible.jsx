@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, Modal, ScrollView, ScrollViewComponent,} from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, Modal, ScrollView, ScrollViewComponent, Platform,} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import API_URL from '../../services/api';
 import { Ionicons } from '@expo/vector-icons';
@@ -616,14 +616,14 @@ return (
           
 
             {/* Previous / Next Verse */}
-            <View style={styles.navigationButtons}>
+            <View style={styles.navigationVerseButtons}>
                   <TouchableOpacity 
                     style={[
                       styles.navigationButton,
                       selectedVerse === '1' && styles.disabledNavigationButton,
                     ]}  
                     onPress={goToPreviousVerse} disabled={selectedVerse === '1'} >
-                  <MaterialIcons name="navigate-before" size={18} color="black" style={styles.previousIcon} />
+                  <MaterialIcons name="navigate-before" size={18} color={COLORS.secondary} style={styles.previousIcon} />
                   {/* <Text> Previous</Text> */}
                   </TouchableOpacity>
           
@@ -636,7 +636,7 @@ return (
                     onPress={goToNextVerse} disabled={
                       selectedVerse === String(Object.keys(verses).length)
                   }>
-                  <MaterialIcons name="navigate-next" size={18} color="black"  style={styles.nextIcon} />
+                  <MaterialIcons name="navigate-next" size={18} color={COLORS.secondary} style={styles.nextIcon} />
                   {/* <Text>Next </Text> */}
                   </TouchableOpacity>
               </View>
@@ -645,21 +645,21 @@ return (
         </>
       ) : (
         <>
-          <ScrollView>
+        
+          <ScrollView contentContainerStyle={{ paddingBottom: Platform.OS === "ios" ? 50 : 5, }}>
 
             <Text style={styles.verseText}>
 
-              {Object.entries(verses).map(
-                ([verseNumber, text]) => (
-
+              {Object.entries(verses).map(([verseNumber, text]) => (
                   <React.Fragment key={verseNumber}>
 
                     <Text style={styles.verseNumber}>
                       {verseNumber}{' '}
                     </Text>
 
-                    {text}{' '}
-
+                    <Text style={styles.textt}>
+                      {text}{' '}
+                    </Text>
                   </React.Fragment>
 
                 )
@@ -667,7 +667,8 @@ return (
 
             </Text>
 
-            {Object.keys(verses).length > 0 && (
+          </ScrollView>
+          {Object.keys(verses).length > 0 && (
             <View style={styles.navigationButtons}>
 
               
@@ -676,14 +677,13 @@ return (
                 onPress={goToPreviousChapter}
                 disabled={
                   chapters.length === 0 ||
-                  String(selectedChapter) ===
-                    String(chapters[0]?.chapter)
+                  String(selectedChapter) === String(chapters[0]?.chapter)
                 }
               >
                 <MaterialIcons
                   name="navigate-before"
                   size={28}
-                  color="black"
+                  color={COLORS.secondary}
                 />
               </TouchableOpacity>
 
@@ -695,24 +695,19 @@ return (
                 disabled={
                   chapters.length === 0 ||
                   String(selectedChapter) ===
-                    String(
-                      chapters[chapters.length - 1]?.chapter
-                    )
+                    String( chapters[chapters.length - 1]?.chapter)
                 }
               >
                 <MaterialIcons
                   name="navigate-next"
                   size={28}
-                  color="black"
+                  color={COLORS.secondary}
                 />
               </TouchableOpacity>
 
             </View>
              )}
-
-             
-
-          </ScrollView>
+        
         </>
   
       )}
@@ -734,7 +729,7 @@ return (
                   Select Translation
                 </Text>
 
-                <TouchableOpacity onPress={closeModal}>
+                <TouchableOpacity style={styles.closeArea} onPress={closeModal} hitSlop={10}>
                   <Text style={styles.closeText}>✕</Text>
                 </TouchableOpacity>
               </View>
@@ -774,7 +769,7 @@ return (
                    {translations.find(item => item.code === (tempLanguage || selectedLanguage))?.shortName} Bible Books
                 </Text>
 
-                <TouchableOpacity onPress={() => setModalStep(null)}>
+                <TouchableOpacity style={styles.closeArea} onPress={() => setModalStep(null)} hitSlop={10}>
                   <Text style={styles.closeText}>✕</Text>
                 </TouchableOpacity>
               </View>
@@ -850,7 +845,7 @@ return (
                   {tempBook || selectedBook}
                 </Text>
 
-                <TouchableOpacity onPress={() => setModalStep(null)}>
+                <TouchableOpacity style={styles.closeArea} onPress={() => setModalStep(null)} hitSlop={10}>
                   <Text style={styles.closeText}>✕</Text>
                 </TouchableOpacity>
 
@@ -891,7 +886,7 @@ return (
                     {selectedBook} {selectedChapter}
                   </Text>
             
-                  <TouchableOpacity onPress={closeModal}>
+                  <TouchableOpacity style={styles.closeArea} onPress={closeModal} hitSlop={10}>
                     <Text style={styles.closeText}>✕</Text>
                   </TouchableOpacity>
                 </View>
@@ -903,7 +898,7 @@ return (
                 <FlatList
                   data={Object.keys(verses)}
                   keyExtractor={(item) => item}
-                  numColumns={4}
+                  numColumns={5}
                   renderItem={({ item: verseNumber }) => (
                     <TouchableOpacity
                       style={[
@@ -1007,9 +1002,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 
+  closeArea: {
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
   closeText: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: COLORS.primary,
   },
 
   testament:{
@@ -1109,25 +1112,35 @@ const styles = StyleSheet.create({
   },
 
   verseNumber: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     marginRight: 8,
     marginTop: 4,
+    color:COLORS.secondary,
+  },
+
+  textt:{
+     color:"#332A4C",
   },
 
   verseText: {
     flex: 1,
     fontSize: 18,
     lineHeight: 30,
+    //
   },
 
   verseItem: {
-    flex: 1,
-    margin: 10,
+    // flex: 1,
+    margin: '1%',
     paddingVertical: 15,
     borderRadius: 10,
-    backgroundColor: '#e1dfdf',
+    borderColor: '#ddd',
     alignItems: 'center',
+    borderWidth: 1,
+    width: '18%',
+    justifyContent: 'center',
+    aspectRatio: 1,
   },
 
   selectedVerseItem: {
@@ -1148,7 +1161,7 @@ const styles = StyleSheet.create({
   selectedVerseBox:{
     marginHorizontal:16,
     marginTop:12,
-    padding:18,
+    padding:12,
     backgroundColor: '#FFFFFF',
     borderRadius:18,
     shadowColor: '#000',
@@ -1164,6 +1177,7 @@ const styles = StyleSheet.create({
     color: COLORS.secondary,
     textAlign: 'center',
     marginBottom: 12,
+    
   },
 
   selectedVerseText:{
@@ -1189,6 +1203,43 @@ const styles = StyleSheet.create({
 
   
   navigationButtons: {
+    position: "absolute",
+    bottom: Platform.OS === "ios" ? 95 : 10,
+    left: 0,
+    right: 0,
+
+    flexDirection: "row",
+    justifyContent: "space-between",
+
+    paddingHorizontal: 15,
+  },
+
+  disabledNavigationButton: {
+    opacity: 0.3,
+  },
+
+  navigationButton: {
+    width: 45,
+    height: 45,
+    borderRadius: 25,
+
+    backgroundColor: "#fff",
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    elevation: 3,
+
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+
+  //verse
+   navigationVerseButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -1197,26 +1248,6 @@ const styles = StyleSheet.create({
     marginHorizontal:10,
     
   },
-
-  disabledNavigationButton: {
-    opacity: 0.3,
-  },
-
-  navigationButton: {
-
-    flex: 1,
-    height: 48,
-    borderRadius: 14,
-    // backgroundColor: '#F7F7F7',
-
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-
-    borderWidth: 1,
-    borderColor: '#E8E8E8',
-  },
-
 
   previousIcon: {
     marginRight: 7,

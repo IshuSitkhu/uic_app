@@ -205,6 +205,30 @@ const authStyles = StyleSheet.create({
     marginTop: 20,
     lineHeight: 22,
   },
+
+  backButton: {
+    position: "absolute",
+    top: 20,
+    left: 25,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: "#ffffff",
+    alignItems: "center",
+    justifyContent: "center",
+
+    // iOS shadow
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.06,
+    shadowRadius: 5,
+
+    // Android shadow
+    elevation: 2,
+  },
 });
 
 export default authStyles;

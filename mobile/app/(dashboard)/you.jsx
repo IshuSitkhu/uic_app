@@ -14,54 +14,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import API_URL from "../../services/api";
 import { Image } from "react-native";
 import {COLORS} from '../../constants/colors';
+import { useAuth } from "../../context/AuthContext";
 
 const You = () => {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
-
-    const fetchUser = async () => {
-        try {
-            const token = await AsyncStorage.getItem("token");
-
-            // No token = user is logged out
-            if (!token) {
-                setUser(null);
-                return;
-            }
-
-            const response = await fetch(`${API_URL}/auth/me`, {
-                method: "GET",
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                setUser(data.user);
-            } else {
-                console.log("Failed to fetch user:", data);
-
-                if (response.status === 401) {
-                    await AsyncStorage.removeItem("token");
-                    setUser(null);
-                }
-            }
-        } catch (error) {
-            console.log("Fetch user error:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useFocusEffect(
-        useCallback(() => {
-            setLoading(true);
-            fetchUser();
-        }, [])
-    );
+    const { user, loading } = useAuth();
 
     if (loading) {
         return (
@@ -90,7 +46,7 @@ const You = () => {
                         <Ionicons
                             name="person-outline"
                             size={45}
-                            color={COLORS.primary}
+                            color="#fff"
                         />
                     </View>
 
@@ -239,7 +195,7 @@ const styles = StyleSheet.create({
         width: 90,
         height: 90,
         borderRadius: 45,
-        backgroundColor: "#f8eeee",
+        backgroundColor: COLORS.primary,
         justifyContent: "center",
         alignItems: "center",
         marginBottom: 20,

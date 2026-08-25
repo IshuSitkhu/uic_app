@@ -145,7 +145,6 @@ const EditProfile = () => {
           <View style={styles.headerPlaceholder} />
         </View>
 
-        {/* PROFILE IMAGE */}
         <View style={styles.profileSection}>
           <View style={styles.imageWrapper}>
             {profileImage ? (
@@ -155,7 +154,7 @@ const EditProfile = () => {
               />
             ) : (
               <View style={styles.profilePlaceholder}>
-                <Ionicons name="person" size={58} color={COLORS.primary} />
+                <Ionicons name="person" size={58} color="#fff" />
               </View>
             )}
 

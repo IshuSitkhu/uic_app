@@ -9,14 +9,17 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {COLORS} from '../../constants/colors';
+import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
+    const { login } = useAuth();
     // const insets = useSafeAreaInsets();
     const [email, setEmail] = useState("");
     const [password , setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
+    
 
     const handleLogin = async () =>{
         if (loading) return;
@@ -39,8 +42,7 @@ const Login = () => {
 
             const data = await response.json();
                 if (response.ok) {
-                await AsyncStorage.setItem("token", data.token);
-                await AsyncStorage.setItem("user", JSON.stringify(data.user));
+                    await login(data.user, data.token);
                     Toast.show({
                         type: 'success',
                         text1: 'Login Successful',
@@ -88,7 +90,11 @@ const Login = () => {
                 // }}
                 showsVerticalScrollIndicator={false}
             >
+                
                 <View style={authStyles.topSection}>
+                    <TouchableOpacity style={authStyles.backButton} onPress={() => router.back()}>
+                        <Ionicons name="arrow-back" size={24} color="#333" />
+                    </TouchableOpacity>
                 <View style={authStyles.logoCircle}>
                 <Image
                     source={require("../../assets/images/icon.png")}
