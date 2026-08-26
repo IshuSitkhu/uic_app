@@ -7,6 +7,7 @@ import { TabView, TabBar } from "react-native-tab-view";
 import { Dimensions } from "react-native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import {COLORS} from '../../constants/colors';
+import Entypo from '@expo/vector-icons/Entypo';
 
 const translations = [
   { code: 'kjv', name: 'King James Version', shortName: 'KJV' },
@@ -117,6 +118,22 @@ const Bible = () => {
 
   const [readAllVerses, setReadAllVerses] = useState(true);
 
+  //font
+  const [fontSize, setFontSize] = useState('medium');
+  const [lineSpacing, setLineSpacing] = useState('normal');
+  const lineHeights = {
+    compact: 26,
+    normal: 30,
+    relaxed: 36,
+    wide: 42,
+  };
+  const fontSizes = {
+    small: 16,
+    medium: 18,
+    large: 21,
+    extraLarge: 24,
+  };
+
   const [routes] = useState([
     { key: "old", title: "Old Testament" },
     { key: "new", title: "New Testament" },
@@ -131,15 +148,23 @@ const Bible = () => {
         return (
           <ScrollView style={{ flex: 1 }}>
             {books.oldTestament.map((book) => (
-              <TouchableOpacity
-                key={book}
-                style={styles.bookItem}
-                onPress={() => fetchChapters(book)}
+            <TouchableOpacity
+              key={book}
+              style={[
+                styles.bookItem,
+                selectedBook === book && styles.selectedBookItem,
+              ]}
+              onPress={() => fetchChapters(book)}
+            >
+              <Text
+                style={[
+                  styles.bookText,
+                  selectedBook === book && styles.selectedBookText,
+                ]}
               >
-                <Text style={styles.bookText}>
-                  {book}
-                </Text>
-              </TouchableOpacity>
+                {book}
+              </Text>
+            </TouchableOpacity>
             ))}
           </ScrollView>
         );
@@ -150,15 +175,23 @@ const Bible = () => {
         return (
           <ScrollView style={{ flex: 1 }}>
             {books.newTestament.map((book) => (
-              <TouchableOpacity
-                key={book}
-                style={styles.bookItem}
-                onPress={() => fetchChapters(book)}
+            <TouchableOpacity
+              key={book}
+              style={[
+                styles.bookItem,
+                selectedBook === book && styles.selectedBookItem,
+              ]}
+              onPress={() => fetchChapters(book)}
+            >
+              <Text
+                style={[
+                  styles.bookText,
+                  selectedBook === book && styles.selectedBookText,
+                ]}
               >
-                <Text style={styles.bookText}>
-                  {book}
-                </Text>
-              </TouchableOpacity>
+                {book}
+              </Text>
+            </TouchableOpacity>
             ))}
           </ScrollView>
         );
@@ -523,78 +556,91 @@ const Bible = () => {
 
 return (
   <SafeAreaView style={styles.container}>
-    <View style={{flexDirection:"row", gap:10,}}>
+    <View style={styles.bibleHeader}>
 
-      <TouchableOpacity style={styles.openTranslationButton}  onPress={() => setModalStep('translation')} >
-        <Text style={styles.openTranslationText}>
-          {selectedLanguage
-            ? translations.find(
-                (item) => item.code === selectedLanguage
-              )?.shortName
-            : 'Select Translation'}
-        </Text>
-      </TouchableOpacity>
+      {/* LEFT SIDE: BOOK + CHAPTER + VERSE */}
+      <View style={styles.referenceContainer}>
+        <View style={styles.bookChapterBox}>
+        <TouchableOpacity style={styles.bookSelector} onPress={() => fetchBooks(selectedLanguage)} >
+          <Text style={styles.bookSelectorText} numberOfLines={1}>
+            {selectedChapter ? selectedBook : 'Select Book'}
+          </Text>
 
-      <TouchableOpacity style={styles.openTranslationButton}  onPress={() => fetchBooks(selectedLanguage)} >
-        <Text style={styles.openTranslationText}>
-          {selectedChapter ? selectedBook : 'Select Book'}
-        </Text>
-      </TouchableOpacity>
-
-      {selectedBook && (
-        <TouchableOpacity style={styles.openTranslationButton}  
-          onPress={() => {
+         
+        </TouchableOpacity>
+        {/* <View style={styles.referenceDivider} /> */}
+        {selectedBook && (
+          <>
+          <View style={styles.referenceDivider} />
+          <TouchableOpacity style={styles.chapterSelector} 
+            onPress={() => {
             if (selectedBook) {
               fetchChapters(selectedBook);
             }
           }} 
-        >
-          <Text style={styles.openTranslationText}>
-            {selectedChapter ? `Chapter: ${selectedChapter}` : 'Select Chapter'}
-          </Text>
-        </TouchableOpacity>
-      )}
+          >
+            <Text style={styles.referenceText}>
+              {/* {selectedChapter ? `Chapter: ${selectedChapter}` : 'Select Chapter'} */}
+              {selectedChapter ? ` ${selectedChapter}` : 'Select Chapter'}
+            </Text>
+          </TouchableOpacity>
+          </>
+          
+        )}
+        </View>
+         {/* <Ionicons name="chevron-down" size={14} color={COLORS.primary} /> */}
 
-      {selectedChapter && (
-        <TouchableOpacity
-          style={styles.openTranslationButton}
-          onPress={() => setModalStep('verseId')}
-        >
-          <Text style={styles.openTranslationText}>
-            {selectedVerse
-              ? `Verse: ${selectedChapter}.${selectedVerse}`
+
+        {/* DIVIDER */}
+        {/* <View style={styles.referenceDivider} /> */}
+
+
+        
+
+        {selectedChapter && (
+          <TouchableOpacity
+            style={styles.verseSelector}
+            onPress={() => setModalStep("verseId")}
+          >
+            <Text style={styles.referenceVerseText}>
+              {selectedVerse
+              ? `: ${selectedChapter}.${selectedVerse}`
               : 'Select Verse'}
+            </Text>
+          </TouchableOpacity>
+        )}
+
+      </View>
+
+
+      {/* RIGHT SIDE: TRANSLATION + SETTINGS */}
+      <View style={styles.headerRight}>
+
+        <TouchableOpacity style={styles.translationSelector} onPress={() => setModalStep("translation")} >
+          <Text style={styles.translationSelectorText}>
+            {selectedLanguage
+              ? translations.find(
+                  (item) => item.code === selectedLanguage
+                )?.shortName
+              : "Select"}
           </Text>
+
+          <Ionicons name="chevron-down" size={8} color="#fff" />
         </TouchableOpacity>
-      )}
+
+
+        {/* SETTINGS */}
+        <TouchableOpacity style={styles.settingsSelector} onPress={() => setModalStep("settings")}
+        >
+          {/* <Ionicons name="settings-outline" size={22} color={COLORS.primary} /> */}
+          <Ionicons name="options-outline" size={22} color={COLORS.primary} />
+        </TouchableOpacity>
+
+      </View>
 
     </View>
     <View style={styles.versesContainer}>
-      {/* {selectedVerse && (
-        <View style={styles.selectedVerseBox}>
-              <Text style={styles.verseReference}>
-                {selectedBook} {selectedChapter}:{selectedVerse}
-              </Text>
-        
-              <Text style={styles.selectedVerseText}>
-                {verseText}
-              </Text>
-        
-              <View style={styles.navigationButtons}>
-                <TouchableOpacity onPress={goToPreviousVerse} disabled={selectedVerse === '1'} >
-                  <MaterialIcons name="navigate-before" size={24} color="black" />
-                
-                </TouchableOpacity>
-        
-                <TouchableOpacity onPress={goToNextVerse} disabled={
-                    selectedVerse === String(Object.keys(verses).length)
-                  }>
-                  <MaterialIcons name="navigate-next" size={24} color="black" />
-                 
-                </TouchableOpacity>
-              </View>
-        </View>
-      )} */}
+
 
       {selectedVerse && !readAllVerses ? (
         <>
@@ -623,7 +669,7 @@ return (
                       selectedVerse === '1' && styles.disabledNavigationButton,
                     ]}  
                     onPress={goToPreviousVerse} disabled={selectedVerse === '1'} >
-                  <MaterialIcons name="navigate-before" size={18} color={COLORS.secondary} style={styles.previousIcon} />
+                  <MaterialIcons name="navigate-before" size={32} color="#fff" style={styles.previousIcon} />
                   {/* <Text> Previous</Text> */}
                   </TouchableOpacity>
           
@@ -636,7 +682,7 @@ return (
                     onPress={goToNextVerse} disabled={
                       selectedVerse === String(Object.keys(verses).length)
                   }>
-                  <MaterialIcons name="navigate-next" size={18} color={COLORS.secondary} style={styles.nextIcon} />
+                  <MaterialIcons name="navigate-next" size={32} color="#fff" style={styles.nextIcon} />
                   {/* <Text>Next </Text> */}
                   </TouchableOpacity>
               </View>
@@ -644,29 +690,84 @@ return (
           
         </>
       ) : (
-        <>
-        
-          <ScrollView contentContainerStyle={{ paddingBottom: Platform.OS === "ios" ? 50 : 5, }}>
-
-            <Text style={styles.verseText}>
-
-              {Object.entries(verses).map(([verseNumber, text]) => (
+        <>        
+          <ScrollView
+            contentContainerStyle={{
+              paddingBottom: Platform.OS === "ios" ? 50 : 5,
+            }}
+          >
+            {readAllVerses ? (
+              // PARAGRAPH MODE
+              <Text
+                style={[
+                  styles.verseText,
+                  {
+                    fontSize: fontSizes[fontSize],
+                    lineHeight: lineHeights[lineSpacing],
+                  },
+                ]}
+              >
+                {Object.entries(verses).map(([verseNumber, text]) => (
                   <React.Fragment key={verseNumber}>
-
-                    <Text style={styles.verseNumber}>
+                    
+                    <Text
+                      style={[
+                        styles.verseNumber,
+                        {
+                          fontSize: fontSizes[fontSize],
+                          lineHeight: lineHeights[lineSpacing],
+                        },
+                      ]}
+                    >
                       {verseNumber}{' '}
                     </Text>
 
-                    <Text style={styles.textt}>
+                    <Text
+                      style={[
+                        styles.textt,
+                        {
+                          fontSize: fontSizes[fontSize],
+                          lineHeight: lineHeights[lineSpacing],
+                        },
+                      ]}
+                    >
                       {text}{' '}
                     </Text>
+
                   </React.Fragment>
+                ))}
+              </Text>
+            ) : (
+              // VERSE MODE
+              <View style={styles.verseText}>
+                {Object.entries(verses).map(([verseNumber, text]) => (
+                  <Text
+                    key={verseNumber}
+                    style={[
+                      styles.textt,
+                      {
+                        fontSize: fontSizes[fontSize],
+                        lineHeight: lineHeights[lineSpacing],
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.verseNumber,
+                        {
+                          fontSize: fontSizes[fontSize],
+                          lineHeight: lineHeights[lineSpacing],
+                        },
+                      ]}
+                    >
+                      {verseNumber}{' '}
+                    </Text>
 
-                )
-              )}
-
-            </Text>
-
+                    {text}
+                  </Text>
+                ))}
+              </View>
+            )}
           </ScrollView>
           {Object.keys(verses).length > 0 && (
             <View style={styles.navigationButtons}>
@@ -682,8 +783,8 @@ return (
               >
                 <MaterialIcons
                   name="navigate-before"
-                  size={28}
-                  color={COLORS.secondary}
+                  size={32}
+                  color="#fff"
                 />
               </TouchableOpacity>
 
@@ -700,8 +801,8 @@ return (
               >
                 <MaterialIcons
                   name="navigate-next"
-                  size={28}
-                  color={COLORS.secondary}
+                  size={32}
+                  color="#fff"
                 />
               </TouchableOpacity>
 
@@ -725,7 +826,7 @@ return (
           {modalStep === 'translation' && (
             <>
               <View style={styles.sheetHeader}>
-                <Text style={styles.heading}>
+                <Text style={styles.sheetTitle}>
                   Select Translation
                 </Text>
 
@@ -746,11 +847,23 @@ return (
                     ]}
                     onPress={() => handleLanguagePress(item.code)}
                   >
-                    <Text style={styles.translationName}>
+                    <Text
+                      style={[
+                        styles.translationName,
+                        (tempLanguage || selectedLanguage) === item.code &&
+                          styles.selectedTranslationText,
+                      ]}
+                    >
                       {item.name}
                     </Text>
 
-                    <Text style={styles.shortName}>
+                    <Text
+                      style={[
+                        styles.shortName,
+                        (tempLanguage || selectedLanguage) === item.code &&
+                          styles.selectedTranslationText,
+                      ]}
+                    >
                       {item.shortName}
                     </Text>
                   </TouchableOpacity>
@@ -773,46 +886,6 @@ return (
                   <Text style={styles.closeText}>✕</Text>
                 </TouchableOpacity>
               </View>
-
-              {/* <ScrollView>
-                <View style={styles.testament}>
-                  <View style={styles.testamentButton}>
-                    <Text style={styles.testamentTitle}>
-                      <Ionicons  name="add-outline" size={24} color="#AC0A0A" />
-                      {' '}OLD TESTAMENT
-                    </Text>
-                  </View>
-                  <View style={styles.testamentButton}>
-                    <Text style={styles.testamentTitle}>
-                      <Ionicons name="add-outline" size={24} color="#AC0A0A" />
-                      {' '}NEW TESTAMENT
-                    </Text>
-                  </View>
-                  
-                </View>
-                
-
-                {books.oldTestament.map((book) => (
-                  <TouchableOpacity key={book} style={styles.bookItem} onPress={() => fetchChapters(book)} >
-                    <Text style={styles.bookText}>
-                      {book}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-
-                <Text style={styles.testamentTitle}>
-                  <Ionicons name="add-outline" size={24} color="#ddd" />
-                  {' '}NEW TESTAMENT
-                </Text>
-
-                {books.newTestament.map((book) => (
-                  <TouchableOpacity key={book} style={styles.bookItem} onPress={() => fetchChapters(book)} >
-                    <Text style={styles.bookText}>
-                      {book}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView> */}
 
               <TabView
                 navigationState={{ index, routes }}
@@ -860,15 +933,33 @@ return (
                 keyExtractor={(item) => item.chapter.toString()}
                 numColumns={5}
                 renderItem={({ item: chapter }) => (
-                  <TouchableOpacity style={styles.chapterItem} onPress={() => fetchVerses(chapter.chapter)}
+                  <TouchableOpacity 
+                      style={[
+                        styles.chapterItem,
+                        selectedChapter === chapter.chapter &&
+                          styles.selectedChapterItem,
+                      ]}
+                   onPress={() => fetchVerses(chapter.chapter)}
                   >
-                    <Text style={styles.chapterText}>
-                      {chapter.chapter}
-                    </Text>
+                  <Text
+                    style={[
+                      styles.chapterText,
+                      selectedChapter === chapter.chapter &&
+                        styles.selectedChapterText,
+                    ]}
+                  >
+                    {chapter.chapter}
+                  </Text>
 
-                    <Text style={styles.verseCountText}>
-                      {chapter.verseCount} verses
-                    </Text>
+                  <Text
+                    style={[
+                      styles.verseCountText,
+                      selectedChapter === chapter.chapter &&
+                        styles.selectedVerseCountText,
+                    ]}
+                  >
+                    {chapter.verseCount} verses
+                  </Text>
                   </TouchableOpacity>
                 )}
               />
@@ -922,9 +1013,170 @@ return (
                 />
               </>
           )}
+
+          {modalStep === 'settings' && (
+            <>
+                <View style={styles.sheetHeader}>
+                  <TouchableOpacity onPress={() => setModalStep(null)} >
+                    <Ionicons name="arrow-back-outline" size={24} color="#000" />
+                  </TouchableOpacity>
+            
+                  <Text style={styles.sheetTitle}>
+                    Setting
+                  </Text>
+            
+                  <TouchableOpacity style={styles.closeArea} onPress={closeModal} hitSlop={10}>
+                    <Text style={styles.closeText}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+            
+                <View>
+                  <Text style={styles.settingTitle}>
+                    Font Size
+                  </Text>
+
+                  <View style={styles.arrange}>
+
+                    <TouchableOpacity onPress={() => setFontSize('small')}>
+                      <Text
+                        style={[
+                          styles.settingSmallFont,
+                          fontSize === 'small' && styles.selectedSettingFont,
+                        ]}
+                      >
+                        Small
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => setFontSize('medium')}>
+                      <Text
+                        style={[
+                          styles.settingMediumFont,
+                          fontSize === 'medium' && styles.selectedSettingFont,
+                        ]}
+                      >
+                        Medium
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => setFontSize('large')}>
+                      <Text
+                        style={[
+                          styles.settingLargeFont,
+                          fontSize === 'large' && styles.selectedSettingFont,
+                        ]}
+                      >
+                        Large
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => setFontSize('extraLarge')}>
+                      <Text
+                        style={[
+                          styles.settingExtraLargeFont,
+                          fontSize === 'extraLarge' && styles.selectedSettingFont,
+                        ]}
+                      >
+                        Extra Large
+                      </Text>
+                    </TouchableOpacity>
+
+                  </View>
+
+                  <View>
+
+                  <View>
+                    <Text style={styles.settingTitle}>
+                      Line Spacing
+                    </Text>
+
+                    <View style={styles.arrange}>
+
+                      <TouchableOpacity onPress={() => setLineSpacing('compact')}>
+                        <Text
+                          style={[
+                            styles.settingFont,
+                            lineSpacing === 'compact' && styles.selectedSettingFont,
+                          ]}
+                        >
+                          Compact
+                        </Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity onPress={() => setLineSpacing('normal')}>
+                        <Text
+                          style={[
+                            styles.settingFont,
+                            lineSpacing === 'normal' && styles.selectedSettingFont,
+                          ]}
+                        >
+                          Normal
+                        </Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity onPress={() => setLineSpacing('relaxed')}>
+                        <Text
+                          style={[
+                            styles.settingFont,
+                            lineSpacing === 'relaxed' && styles.selectedSettingFont,
+                          ]}
+                        >
+                          Relaxed
+                        </Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity onPress={() => setLineSpacing('wide')}>
+                        <Text
+                          style={[
+                            styles.settingFont,
+                            lineSpacing === 'wide' && styles.selectedSettingFont,
+                          ]}
+                        >
+                          Wide
+                        </Text>
+                      </TouchableOpacity>
+
+                    </View>
+                  </View>
+
+                  <Text style={styles.settingTitle}>
+                    Reading Mode
+                  </Text>
+
+                  <View style={styles.arrange}>
+                    <TouchableOpacity onPress={() => setReadAllVerses(true)}>
+                      <Text
+                        style={[
+                          styles.settingFont,
+                          readAllVerses && styles.selectedSettingFont,
+                        ]}
+                      >
+                        Paragraph
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => setReadAllVerses(false)}>
+                      <Text
+                        style={[
+                          styles.settingFont,
+                          !readAllVerses && styles.selectedSettingFont,
+                        ]}
+                      >
+                        Verse
+                      </Text>
+                    </TouchableOpacity>
+
+                  </View>
+                </View>
+                </View>
+                
+            </>
+            
+          )}
         </View>
       </View>
     </Modal>
+
 
   </SafeAreaView>
 );
@@ -935,13 +1187,128 @@ export default Bible;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    
   },
 
-  heading: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+  //bible
+  bibleHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal:20,
+    paddingVertical: 5,
+    height: 65,
+    backgroundColor: "#fff",
+    borderTopWidth: 0,
+  },
+
+  //left side
+  referenceContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexShrink: 1,
+  },
+
+  bookChapterBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    height: 38,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    backgroundColor: "#fff",
+    overflow: "hidden",
+  },
+
+  bookSelector: {
+    justifyContent: "center",
+    paddingHorizontal: 10,
+    minWidth: 80,
+    maxWidth: 130,
+  },
+
+  bookSelectorText: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#222",
+  },
+
+  chapterSelector: {
+    height: "100%",
+    minWidth: 25,
+    paddingHorizontal: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  referenceDivider: {
+    width: 1,
+    height: 22,
+    backgroundColor: "#ddd",
+  },
+
+  referenceText: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: COLORS.primary,
+  },
+
+  verseSelector: {
+      alignItems: "center",
+      // gap: 2,
+      // backgroundColor: COLORS.primary,
+      justifyContent: "center",
+      paddingHorizontal:10,
+      paddingVertical:5,
+      borderRadius:25,
+      marginHorizontal:5,
+  },
+
+  referenceVerseText: {
+    fontSize: 12,
+      fontWeight: "700",
+      color:  COLORS.primary,
+  },
+
+  colon: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#777",
+  },
+
+  //rightside
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginLeft: 10,
+    // height: 40,
+  },
+
+  translationSelector: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+    backgroundColor: COLORS.primary,
+    justifyContent: "center",
+    paddingHorizontal:5,
+    paddingVertical:5,
+    alignItems: "center",
+    height: 38,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    
+  },
+
+  translationSelectorText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#fff",
+  },
+
+  settingsSelector: {
+    padding: 2,
   },
 
   // Translation list
@@ -969,6 +1336,11 @@ const styles = StyleSheet.create({
     color: '#666',
   },
 
+  selectedTranslationText: {
+    color: COLORS.primary,
+    fontWeight: 'bold',
+  },
+
   // Dark transparent area behind bottom sheet
   modalOverlay: {
     flex: 1,
@@ -980,7 +1352,7 @@ const styles = StyleSheet.create({
   // Bottom sheet
   bottomSheet: {
     backgroundColor: '#fff',
-    height: '80%',
+    height: '85%',
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     padding: 20,
@@ -1059,6 +1431,15 @@ const styles = StyleSheet.create({
       borderBottomColor: "#eee",
     },
 
+    selectedBookItem: {
+      color: COLORS.secondary,
+    },
+
+    selectedBookText: {
+      color:  COLORS.secondary,
+      fontWeight: 'bold',
+    },
+
     bookText: {
       fontSize: 16,
     },
@@ -1085,8 +1466,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
+  selectedChapterItem: {
+    backgroundColor: COLORS.secondary,
+  },
+
+  selectedChapterText: {
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+
   verseCountText:{
-      fontSize: 12,
+      fontSize: 8,
+  },
+
+  selectedVerseCountText: {
+    color: '#fff',
   },
 
   openTranslationButton: {
@@ -1102,7 +1496,7 @@ const styles = StyleSheet.create({
   },
 
   versesContainer: {
-    marginTop: 25,
+    marginTop: 10,
   },
 
   chapterReference: {
@@ -1112,7 +1506,7 @@ const styles = StyleSheet.create({
   },
 
   verseNumber: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     marginRight: 8,
     marginTop: 4,
@@ -1121,13 +1515,14 @@ const styles = StyleSheet.create({
 
   textt:{
      color:"#332A4C",
+     
   },
 
   verseText: {
     flex: 1,
-    fontSize: 18,
+    fontSize: 16,
     lineHeight: 30,
-    //
+    paddingHorizontal: 20,
   },
 
   verseItem: {
@@ -1149,7 +1544,7 @@ const styles = StyleSheet.create({
 
   verseItemText: {
     fontSize: 14,
-    fontWeight: '800',
+    fontWeight: '700',
     color: '#333',
   },
 
@@ -1204,14 +1599,15 @@ const styles = StyleSheet.create({
   
   navigationButtons: {
     position: "absolute",
-    bottom: Platform.OS === "ios" ? 95 : 10,
-    left: 0,
-    right: 0,
+    bottom: Platform.OS === "ios" ? 120 : 20,
+    left: 10,
+    right: 10,
 
     flexDirection: "row",
     justifyContent: "space-between",
 
     paddingHorizontal: 15,
+    
   },
 
   disabledNavigationButton: {
@@ -1220,22 +1616,24 @@ const styles = StyleSheet.create({
 
   navigationButton: {
     width: 45,
-    height: 45,
+    height: 55,
     borderRadius: 25,
 
-    backgroundColor: "#fff",
-
-    justifyContent: "center",
     alignItems: "center",
+    height: 38,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    backgroundColor: COLORS.primary,
 
-    elevation: 3,
+    // elevation: 3,
 
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 2,
+    // },
+    // shadowOpacity: 0.2,
+    // shadowRadius: 4,
   },
 
   //verse
@@ -1251,12 +1649,65 @@ const styles = StyleSheet.create({
 
   previousIcon: {
     marginRight: 7,
+    alignItems: 'center',
   },
 
   nextIcon: {
     marginLeft: 7,
+    alignItems: 'center',
   },
 
+  settingFont:{
+    fontSize: 16,
+    paddingVertical: 5,
+    paddingHorizontal: 14,
+    // margin:10,
+  },
+
+  settingSmallFont:{
+    fontSize:16,
+
+  },
+
+  settingMediumFont:{
+    fontSize:18,
+
+  },
+
+  settingLargeFont:{
+    fontSize:21,
+
+  },
+
+  settingExtraLargeFont:{
+    fontSize:24,
+
+  },
+
+  arrange:{
+    flexDirection:"row",
+    justifyContent:"space-between",
+    paddingVertical: 14,
+    // paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+      
+      
+  },
+
+  settingTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    padding:10,
+  },
+
+  selectedSettingFont: {
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    borderBottomColor: COLORS.primary,
+    borderBottomWidth: 1,
+      borderBottomColor:COLORS.primary,
+  },
 
 
 });
