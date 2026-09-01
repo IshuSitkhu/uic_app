@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, FlatList, Modal, ScrollView, ScrollViewComponent, Platform,} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import API_URL from '../../services/api';
+import API_URL from '../../../services/api';
 import { Ionicons } from '@expo/vector-icons';
 import { TabView, TabBar } from "react-native-tab-view";
 import { Dimensions } from "react-native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import {COLORS} from '../../constants/colors';
+import {COLORS} from '../../../constants/colors';
 import Entypo from '@expo/vector-icons/Entypo';
 
 const translations = [

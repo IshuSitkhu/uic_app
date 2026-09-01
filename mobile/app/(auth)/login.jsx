@@ -21,62 +21,108 @@ const Login = () => {
     const [rememberMe, setRememberMe] = useState(false);
     
 
-    const handleLogin = async () =>{
+    const handleLogin = async () => {
         if (loading) return;
 
         setLoading(true);
-        try{
-            const response = await fetch(`${API_URL}/auth/login`,{
+
+        try {
+            const response = await fetch(`${API_URL}/auth/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Accept: "application/json",
                 },
                 body: JSON.stringify({
-
-                    email,
+                    email: email.trim(),
                     password,
-
+                    device_name: "mobile-app",
                 }),
             });
 
             const data = await response.json();
-                if (response.ok) {
-                    await login(data.user, data.token);
-                    Toast.show({
-                        type: 'success',
-                        text1: 'Login Successful',
-                        
-                        position: 'top',
+
+            // LOGIN SUCCESS
+            if (response.ok) {
+                await login(data.user, data.access_token);
+
+                Toast.show({
+                    type: "success",
+                    text1: "Login Successful",
+                    position: "top",
+                });
+
+                console.log("Login successful:", data);
+
+                setTimeout(() => {
+                    router.replace("/home");
+                }, 1500);
+
+            // ACCOUNT WAITING FOR ADMIN APPROVAL
+            } else if (
+                response.status === 403 &&
+                data.message ===
+                    "Your account is awaiting administrator approval."
+            ) {
+                Toast.show({
+                    type: "info",
+                    text1: "Approval Pending",
+                    text2: "Your account is waiting for administrator approval.",
+                    position: "top",
+                });
+
+                setTimeout(() => {
+                    router.replace("/(auth)/pending-approval");
+                }, 1200);
+
+            // OTP NOT VERIFIED
+            } else if (
+                response.status === 403 &&
+                data.message ===
+                    "Please verify your OTP before logging in."
+            ) {
+                Toast.show({
+                    type: "error",
+                    text1: "OTP Verification Required",
+                    text2: "Please verify your email before logging in.",
+                    position: "top",
+                });
+
+                setTimeout(() => {
+                    router.replace({
+                        pathname: "/(auth)/verify-otp",
+                        params: {
+                            email: email.trim(),
+                            purpose: "registration",
+                        },
                     });
-    
-                    console.log("Login successful:", data);
-    
-                    setTimeout(() => {
-                        router.replace("/home");
-                    }, 1500);
-    
-                } else {
-                    Toast.show({
-                        type: 'error',
-                        text1: 'Login Failed',
-                        
-                        position: 'top',
-                    });
-    
-                    console.log("Login failed:", data);
+                }, 1200);
+
+            // OTHER ERRORS
+            } else {
+                Toast.show({
+                    type: "error",
+                    text1: "Login Failed",
+                    text2: data.message || "Invalid email or password.",
+                    position: "top",
+                });
+
+                console.log("Login failed:", data);
             }
-        } catch(error){
+
+        } catch (error) {
+            console.log("Login error:", error);
+
             Toast.show({
-                type: 'error',
-                text1: 'Something went wrong',
-                text2: 'Unable to connect to the server.',
-                position: 'top',
+                type: "error",
+                text1: "Something went wrong",
+                text2: "Unable to connect to the server.",
+                position: "top",
             });
-            console.log(error);
-        }finally {
-        setLoading(false);
-    }
+
+        } finally {
+            setLoading(false);
+        }
     };
     
   return (
@@ -159,7 +205,6 @@ const Login = () => {
                         </TouchableOpacity>
                     </View>
 
-                    {/* Create Account Button */}
                     <TouchableOpacity style={authStyles.button} onPress={handleLogin} disabled={loading}>
                         <Text style={authStyles.buttonText}>
                             {loading ? "Logging in..." : "Login"}

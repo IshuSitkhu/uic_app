@@ -11,13 +11,14 @@ import {
     Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { COLORS } from "../../constants/colors";
+import { COLORS } from "../../../constants/colors";
 import { SafeAreaView } from "react-native-safe-area-context";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import { router } from "expo-router";
 
 const Home = () => {
     const insets = useSafeAreaInsets();
@@ -27,7 +28,7 @@ const Home = () => {
 
             <View style={styles.header}>
                 <View style={styles.logoContainer}>
-                  <Image  source={require("../../assets/images/icon.png")} style={styles.logo} />
+                  <Image  source={require("../../../assets/images/icon.png")} style={styles.logo} />
 
                   <Text style={styles.logoText}>
                       United in Christ
@@ -53,7 +54,7 @@ const Home = () => {
                 </View>
 
                 <View style={styles.welcomeImageContainer}>
-                    <Image source={require("../../assets/images/icon.png")} style={styles.welcomeImage} />
+                    <Image source={require("../../../assets/images/icon.png")} style={styles.welcomeImage} />
                 </View>
             </View>
 
@@ -95,7 +96,7 @@ const Home = () => {
 
                 <View style={styles.verseImageContainer}>
                   <Image
-                    source={require("../../assets/images/icon.png")}
+                    source={require("../../../assets/images/icon.png")}
                     style={styles.verseImage}
                   />
                 </View>
@@ -148,14 +149,14 @@ const Home = () => {
 
                     </Pressable>
 
-                    <Pressable style={styles.faithItem}>
+                    <Pressable style={styles.faithItem} onPress={() => router.push("/blogs")}>
 
                         <View style={styles.faithIcon}>
                             <Ionicons  name="book-outline" size={28} color={COLORS.primary} />
                         </View>
 
                         <Text style={styles.faithText}>
-                            Bible
+                            Blog
                         </Text>
                         {/* <Text style={styles.faithDescription}>
                           Explore God's {"\n"}
@@ -190,7 +191,7 @@ const Home = () => {
                 <View style={styles.inspirationCards}>
                     <Pressable style={styles.inspirationCard}>
                         <Image
-                            source={require("../../assets/images/icon.png")}
+                            source={require("../../../assets/images/icon.png")}
                             style={styles.inspirationImage}
                         />
                         <View style={styles.inspirationIcon}>
@@ -212,7 +213,7 @@ const Home = () => {
 
                     <Pressable style={styles.inspirationCard}>
                         <Image
-                            source={require("../../assets/images/icon.png")}
+                            source={require("../../../assets/images/icon.png")}
                             style={styles.inspirationImage}
                         />
 
@@ -225,9 +226,11 @@ const Home = () => {
                         </View>
 
                         <View style={styles.inspirationTextContainer}>
-                            <Text style={styles.inspirationText}>
-                                Bible
-                            </Text>
+                            
+                                <Text style={styles.inspirationText}>
+                                    Blog
+                                </Text>
+                            
 
                             <Text style={styles.inspirationSubText}>
                                 Lord guide my heart and steps today. Give me peace, and strength.
@@ -298,7 +301,7 @@ const Home = () => {
           </View>
 
           <ImageBackground
-              source={require("../../assets/images/icon.png")}
+              source={require("../../../assets/images/icon.png")}
               style={styles.joinCommunitySection}
               imageStyle={styles.joinCommunityBackground}
           >
@@ -615,19 +618,19 @@ const styles = StyleSheet.create({
 
     inspirationCard: {
         width: "47%",
-        backgroundColor: "#fff",
+        backgroundColor: "#FFFFFF",
         borderRadius: 15,
         overflow: "hidden",
 
-        elevation: 3,
+        elevation: 4,
 
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
-            height: 2,
+            height: 4,
         },
-        shadowOpacity: 0.12,
-        shadowRadius: 5,
+        shadowOpacity: 0.08,
+        shadowRadius: 10,
     },
 
     inspirationImage: {

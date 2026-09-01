@@ -66,7 +66,7 @@ const Settings = () => {
         <View style={styles.screen}>
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
                 <View style={styles.header}>
-                    <TouchableOpacity  style={styles.backButton} onPress={() => router.push("/you")} activeOpacity={0.7}  >
+                    <TouchableOpacity  style={styles.backButton} onPress={() => router.back()} activeOpacity={0.7}  >
                         <Ionicons name="arrow-back" size={23} color="#222" />
                     </TouchableOpacity>
 

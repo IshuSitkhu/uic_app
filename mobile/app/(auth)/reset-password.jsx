@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import API_URL from "../../services/api";
+import { COLORS } from "../../constants/colors";
 
 const ResetPassword = () => {
   const { email, otp } = useLocalSearchParams();
@@ -118,7 +119,7 @@ const ResetPassword = () => {
       </TouchableOpacity>
 
       <View style={styles.iconCircle}>
-        <Ionicons name="lock-closed-outline" size={40} color="#ac0a0aa8" />
+        <Ionicons name="lock-closed-outline" size={40} color={COLORS.primary} />
       </View>
 
       <Text style={styles.title}>
@@ -254,7 +255,7 @@ const styles = StyleSheet.create({
   },
 
   redText: {
-    color: "#ac0a0aa8",
+    color: COLORS.primary,
   },
 
   subtitle: {
@@ -299,7 +300,7 @@ const styles = StyleSheet.create({
   button: {
     height: 52,
     borderRadius: 10,
-    backgroundColor: "#ac0a0aa8",
+    backgroundColor: COLORS.primary,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 10,

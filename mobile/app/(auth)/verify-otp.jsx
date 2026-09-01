@@ -1,304 +1,299 @@
+import { Ionicons } from "@expo/vector-icons";
+import { router, useLocalSearchParams } from "expo-router";
+import { useState } from "react";
 import {
+    ScrollView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
-    ScrollView,
 } from "react-native";
-import React, { useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
 import Toast from "react-native-toast-message";
 import API_URL from "../../services/api";
+import { COLORS } from "../../constants/colors";
 
 const VerifyOtp = () => {
-    const { email } = useLocalSearchParams();
+  const { email, purpose } = useLocalSearchParams();
 
-    const [otp, setOtp] = useState("");
-    const [loading, setLoading] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [loading, setLoading] = useState(false);
 
-    const handleVerifyOtp = async () => {
-        if (loading) return;
+  const isRegistration = purpose === "registration";
 
-        if (!otp.trim()) {
-            Toast.show({
-                type: "error",
-                text1: "OTP Required",
-                text2: "Please enter the verification code.",
-                position: "top",
+  const handleVerifyOtp = async () => {
+    if (loading) return;
+
+    if (!otp.trim()) {
+      Toast.show({
+        type: "error",
+        text1: "OTP Required",
+        text2: "Please enter the verification code.",
+        position: "top",
+      });
+      return;
+    }
+
+    if (otp.trim().length !== 4) {
+      Toast.show({
+        type: "error",
+        text1: "Invalid OTP",
+        text2: "OTP must contain 4 digits.",
+        position: "top",
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${API_URL}/auth/verify-otp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          otp: otp.trim(),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Toast.show({
+          type: "success",
+          text1: "OTP Verified",
+          text2: isRegistration
+                ? "Your email has been verified."
+                : "OTP verified successfully.",
+          position: "top",
+        });
+
+        console.log("OTP verified:", data);
+
+        setTimeout(() => {
+          if (isRegistration) {
+            router.replace("/(auth)/pending-approval");
+          } else {
+            router.replace({
+              pathname: "/(auth)/reset-password",
+              params: {
+                email,
+                otp: otp.trim(),
+              },
             });
-            return;
-        }
+          }
+        }, 1200);
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Verification Failed",
+          text2: data.message || "Invalid or expired OTP.",
+          position: "top",
+        });
 
-        if (otp.trim().length !== 6) {
-            Toast.show({
-                type: "error",
-                text1: "Invalid OTP",
-                text2: "OTP must contain 6 digits.",
-                position: "top",
-            });
-            return;
-        }
+        console.log("OTP verification failed:", data);
+      }
+    } catch (error) {
+      console.log("OTP verification error:", error);
 
-        setLoading(true);
+      Toast.show({
+        type: "error",
+        text1: "Something went wrong",
+        text2: "Unable to connect to the server.",
+        position: "top",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        try {
-            const response = await fetch(`${API_URL}/auth/verify-otp`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                },
-                body: JSON.stringify({
-                    email,
-                    otp: otp.trim(),
-                }),
-            });
+  return (
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      keyboardShouldPersistTaps="handled"
+    >
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <Ionicons name="arrow-back" size={24} color="#333" />
+      </TouchableOpacity>
 
-            const data = await response.json();
+      <View style={styles.iconCircle}>
+        <Ionicons name="mail-outline" size={40} color= "#fff"/>
+      </View>
 
-            if (response.ok) {
-                Toast.show({
-                    type: "success",
-                    text1: "OTP Verified",
-                    text2: "You can now create a new password.",
-                    position: "top",
-                });
+      <Text style={styles.title}>
+        Verify <Text style={styles.redText}>OTP</Text>
+      </Text>
 
-                console.log("OTP verified:", data);
+      <Text style={styles.subtitle}>
+           Enter the 4-digit verification code sent to
+      </Text>
 
-                setTimeout(() => {
-                    router.push({
-                        pathname: "/(auth)/reset-password",
-                        params: {
-                            email,
-                            otp: otp.trim(),
-                        },
-                    });
-                }, 1200);
-            } else {
-                Toast.show({
-                    type: "error",
-                    text1: "Verification Failed",
-                    text2: data.message || "Invalid or expired OTP.",
-                    position: "top",
-                });
+      <Text style={styles.email}>{email}</Text>
 
-                console.log("OTP verification failed:", data);
-            }
-        } catch (error) {
-            console.log("OTP verification error:", error);
+      <View style={styles.form}>
+        <Text style={styles.label}>Verification Code</Text>
 
-            Toast.show({
-                type: "error",
-                text1: "Something went wrong",
-                text2: "Unable to connect to the server.",
-                position: "top",
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
+        <View style={styles.inputWrapper}>
+          <Ionicons name="keypad-outline" size={20} color="#999" />
 
-    return (
-        <ScrollView
-            style={styles.container}
-            contentContainerStyle={styles.content}
-            keyboardShouldPersistTaps="handled"
+          <TextInput
+            style={styles.input}
+            placeholder="Enter 4-digit OTP"
+            placeholderTextColor="#999"
+            value={otp}
+            onChangeText={setOtp}
+            keyboardType="number-pad"
+            maxLength={4}
+          />
+        </View>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleVerifyOtp}
+          disabled={loading}
         >
-            <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => router.back()}
-            >
-                <Ionicons name="arrow-back" size={24} color="#333" />
-            </TouchableOpacity>
-
-            <View style={styles.iconCircle}>
-                <Ionicons
-                    name="mail-outline"
-                    size={40}
-                    color="#ac0a0aa8"
-                />
-            </View>
-
-            <Text style={styles.title}>
-                Verify <Text style={styles.redText}>OTP</Text>
-            </Text>
-
-            <Text style={styles.subtitle}>
-                Enter the 6-digit verification code sent to
-            </Text>
-
-            <Text style={styles.email}>
-                {email}
-            </Text>
-
-            <View style={styles.form}>
-                <Text style={styles.label}>Verification Code</Text>
-
-                <View style={styles.inputWrapper}>
-                    <Ionicons
-                        name="keypad-outline"
-                        size={20}
-                        color="#999"
-                    />
-
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Enter 6-digit OTP"
-                        placeholderTextColor="#999"
-                        value={otp}
-                        onChangeText={setOtp}
-                        keyboardType="number-pad"
-                        maxLength={6}
-                    />
-                </View>
-
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={handleVerifyOtp}
-                    disabled={loading}
-                >
-                    <Text style={styles.buttonText}>
-                        {loading ? "Verifying..." : "Verify OTP"}
-                    </Text>
-                </TouchableOpacity>
-
-            </View>
-        </ScrollView>
-    );
+          <Text style={styles.buttonText}>
+            {loading ? "Verifying..." : "Verify OTP"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
 };
 
 export default VerifyOtp;
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#fff",
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
 
-    content: {
-        flexGrow: 1,
-        padding: 25,
-        justifyContent: "center",
-    },
+  content: {
+    flexGrow: 1,
+    padding: 25,
+    justifyContent: "center",
+  },
 
   backButton: {
-        position: "absolute",
-        top:70,
-        left:25,
-        width: 42,
-        height: 42,
-        borderRadius: 21,
-        backgroundColor: "#ffffff",
-        alignItems: "center",
-        justifyContent: "center",
+    position: "absolute",
+    top: 70,
+    left: 25,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: "#ffffff",
+    alignItems: "center",
+    justifyContent: "center",
 
-        // iOS shadow
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.06,
-        shadowRadius: 5,
-
-        // Android shadow
-        elevation: 2,
+    // iOS shadow
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
     },
+    shadowOpacity: 0.06,
+    shadowRadius: 5,
 
-    iconCircle: {
-        width: 85,
-        height: 85,
-        borderRadius: 50,
-        backgroundColor: "#ac0a0a15",
-        justifyContent: "center",
-        alignItems: "center",
-        alignSelf: "center",
-        marginBottom: 25,
-    },
+    // Android shadow
+    elevation: 2,
+  },
 
-    title: {
-        fontSize: 30,
-        fontWeight: "700",
-        textAlign: "center",
-        color: "#222",
-        marginBottom: 12,
-    },
+  iconCircle: {
+    width: 85,
+    height: 85,
+    borderRadius: 50,
+    backgroundColor: COLORS.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+    marginBottom: 25,
+  },
 
-    redText: {
-        color: "#ac0a0aa8",
-    },
+  title: {
+    fontSize: 30,
+    fontWeight: "700",
+    textAlign: "center",
+    color: "#222",
+    marginBottom: 12,
+  },
 
-    subtitle: {
-        fontSize: 15,
-        color: "#777",
-        textAlign: "center",
-        lineHeight: 23,
-    },
+  redText: {
+    color: COLORS.primary,
+  },
 
-    email: {
-        fontSize: 15,
-        fontWeight: "600",
-        color: "#333",
-        textAlign: "center",
-        marginTop: 5,
-        marginBottom: 35,
-    },
+  subtitle: {
+    fontSize: 15,
+    color: "#777",
+    textAlign: "center",
+    lineHeight: 23,
+  },
 
-    form: {
-        width: "100%",
-    },
+  email: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#333",
+    textAlign: "center",
+    marginTop: 5,
+    marginBottom: 35,
+  },
 
-    label: {
-        fontSize: 16,
-        fontWeight: "600",
-        color: "#444",
-        marginBottom: 8,
-    },
+  form: {
+    width: "100%",
+  },
 
-    inputWrapper: {
-        height: 52,
-        borderWidth: 1,
-        borderColor: "#ddd",
-        borderRadius: 10,
-        flexDirection: "row",
-        alignItems: "center",
-        paddingHorizontal: 15,
-        marginBottom: 25,
-    },
+  label: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#444",
+    marginBottom: 8,
+  },
 
-    input: {
-        flex: 1,
-        fontSize: 18,
-        marginLeft: 10,
-        color: "#333",
-        letterSpacing: 3,
-    },
+  inputWrapper: {
+    height: 52,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    marginBottom: 25,
+  },
 
-    button: {
-        height: 52,
-        borderRadius: 10,
-        backgroundColor: "#ac0a0aa8",
-        justifyContent: "center",
-        alignItems: "center",
-    },
+  input: {
+    flex: 1,
+    fontSize: 18,
+    marginLeft: 10,
+    color: "#333",
+    letterSpacing: 3,
+  },
 
-    buttonText: {
-        color: "#fff",
-        fontSize: 17,
-        fontWeight: "600",
-    },
+  button: {
+    height: 52,
+    borderRadius: 10,
+    backgroundColor: COLORS.primary,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 
-    backLogin: {
-        alignItems: "center",
-        marginTop: 25,
-    },
+  buttonText: {
+    color: "#fff",
+    fontSize: 17,
+    fontWeight: "600",
+  },
 
-    backLoginText: {
-        color: "#ac0a0aa8",
-        fontSize: 16,
-        fontWeight: "600",
-    },
+  backLogin: {
+    alignItems: "center",
+    marginTop: 25,
+  },
+
+  backLoginText: {
+    color: COLORS.primary,
+    fontSize: 16,
+    fontWeight: "600",
+  },
 });

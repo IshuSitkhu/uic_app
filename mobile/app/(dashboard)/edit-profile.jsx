@@ -134,7 +134,7 @@ const EditProfile = () => {
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => router.push("/settings")}
+            onPress={() => router.back()}
             activeOpacity={0.7}
           >
             <Ionicons name="arrow-back" size={23} color="#222" />

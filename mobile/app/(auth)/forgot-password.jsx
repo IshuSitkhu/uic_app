@@ -11,6 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import Toast from "react-native-toast-message";
 import API_URL from "../../services/api";
+import { COLORS } from "../../constants/colors";
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState("");
@@ -58,7 +59,10 @@ const ForgotPassword = () => {
                 setTimeout(() => {
                     router.push({
                         pathname: "/(auth)/verify-otp",
-                        params: { email: email.trim() },
+                        params: {
+                            email: email.trim(),
+                            purpose: "forgot-password",
+                        },
                     });
                 }, 1500);
             } else {
@@ -102,7 +106,7 @@ const ForgotPassword = () => {
                 <Ionicons
                     name="lock-closed-outline"
                     size={40}
-                    color="#ac0a0aa8"
+                    color="#fff"
                 />
             </View>
 
@@ -154,7 +158,7 @@ const ForgotPassword = () => {
                     <Ionicons
                         name="arrow-back-outline"
                         size={18}
-                        color="#ac0a0aa8"
+                        color=COLORS.primary
                     />
 
                     <Text style={styles.loginText}>
@@ -215,7 +219,7 @@ const styles = StyleSheet.create({
         width: 85,
         height: 85,
         borderRadius: 50,
-        backgroundColor: "#ac0a0a15",
+        backgroundColor: COLORS.primary,
         justifyContent: "center",
         alignItems: "center",
         alignSelf: "center",
@@ -231,7 +235,7 @@ const styles = StyleSheet.create({
     },
 
     redText: {
-        color: "#ac0a0aa8",
+        color: COLORS.primary,
     },
 
     subtitle: {
@@ -274,7 +278,7 @@ const styles = StyleSheet.create({
     button: {
         height: 52,
         borderRadius: 10,
-        backgroundColor: "#ac0a0aa8",
+        backgroundColor: COLORS.primary,
         justifyContent: "center",
         alignItems: "center",
     },
@@ -293,7 +297,7 @@ const styles = StyleSheet.create({
     },
 
     loginText: {
-        color: "#ac0a0aa8",
+        color: COLORS.primary,
         fontSize: 16,
         fontWeight: "600",
         marginLeft: 6,

@@ -57,8 +57,18 @@ const Register = () => {
 
                 console.log("Registration successful:", data);
 
+                // setTimeout(() => {
+                //     router.push("/(auth)/login");
+                // }, 1500);
+
                 setTimeout(() => {
-                    router.push("/(auth)/login");
+                    router.replace({
+                        pathname: "/(auth)/verify-otp",
+                        params: {
+                            email: email.trim(),
+                            purpose: "registration",
+                        },
+                    });
                 }, 1500);
 
             } else {
@@ -192,10 +202,9 @@ const Register = () => {
                         </View>
                     </View>
 
-                    {/* Create Account Button */}
                     <TouchableOpacity style={authStyles.button} onPress={handleRegister}>
                         <Text style={authStyles.buttonText} >
-                            Create Account
+                            {loading ? "Creating Account..." : "Create Account"}
                         </Text>
                     </TouchableOpacity>
 

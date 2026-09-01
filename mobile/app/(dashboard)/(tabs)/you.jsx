@@ -11,10 +11,10 @@ import { useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import API_URL from "../../services/api";
+import API_URL from "../../../services/api";
 import { Image } from "react-native";
-import {COLORS} from '../../constants/colors';
-import { useAuth } from "../../context/AuthContext";
+import {COLORS} from '../../../constants/colors';
+import { useAuth } from "../../../context/AuthContext";
 
 const You = () => {
     const { user, loading } = useAuth();
