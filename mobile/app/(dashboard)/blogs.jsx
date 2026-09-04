@@ -15,8 +15,10 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
 import API_URL from "../../services/api";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const Blogs = () => {
+  const insets = useSafeAreaInsets();
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -64,7 +66,14 @@ const Blogs = () => {
 
   return (
     <>
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#f9f7fb" }}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "#f9f7fb",
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
+        }}
+      >
         <View style={styles.screen}>
           <ScrollView
             showsVerticalScrollIndicator={false}
@@ -83,14 +92,6 @@ const Blogs = () => {
 
               <View style={styles.headerPlaceholder} />
             </View>
-            <TouchableOpacity
-              style={styles.addBlog}
-              onPress={() => router.push("/add-blog")}
-            >
-              <Text style={styles.addBlogText}>Add Blogs</Text>
-
-              {/* <Ionicons name="chevron-down" size={8} color="#fff" /> */}
-            </TouchableOpacity>
 
             {loading ? (
               <View style={styles.loadingContainer}>
@@ -153,7 +154,7 @@ const Blogs = () => {
                         </Pressable>
                       </View>
 
-                      <Text style={styles.blogTitle} numberOfLines={2}>
+                      <Text style={styles.blogTitle} numberOfLines={1}>
                         {blog.blog_title}
                       </Text>
 
@@ -183,7 +184,7 @@ const Blogs = () => {
             )}
           </ScrollView>
         </View>
-      </SafeAreaView>
+      </View>
     </>
   );
 };
@@ -307,7 +308,7 @@ const styles = StyleSheet.create({
   },
 
   blogCard: {
-    marginTop: 14,
+    marginTop: 10,
     backgroundColor: "#f9f7fb",
     borderRadius: 16,
     padding: 12,
@@ -331,7 +332,7 @@ const styles = StyleSheet.create({
 
   blogImageContainer: {
     width: 105,
-    height: 145,
+    height: 125,
     borderRadius: 12,
     overflow: "hidden",
   },

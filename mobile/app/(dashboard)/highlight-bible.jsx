@@ -13,8 +13,10 @@ import {
 } from "react-native";
 import { COLORS } from "../../constants/colors";
 import API_URL from "../../services/api";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const highlightBible = () => {
+    const insets = useSafeAreaInsets();
   const [highlightBible, setHighlightBible] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -56,7 +58,14 @@ const highlightBible = () => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#f9f7fb" }}>
+    <View
+            style={{
+              flex: 1,
+              backgroundColor: "#f9f7fb",
+              paddingTop: insets.top,
+              paddingBottom: insets.bottom,
+            }}
+          >
       <View style={styles.screen}>
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -105,6 +114,9 @@ const highlightBible = () => {
                     <Text style={styles.reference}>
                       {item.book} {item.chapter}:{item.verse}
                     </Text>
+                    <Text style={styles.translation}>
+                        {item.translation?.toUpperCase()}
+                      </Text>
                   </View>
 
                   <View style={styles.verseTextContainer}>
@@ -118,9 +130,7 @@ const highlightBible = () => {
                     <View>
                       <Text style={styles.verseText}>{item.text}</Text>
 
-                      <Text style={styles.translation}>
-                        {item.translation?.toUpperCase()}
-                      </Text>
+                      
                     </View>
                   </View>
                 </View>
@@ -129,7 +139,7 @@ const highlightBible = () => {
           )}
         </ScrollView>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

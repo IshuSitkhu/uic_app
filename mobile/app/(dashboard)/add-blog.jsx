@@ -26,11 +26,13 @@ import {
   actions,
 } from "react-native-pell-rich-editor";
 import Toast from "react-native-toast-message";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { COLORS } from "../../constants/colors";
 import API_URL from "../../services/api";
 
 const AddBlog = () => {
+      const insets = useSafeAreaInsets();
   const [saving, setSaving] = useState(false);
 
   const [blogTitle, setBlogTitle] = useState("");
@@ -206,7 +208,14 @@ const AddBlog = () => {
     }
   };
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#f9f7fb" }}>
+    <View
+        style={{
+          flex: 1,
+          backgroundColor: "#f9f7fb",
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
+        }}
+      >
       <View style={styles.screen}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
@@ -505,7 +514,7 @@ const AddBlog = () => {
           )}
         </KeyboardAvoidingView>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

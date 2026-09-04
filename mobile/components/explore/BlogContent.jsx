@@ -1,16 +1,139 @@
 import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useEffect, useState } from "react";
 import {
-    Image,
-    ImageBackground,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
+  ActivityIndicator,
+  Alert,
+  Image,
+  ImageBackground,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
+
 import { COLORS } from "../../constants/colors";
+import API_URL from "../../services/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-toast-message";
 
 const BlogContent = () => {
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [favoriteStatus, setFavoriteStatus] = useState({});
+
+  const fetchBlogs = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      const response = await fetch(`${API_URL}/blogs`, {
+        headers: {
+          Accept: "application/json",
+          ...(token && {
+            Authorization: `Bearer ${token}`,
+          }),
+        },
+      });
+
+      const data = await response.json();
+
+      console.log("BLOG API RESPONSE:", data);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch blogs");
+      }
+
+      const fetchedBlogs = data.blogs?.data || [];
+
+      setBlogs(fetchedBlogs);
+
+      const favoriteMap = {};
+
+      fetchedBlogs.forEach((blog) => {
+            favoriteMap[Number(blog.id)] = blog.is_favorited;
+      });
+
+      setFavoriteStatus(favoriteMap);
+    } catch (error) {
+      console.error("Error fetching blogs:", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBlogs();
+  }, []);
+
+  const handleFavorite = async (blogId) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      if (!token) {
+        Alert.alert("Error", "Please login first.");
+        return;
+      }
+
+      const response = await fetch(
+        `${API_URL}/blogs/${blogId}/favorite`,
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("FAVORITE RESPONSE:", response.status, data);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update favorite");
+      }
+
+      setFavoriteStatus((prev) => ({
+        ...prev,
+        [blogId]: data.is_favorited,
+      }));
+      Toast.show({
+            type: "success",
+            text1: data.is_favorited ? "Blog Saved" : "Blog Unsaved",
+            position: "top",
+          });
+    } catch (error) {
+      console.error("Favorite error:", error.message);
+      Toast.show({
+            type: "error",
+            text1: "Error",
+            text2: "Failed to update favorite.",
+            position: "top",
+          });
+    }
+  };
+
+  // Remove HTML tags from blog content
+  const stripHtml = (html) => {
+    if (!html) return "";
+
+    return html
+      .replace(/<[^>]*>/g, "")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .trim();
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="small" color={COLORS.primary} />
+      </View>
+    );
+  }
+
   return (
     <View>
       <ImageBackground
@@ -61,101 +184,113 @@ const BlogContent = () => {
           </Pressable>
         </View>
 
-        <Pressable
-          style={styles.blogCard}
-          onPress={() => router.push("/blog-detail ")}
-        >
-          <View style={styles.blogContent}>
-            <View style={styles.blogImageContainer}>
-              <Image
-                source={require("../../assets/images/blogs.jpg")}
-                style={styles.blogImage}
-              />
-            </View>
-
-            <View style={styles.blogDetails}>
-              <View style={styles.blogTopRow}>
-                <View style={styles.smallCategoryBadge}>
-                  <Text style={styles.smallCategoryText}>Motivation</Text>
+        {blogs.length === 0 ? (
+          <Text style={styles.emptyText}>No blogs available.</Text>
+        ) : (
+          blogs.map((blog) => (
+            <Pressable
+              key={blog.id}
+              style={styles.blogCard}
+              onPress={() =>
+                router.push({
+                  pathname: "/blog-detail",
+                  params: {
+                    id: blog.id,
+                  },
+                })
+              }
+            >
+              <View style={styles.blogContent}>
+                <View style={styles.blogImageContainer}>
+                  <Image
+                    source={
+                      blog.blog_file
+                        ? {
+                            uri: `${API_URL.replace(
+                              "/api",
+                              "",
+                            )}/frontend/blogs/${blog.blog_file}`,
+                          }
+                        : require("../../assets/images/blogs.jpg")
+                    }
+                    style={styles.blogImage}
+                  />
                 </View>
 
-                <Pressable style={styles.saveButton}>
-                  <Feather name="bookmark" size={17} color={COLORS.primary} />
-                </Pressable>
-              </View>
+                <View style={styles.blogDetails}>
+                  <View style={styles.blogTopRow}>
+                    <View style={styles.smallCategoryBadge}>
+                      <View style={styles.categoryContainer}>
+                      <Ionicons
+                          name="pricetag-outline"
+                          size={14}
+                          color="#C45A5A"
+                        />
+                      <Text style={styles.smallCategoryText}>
+                        {/* {blog.blog_category || "Other"} */}
+                        {blog.blog_category
+                        ? blog.blog_category.charAt(0).toUpperCase() +
+                          blog.blog_category.slice(1)
+                        : ""}
+                      </Text>
+                      </View>
+                    </View>
 
-              <Text style={styles.blogTitle} numberOfLines={2}>
-                Trusting God in Uncertain Times
-              </Text>
+                    <Pressable
+                      style={styles.saveButton}
+                      onPress={(event) => {
+                        event.stopPropagation();
+                        handleFavorite(Number(blog.id));
+                      }}
+                    >
+                      <Ionicons
+                        name={
+                          favoriteStatus[Number(blog.id)]
+                            ? "bookmark"
+                            : "bookmark-outline"
+                        }
+                        size={17}
+                        color={COLORS.primary}
+                      />
+                    </Pressable>
+                  </View>
 
-              <Text style={styles.blogDescription} numberOfLines={2}>
-                Lord guide my heart and steps today. Give me peace and strength.
-              </Text>
+                  <Text style={styles.blogTitle} numberOfLines={1}>
+                    {blog.blog_title}
+                  </Text>
 
-              <View style={styles.blogAuthorRow}>
-                <Ionicons
-                  name="person-circle-outline"
-                  size={19}
-                  color={COLORS.primary}
-                />
+                  <Text style={styles.blogDescription} numberOfLines={2}>
+                    {stripHtml(blog.blog)}
+                  </Text>
 
-                <Text style={styles.blogAuthor}>By Willam</Text>
+                  <View style={styles.blogAuthorRow}>
+                    <Ionicons
+                      name="person-circle-outline"
+                      size={19}
+                      color={COLORS.primary}
+                    />
 
-                <View style={styles.divider} />
+                    <Text style={styles.blogAuthor}>
+                      By {blog.userdetails?.name || "Unknown"}
+                    </Text>
 
-                <Text style={styles.blogDate}>Aug 10, 2025</Text>
-              </View>
-            </View>
-          </View>
-        </Pressable>
-        <Pressable style={styles.blogCard}>
-          <View style={styles.blogContent}>
-            <View style={styles.blogImageContainer}>
-              <Image
-                source={require("../../assets/images/blogs.jpg")}
-                style={styles.blogImage}
-              />
-            </View>
+                    <View style={styles.divider} />
 
-            <View style={styles.blogDetails}>
-              <View style={styles.blogTopRow}>
-                <View style={styles.smallCategoryBadge}>
-                  <Text style={styles.smallCategoryText}>Motivation</Text>
+                    <Text style={styles.blogDate}>
+                      {blog.blog_date}
+                    </Text>
+                  </View>
                 </View>
-
-                <Pressable style={styles.saveButton}>
-                  <Feather name="bookmark" size={17} color={COLORS.primary} />
-                </Pressable>
               </View>
-
-              <Text style={styles.blogTitle} numberOfLines={2}>
-                Trusting God in Uncertain Times
-              </Text>
-
-              <Text style={styles.blogDescription} numberOfLines={2}>
-                Lord guide my heart and steps today. Give me peace and strength.
-              </Text>
-
-              <View style={styles.blogAuthorRow}>
-                <Ionicons
-                  name="person-circle-outline"
-                  size={19}
-                  color={COLORS.primary}
-                />
-
-                <Text style={styles.blogAuthor}>By Willam</Text>
-
-                <View style={styles.divider} />
-
-                <Text style={styles.blogDate}>Aug 10, 2025</Text>
-              </View>
-            </View>
-          </View>
-        </Pressable>
+            </Pressable>
+          ))
+        )}
       </View>
     </View>
   );
 };
+
+
 
 export default BlogContent;
 
@@ -289,7 +424,7 @@ const styles = StyleSheet.create({
 
   blogImageContainer: {
     width: 105,
-    height: 145,
+    height: 125,
     borderRadius: 12,
     overflow: "hidden",
   },
@@ -312,11 +447,19 @@ const styles = StyleSheet.create({
   },
 
   smallCategoryBadge: {
-    backgroundColor: "#F4E0E0",
-    paddingHorizontal: 9,
-    paddingVertical: 4,
+    // backgroundColor: "#F4E0E0",
+    // paddingHorizontal: 9,
+    // paddingVertical: 4,
     borderRadius: 15,
   },
+  categoryContainer: {
+    backgroundColor: "#F4E0E0",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+    flexDirection:"row" ,
+    gap:5,
+   },
 
   smallCategoryText: {
     fontSize: 10,
@@ -372,4 +515,10 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontWeight: "500",
   },
+
+  loadingContainer: {
+  paddingVertical: 30,
+  alignItems: "center",
+  justifyContent: "center",
+},
 });

@@ -15,6 +15,11 @@ export default function DashboardLayout() {
             <Stack.Screen name="edit-profile"   options={{ headerShown: false,  }}/>
             <Stack.Screen name="saved-bible"   options={{ headerShown: false,  }}/>
             <Stack.Screen name="highlight-bible"   options={{ headerShown: false,  }}/>
+
+            <Stack.Screen
+  name="myprofile-blog"
+  options={{ headerShown: false }}
+/>
         </Stack>
 
     );

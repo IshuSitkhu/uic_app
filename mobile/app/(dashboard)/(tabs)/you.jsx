@@ -13,8 +13,10 @@ import {
 
 import { COLORS } from "../../../constants/colors";
 import { useAuth } from "../../../context/AuthContext";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const You = () => {
+  const insets = useSafeAreaInsets();
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -83,7 +85,14 @@ const You = () => {
   // =========================================
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View
+        style={{
+          flex: 1,
+          backgroundColor: "#f9f7fb",
+          paddingTop: insets.top,
+          // paddingBottom: insets.bottom,
+        }}
+      >
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
@@ -168,39 +177,21 @@ const You = () => {
           </View>
         </View>
 
-        <Pressable
-          style={({ pressed }) => [
-            styles.collectionCard,
-            pressed && styles.featurePressed,
-          ]}
-          onPress={() => router.push("/saved-bible")}
-        >
-          <View style={styles.collectionIcon}>
-            <Ionicons
-              name="bookmark"
-              size={27}
-              color={COLORS.primary}
-            />
-          </View>
+<Pressable
+  style={({ pressed }) => [
+    styles.savedButton,
+    pressed && { opacity: 0.7 },
+  ]}
+  onPress={() => router.push("/saved-bible")}
+>
+  <Ionicons
+    name="bookmark"
+    size={27}
+    color={COLORS.primary}
+  />
 
-          <View style={styles.collectionContent}>
-            <Text style={styles.collectionTitle}>
-              Saved
-            </Text>
-
-            <Text style={styles.collectionSubtitle}>
-              Prayer · Blog · Worship · Questions
-            </Text>
-          </View>
-
-          <View style={styles.collectionArrow}>
-            <Ionicons
-              name="arrow-forward"
-              size={20}
-              color={COLORS.primary}
-            />
-          </View>
-        </Pressable>
+  <Text style={styles.savedText}>Saved</Text>
+</Pressable>
 
         {/* =========================================
             YOUR SPACE
@@ -317,7 +308,7 @@ const You = () => {
               styles.blogCard,
               pressed && styles.featurePressed,
             ]}
-            onPress={() => router.push("/blogs")}
+           onPress={() => router.push("/myprofile-blog")}
           >
             <View
               style={[
@@ -459,7 +450,7 @@ const You = () => {
 
           {/* NOTES */}
 
-          <Pressable
+          {/* <Pressable
             style={({ pressed }) => [
               styles.bibleCard,
               pressed && styles.featurePressed,
@@ -488,12 +479,12 @@ const You = () => {
               color="#999"
               style={styles.bibleArrow}
             />
-          </Pressable>
+          </Pressable> */}
         </View>
 
         <View style={styles.bottomSpace} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -513,7 +504,7 @@ const styles = StyleSheet.create({
 
   contentContainer: {
     paddingHorizontal: 20,
-    paddingBottom: 30,
+    // paddingBottom: 30,
   },
 
   loadingContainer: {
@@ -986,12 +977,45 @@ shareText: {
   // =========================================
   // COLLECTION
   // =========================================
+savedButton: {
+  alignSelf: "flex-start",
+
+  minWidth: 75,
+  paddingHorizontal: 14,
+  paddingVertical: 10,
+
+  borderRadius: 18,
+
+  backgroundColor: "#FFFFFF",
+
+  alignItems: "center",
+  justifyContent: "center",
+
+  shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 3,
+  },
+  shadowOpacity: 0.06,
+  shadowRadius: 8,
+
+  elevation: 2,
+
+  marginBottom: 15,
+},
+
+savedText: {
+  marginTop: 5,
+  fontSize: 13,
+  fontWeight: "600",
+  color: "#30263D",
+},
 
   collectionCard: {
     minHeight: 92,
 
     borderRadius: 22,
-
+    flexDirection:"row",
     paddingHorizontal: 15,
     paddingVertical: 14,
 

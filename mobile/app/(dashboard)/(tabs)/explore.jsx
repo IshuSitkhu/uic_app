@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
 
   page: {
     width: screenWidth,
-    paddingHorizontal: 25,
+    paddingHorizontal: 15,
   },
 
   backButton: {
