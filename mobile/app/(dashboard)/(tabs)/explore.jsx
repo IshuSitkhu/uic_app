@@ -1,232 +1,257 @@
-import { Ionicons } from "@expo/vector-icons";
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import React, { useState } from "react";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import { useRef, useState } from "react";
 import {
+    Dimensions,
+    Platform,
     Pressable,
     ScrollView,
     StyleSheet,
     Text,
     View,
-    Platform,
-    TouchableOpacity,
 } from "react-native";
-import { COLORS } from "../../../constants/colors";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { COLORS } from "../../../constants/colors";
 
 import BlogContent from "../../../components/explore/BlogContent";
 import PrayerContent from "../../../components/explore/PrayerContent";
-import SongContent from "../../../components/explore/SongContent";
 import QuestionContent from "../../../components/explore/QuestionContent";
-import { router } from "expo-router";
+import SongContent from "../../../components/explore/SongContent";
+
+const screenWidth = Dimensions.get("window").width;
 
 const Explore = () => {
+  const [selectedCategory, setSelectedCategory] = useState("blogs");
 
-    const [selectedCategory, setSelectedCategory] = useState("blogs");
+  // const renderContent = () => {
+  //     switch (selectedCategory) {
+  //         case "blogs":
+  //             return <BlogContent />;
 
-    const renderContent = () => {
-        switch (selectedCategory) {
-            case "blogs":
-                return <BlogContent />;
+  //         case "prayers":
+  //             return <PrayerContent />;
 
-            case "prayers":
-                return <PrayerContent />;
+  //         case "songs":
+  //             return <SongContent />;
 
-            case "songs":
-                return <SongContent />;
+  //         case "questions":
+  //             return <QuestionContent />;
 
-            case "questions":
-                return <QuestionContent />;
+  //         default:
+  //             return <BlogContent />;
+  //     }
+  // };
 
-            default:
-                return <BlogContent />;
-        }
-    };
+  const contentScrollRef = useRef(null);
 
-    return (
-        <SafeAreaView style={styles.container} edges={["top"]}>
+  const categories = ["blogs", "prayers", "songs", "questions"];
 
-            <ScrollView
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{
-                    paddingBottom: Platform.OS === "ios" ? 50 : 5,
-                }}
-            >
-                <View style={styles.header}>
+  const handleCategoryPress = (category) => {
+    const index = categories.indexOf(category);
+
+    setSelectedCategory(category);
+
+    contentScrollRef.current?.scrollTo({
+      x: index * screenWidth,
+      animated: true,
+    });
+  };
+
+  return (
+    <SafeAreaView style={styles.container} edges={["top"]}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingBottom: Platform.OS === "ios" ? 50 : 5,
+        }}
+      >
+        {/* <View style={styles.header}>
                     <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
                         <Ionicons name="arrow-back" size={24} color="#333" />
                     </TouchableOpacity>
 
                     
 
-                </View>
-                <View style={styles.exploreTitle}>
-                        <Text style={styles.title}>Explore</Text>
-                        <Text style={styles.subtitle}>
-                            Growth in faith. Be inspired. Walk with God.
-                        </Text>
-                </View>
+                </View> */}
+        <View style={styles.exploreTitle}>
+          <Text style={styles.title}>Explore</Text>
+          <Text style={styles.subtitle}>
+            Growth in faith. Be inspired. Walk with God.
+          </Text>
+        </View>
 
-                <View style={styles.categoryContainer}>
+        <View style={styles.categoryContainer}>
+          <CategoryButton
+            icon="clipboard-list"
+            title="Blogs"
+            active={selectedCategory === "blogs"}
+            // onPress={() => setSelectedCategory("blogs")}
+            onPress={() => handleCategoryPress("blogs")}
+          />
 
-                    <CategoryButton
-                        icon="clipboard-list"
-                        title="Blogs"
-                        active={selectedCategory === "blogs"}
-                        onPress={() => setSelectedCategory("blogs")}
-                    />
+          <CategoryButton
+            icon="praying-hands"
+            title="Prayers"
+            active={selectedCategory === "prayers"}
+            onPress={() => handleCategoryPress("prayers")}
+          />
 
-                    <CategoryButton
-                        icon="praying-hands"
-                        title="Prayers"
-                        active={selectedCategory === "prayers"}
-                        onPress={() => setSelectedCategory("prayers")}
-                    />
+          <CategoryButton
+            icon="music"
+            title="Songs"
+            active={selectedCategory === "songs"}
+            onPress={() => handleCategoryPress("songs")}
+          />
 
-                    <CategoryButton
-                        icon="music"
-                        title="Songs"
-                        active={selectedCategory === "songs"}
-                        onPress={() => setSelectedCategory("songs")}
-                    />
+          <CategoryButton
+            icon="question"
+            title="Questions"
+            active={selectedCategory === "questions"}
+            onPress={() => handleCategoryPress("questions")}
+          />
+        </View>
 
-                    <CategoryButton
-                        icon="question"
-                        title="Questions"
-                        active={selectedCategory === "questions"}
-                        onPress={() => setSelectedCategory("questions")}
-                    />
-
-                </View>
-
-
-                {/* SELECTED CONTENT */}
-                <View style={styles.content}>
+        {/* SELECTED CONTENT */}
+        {/* <View style={styles.content}>
                     {renderContent()}
-                </View>
+                </View> */}
 
-            </ScrollView>
+        <View style={styles.content}>
+          <ScrollView
+            ref={contentScrollRef}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            nestedScrollEnabled
+            onMomentumScrollEnd={(event) => {
+              const index = Math.round(
+                event.nativeEvent.contentOffset.x / screenWidth,
+              );
 
-        </SafeAreaView>
-    );
+              setSelectedCategory(categories[index]);
+            }}
+          >
+            <View style={styles.page}>
+              <BlogContent />
+            </View>
+
+            <View style={styles.page}>
+              <PrayerContent />
+            </View>
+
+            <View style={styles.page}>
+              <SongContent />
+            </View>
+
+            <View style={styles.page}>
+              <QuestionContent />
+            </View>
+          </ScrollView>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
 };
 
+const CategoryButton = ({ icon, title, active, onPress }) => {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={[styles.categoryButton, active && styles.categoryButtonActive]}
+    >
+      <FontAwesome5
+        name={icon}
+        size={14}
+        color={active ? "#fff" : COLORS.primary}
+      />
 
-const CategoryButton = ({
-    icon,
-    title,
-    active,
-    onPress,
-}) => {
-
-    return (
-        <Pressable
-            onPress={onPress}
-            style={[
-                styles.categoryButton,
-                active && styles.categoryButtonActive,
-            ]}
-        >
-
-            <FontAwesome5
-                name={icon}
-                size={14}
-                color={active ? "#fff" : COLORS.primary}
-            />
-
-            <Text
-                style={[
-                    styles.categoryText,
-                    active && styles.categoryTextActive,
-                ]}
-            >
-                {title}
-            </Text>
-
-        </Pressable>
-    );
+      <Text style={[styles.categoryText, active && styles.categoryTextActive]}>
+        {title}
+      </Text>
+    </Pressable>
+  );
 };
-
 
 export default Explore;
 
-
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    // backgroundColor: "#f9f7fb",
+  },
 
-    container: {
-        flex: 1,
-        // backgroundColor: "#fff",
-    },
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 20,
+  },
 
-    header: {
-        paddingHorizontal: 20,
-        paddingTop: 10,
-        paddingBottom: 20,
-    },
+  // exploreTitle:{
+  //   margin:25,
+  // },
 
-    exploreTitle:{
-      margin:25,
-    },
+  title: {
+    marginHorizontal: 25,
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#222",
+    marginTop: 15,
+  },
 
-    title: {
-        fontSize: 20,
-        fontWeight: "700",
-        color: "#222",
-        marginTop: 15,
-    },
+  subtitle: {
+    marginHorizontal: 25,
+    fontSize: 14,
+    color: "#777",
+    marginVertical: 10,
+  },
 
-    subtitle: {
-        fontSize: 14,
-        color: "#777",
-        marginTop: 5,
-    },
+  categoryContainer: {
+    flexDirection: "row",
+    paddingHorizontal: 10,
+    // gap: 2,
+    backgroundColor: "#f9f7fb",
+    paddingVertical: 10,
+    //
+    borderRadius: 50,
+    marginHorizontal: 8,
+  },
 
-    categoryContainer: {
-        flexDirection: "row",
-        paddingHorizontal: 10,
-        // gap: 2,
-        backgroundColor: "#fff",
-        paddingVertical:10,
-        // 
-         borderRadius: 50,
-         marginHorizontal:15,
-    },
+  categoryButton: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
 
-    categoryButton: {
-        flex: 1,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
+    paddingVertical: 8,
+    // paddingHorizontal: 12,
+    borderRadius: 25,
 
-        paddingVertical: 8,
-        // paddingHorizontal: 12,
-        borderRadius: 25,
-        
+    // backgroundColor: "#F3F0F8",
+  },
 
-        // backgroundColor: "#F3F0F8",
-    },
+  categoryButtonActive: {
+    backgroundColor: COLORS.primary,
+  },
 
-    categoryButtonActive: {
-        backgroundColor: COLORS.primary,
+  categoryText: {
+    marginLeft: 6,
+    fontSize: 12,
+    fontWeight: "500",
+    color: COLORS.primary,
+  },
 
-    },
+  categoryTextActive: {
+    color: "#fff",
+  },
 
-    categoryText: {
-        marginLeft: 6,
-        fontSize: 12,
-        fontWeight: "500",
-        color: COLORS.primary,
-    },
+  content: {
+    paddingTop: 20,
+  },
 
-    categoryTextActive: {
-        color: "#fff",
-    },
+  page: {
+    width: screenWidth,
+    paddingHorizontal: 25,
+  },
 
-    content: {
-        paddingHorizontal: 15,
-        paddingTop: 20,
-    },
-
-    
   backButton: {
     position: "absolute",
     top: 20,
@@ -250,5 +275,4 @@ const styles = StyleSheet.create({
     // Android shadow
     elevation: 2,
   },
-
 });

@@ -1,34 +1,35 @@
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Image,
+    Platform,
     Pressable,
+    SafeAreaView,
     ScrollView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
-    Platform,
 } from "react-native";
+import { COLORS } from "../../constants/colors";
 import API_URL from "../../services/api";
-import DateTimePicker from '@react-native-community/datetimepicker';
-import {COLORS} from '../../constants/colors';
 
 const EditProfile = () => {
-    const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-    const [username, setUsername] = useState("");
-    const [mobileNumber, setMobileNumber] = useState("");
-    const [email, setEmail] = useState("");
-    const [gender, setGender] = useState("");
-    const [address, setAddress] = useState("");
-    const [dob, setDob] = useState('');
-    const [showDatePicker, setShowDatePicker] = useState(false);
+  const [username, setUsername] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [email, setEmail] = useState("");
+  const [gender, setGender] = useState("");
+  const [address, setAddress] = useState("");
+  const [dob, setDob] = useState("");
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   // UI only
   const [profileImage, setProfileImage] = useState(null);
@@ -120,207 +121,217 @@ const EditProfile = () => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={COLORS.primary}/>
+        <ActivityIndicator size="small" color={COLORS.secondary} />
       </View>
     );
   }
 
   return (
-    <View style={styles.screen}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
-      >
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="arrow-back" size={23} color="#222" />
-          </TouchableOpacity>
-
-          <Text style={styles.title}>Edit Profile</Text>
-
-          <View style={styles.headerPlaceholder} />
-        </View>
-
-        <View style={styles.profileSection}>
-          <View style={styles.imageWrapper}>
-            {profileImage ? (
-              <Image
-                source={{ uri: profileImage }}
-                style={styles.profileImage}
-              />
-            ) : (
-              <View style={styles.profilePlaceholder}>
-                <Ionicons name="person" size={58} color="#fff" />
-              </View>
-            )}
-
-            <TouchableOpacity style={styles.cameraButton} activeOpacity={0.8}>
-              <Ionicons name="camera" size={19} color="#fff" />
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f9f7fb" }}>
+      <View style={styles.screen}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.content}
+        >
+          <View style={styles.header}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => router.back()}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="arrow-back" size={23} color="#222" />
             </TouchableOpacity>
+
+            <Text style={styles.title}>Edit Profile</Text>
+
+            <View style={styles.headerPlaceholder} />
           </View>
 
-          <Text style={styles.changePhotoText}>Change profile photo</Text>
-        </View>
+          <View style={styles.profileSection}>
+            <View style={styles.imageWrapper}>
+              {profileImage ? (
+                <Image
+                  source={{ uri: profileImage }}
+                  style={styles.profileImage}
+                />
+              ) : (
+                <View style={styles.profilePlaceholder}>
+                  <Ionicons name="person" size={58} color="#fff" />
+                </View>
+              )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Personal Information</Text>
+              <TouchableOpacity style={styles.cameraButton} activeOpacity={0.8}>
+                <Ionicons name="camera" size={19} color="#fff" />
+              </TouchableOpacity>
+            </View>
 
-          {/* <Text style={styles.label}>
+            <Text style={styles.changePhotoText}>Change profile photo</Text>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Personal Information</Text>
+
+            {/* <Text style={styles.label}>
                         Username
                     </Text> */}
-          <View style={styles.inputContainer}>
-            <Ionicons name="person-outline" size={20} color="#999" />
-            <TextInput
-              style={styles.input}
-              value={username}
-              onChangeText={setUsername}
-              placeholder="Username"
-              placeholderTextColor="#aaa"
-              autoCapitalize="none"
-            />
-          </View>
+            <View style={styles.inputContainer}>
+              <Ionicons name="person-outline" size={20} color="#999" />
+              <TextInput
+                style={styles.input}
+                value={username}
+                onChangeText={setUsername}
+                placeholder="Username"
+                placeholderTextColor="#aaa"
+                autoCapitalize="none"
+              />
+            </View>
 
-          <View style={styles.inputContainer}>
-            <Ionicons name="call-outline" size={20} color="#999" />
-            <TextInput
-              style={styles.input}
-              value={mobileNumber}
-              onChangeText={setMobileNumber}
-              placeholder="Phone number"
-              placeholderTextColor="#aaa"
-              keyboardType="phone-pad"
-            />
-          </View>
+            <View style={styles.inputContainer}>
+              <Ionicons name="call-outline" size={20} color="#999" />
+              <TextInput
+                style={styles.input}
+                value={mobileNumber}
+                onChangeText={setMobileNumber}
+                placeholder="Phone number"
+                placeholderTextColor="#aaa"
+                keyboardType="phone-pad"
+              />
+            </View>
 
-          <View style={styles.inputContainer}>
-            <Ionicons name="mail-outline" size={20} color="#999" />
+            <View style={styles.inputContainer}>
+              <Ionicons name="mail-outline" size={20} color="#999" />
 
-            <TextInput
-              style={styles.input}
-              value={email}
-              onChangeText={setEmail}
-              placeholder="Email address"
-              placeholderTextColor="#aaa"
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
+              <TextInput
+                style={styles.input}
+                value={email}
+                onChangeText={setEmail}
+                placeholder="Email address"
+                placeholderTextColor="#aaa"
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
 
-          <View style={styles.inputContainer}>
-            <Ionicons name="person-outline" size={20} color="#999" />
+            <View style={styles.inputContainer}>
+              <Ionicons name="person-outline" size={20} color="#999" />
 
-            <TextInput
-              style={styles.input}
-              value={gender}
-              onChangeText={setGender}
-              placeholder="Gender"
-              placeholderTextColor="#aaa"
-            />
-          </View>
+              <TextInput
+                style={styles.input}
+                value={gender}
+                onChangeText={setGender}
+                placeholder="Gender"
+                placeholderTextColor="#aaa"
+              />
+            </View>
 
-          <View style={styles.inputContainer}>
-            <Ionicons name="location-outline" size={20} color="#999" />
+            <View style={styles.inputContainer}>
+              <Ionicons name="location-outline" size={20} color="#999" />
 
-            <TextInput
-              style={styles.input}
-              value={address}
-              onChangeText={setAddress}
-              placeholder="Address"
-              placeholderTextColor="#aaa"
-            />
-          </View>
+              <TextInput
+                style={styles.input}
+                value={address}
+                onChangeText={setAddress}
+                placeholder="Address"
+                placeholderTextColor="#aaa"
+              />
+            </View>
 
             <Pressable
-            style={styles.inputContainer}
-            onPress={() => setShowDatePicker(true)}
+              style={styles.inputContainer}
+              onPress={() => setShowDatePicker(true)}
             >
-            <Ionicons name="calendar-outline" size={20} color="#999" />
+              <Ionicons name="calendar-outline" size={20} color="#999" />
 
-            <TextInput
+              <TextInput
                 style={styles.input}
                 value={dob}
                 placeholder="Select Date of Birth"
                 placeholderTextColor="#aaa"
                 editable={false}
                 pointerEvents="none"
-            />
+              />
             </Pressable>
 
             {showDatePicker && (
-            <DateTimePicker
+              <DateTimePicker
                 value={dob ? new Date(dob) : new Date()}
                 mode="date"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                display={Platform.OS === "ios" ? "spinner" : "default"}
                 maximumDate={new Date()}
                 onChange={(event, selectedDate) => {
-                setShowDatePicker(false);
+                  setShowDatePicker(false);
 
-                if (selectedDate) {
+                  if (selectedDate) {
                     const formattedDate = selectedDate
-                    .toISOString()
-                    .split('T')[0];
+                      .toISOString()
+                      .split("T")[0];
 
                     setDob(formattedDate);
-                }
+                  }
                 }}
-            />
-            )}
-        </View>
-
-        <Pressable
-          style={({ pressed }) => [
-            styles.saveButton,
-            pressed && styles.buttonPressed,
-          ]}
-          onPress={handleSave}
-          disabled={saving}
-        >
-          {saving ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <>
-              <Ionicons
-                name="checkmark-circle-outline"
-                size={21}
-                color="#fff"
               />
+            )}
+          </View>
 
-              <Text style={styles.saveButtonText}>Save Changes</Text>
-            </>
-          )}
-        </Pressable>
-
-        <View style={styles.dangerSection}>
-          <Text style={styles.dangerTitle}>Account Settings</Text>
-
-          <TouchableOpacity
-            style={styles.deleteButton}
-            onPress={handleDeleteAccount}
-            activeOpacity={0.75}
+          <Pressable
+            style={({ pressed }) => [
+              styles.saveButton,
+              pressed && styles.buttonPressed,
+            ]}
+            onPress={handleSave}
+            disabled={saving}
           >
-            <View style={styles.deleteLeft}>
-              <View style={styles.deleteIconContainer}>
-                <Ionicons name="trash-outline" size={21} color={COLORS.primary} />
+            {saving ? (
+              <ActivityIndicator size="small" color={COLORS.secondary} />
+            ) : (
+              <>
+                <Ionicons
+                  name="checkmark-circle-outline"
+                  size={21}
+                  color="#fff"
+                />
+
+                <Text style={styles.saveButtonText}>Save Changes</Text>
+              </>
+            )}
+          </Pressable>
+
+          <View style={styles.dangerSection}>
+            <Text style={styles.dangerTitle}>Account Settings</Text>
+
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={handleDeleteAccount}
+              activeOpacity={0.75}
+            >
+              <View style={styles.deleteLeft}>
+                <View style={styles.deleteIconContainer}>
+                  <Ionicons
+                    name="trash-outline"
+                    size={21}
+                    color={COLORS.primary}
+                  />
+                </View>
+
+                <View>
+                  <Text style={styles.deleteText}>Delete Account</Text>
+
+                  <Text style={styles.deleteSubText}>
+                    This action cannot be undone
+                  </Text>
+                </View>
               </View>
 
-              <View>
-                <Text style={styles.deleteText}>Delete Account</Text>
-
-                <Text style={styles.deleteSubText}>
-                  This action cannot be undone
-                </Text>
-              </View>
-            </View>
-
-            <Ionicons name="chevron-forward" size={20} color={COLORS.primary} />
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </View>
+              <Ionicons
+                name="chevron-forward"
+                size={20}
+                color={COLORS.primary}
+              />
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -348,7 +359,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingTop: 58,
+    paddingTop: 25,
     paddingBottom: 20,
   },
 
@@ -356,7 +367,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: "#fff",
+    backgroundColor: "#f9f7fb",
     justifyContent: "center",
     alignItems: "center",
 
@@ -440,7 +451,7 @@ const styles = StyleSheet.create({
   },
 
   section: {
-    backgroundColor: "#fff",
+    backgroundColor: "#f9f7fb",
     borderRadius: 22,
     padding: 18,
 
@@ -531,7 +542,7 @@ const styles = StyleSheet.create({
 
   deleteButton: {
     minHeight: 78,
-    backgroundColor: "#fff",
+    backgroundColor: "#f9f7fb",
     borderRadius: 18,
     paddingHorizontal: 16,
     flexDirection: "row",

@@ -10,8 +10,8 @@ import {
     View,
 } from "react-native";
 import Toast from "react-native-toast-message";
-import API_URL from "../../services/api";
 import { COLORS } from "../../constants/colors";
+import API_URL from "../../services/api";
 
 const VerifyOtp = () => {
   const { email, purpose } = useLocalSearchParams();
@@ -66,8 +66,8 @@ const VerifyOtp = () => {
           type: "success",
           text1: "OTP Verified",
           text2: isRegistration
-                ? "Your email has been verified."
-                : "OTP verified successfully.",
+            ? "Your email has been verified."
+            : "OTP verified successfully.",
           position: "top",
         });
 
@@ -121,7 +121,7 @@ const VerifyOtp = () => {
       </TouchableOpacity>
 
       <View style={styles.iconCircle}>
-        <Ionicons name="mail-outline" size={40} color= "#fff"/>
+        <Ionicons name="mail-outline" size={40} color="#fff" />
       </View>
 
       <Text style={styles.title}>
@@ -129,7 +129,7 @@ const VerifyOtp = () => {
       </Text>
 
       <Text style={styles.subtitle}>
-           Enter the 4-digit verification code sent to
+        Enter the 4-digit verification code sent to
       </Text>
 
       <Text style={styles.email}>{email}</Text>
@@ -170,7 +170,7 @@ export default VerifyOtp;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f9f7fb",
   },
 
   content: {

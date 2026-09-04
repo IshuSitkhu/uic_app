@@ -9,7 +9,13 @@ php artisan serve --host=0.0.0.0 --port=8000
 ### React Native / Expo
 cd mobile
 npm expo install
+
+For local testing:
 npx expo start
+
+For testing from another network/country:
+npx expo start --tunnel
+-But i think A local API URL only works on the same local network.
 
 # Press "a" to run the app on the Android Emulator
 

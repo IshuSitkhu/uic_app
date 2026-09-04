@@ -80,252 +80,252 @@ class BibleController extends Controller
         ]);
     }
     public function getVerse($language, $book, $chapter, $verse)
-{
-    $filepath = match ($language) {
-        'np' => 'ne_ulb.json',
-        'kjv' => 'AKJV_bible.json',
-        'asv' => 'ASV_bible.json',
-        'esv' => 'ESV_bible.json',
-        'nasb' => 'NASB_bible.json',
-        'niv' => 'NIV_bible.json',
-        'nkjv' => 'NKJV_bible.json',
-        'nlt' => 'NLT_bible.json',
-        default => 'AKJV_bible.json',
-    };
+    {
+        $filepath = match ($language) {
+            'np' => 'ne_ulb.json',
+            'kjv' => 'AKJV_bible.json',
+            'asv' => 'ASV_bible.json',
+            'esv' => 'ESV_bible.json',
+            'nasb' => 'NASB_bible.json',
+            'niv' => 'NIV_bible.json',
+            'nkjv' => 'NKJV_bible.json',
+            'nlt' => 'NLT_bible.json',
+            default => 'AKJV_bible.json',
+        };
 
-    $path = public_path('bible/json/' . $filepath);
-    if (!file_exists($path)) {
-        return response()->json(['error' => 'JSON file not found']);
-    }
-
-    $bible = Cache::remember('bible_' . $language, 3600, function () use ($path) {
-        $data = json_decode(file_get_contents($path), true);
-        // Convert flat structure if needed
-        if (isset($data['verses'])) {
-            $nested = [];
-            foreach ($data['verses'] as $v) {
-                $book = $v['book_name'];
-                $chapter = (string)$v['chapter'];
-                $verse = (string)$v['verse'];
-                $nested[$book][$chapter][$verse] = $v['text'];
-            }
-            return $nested;
+        $path = public_path('bible/json/' . $filepath);
+        if (!file_exists($path)) {
+            return response()->json(['error' => 'JSON file not found']);
         }
-        return $data;
-    });
 
-    $book = ucwords(strtolower($book));
-    $chapter = (string)(int)$chapter;
-    $verse = (string)(int)$verse;
-
-    if (isset($bible[$book][$chapter][$verse])) {
-        return response()->json([
-            'book' => $book,
-            'chapter' => (int)$chapter,
-            'verse' => (int)$verse,
-            'text' => $bible[$book][$chapter][$verse]
-        ]);
-    }
-
-    return response()->json(['error' => 'Verse not found'], 404);
-}
-
-
-public function getChapter($language, $book, $chapter)
-{
-    $filepath = match ($language) {
-        'np' => 'ne_ulb.json',
-        'kjv' => 'AKJV_bible.json',
-        'asv' => 'ASV_bible.json',
-        'esv' => 'ESV_bible.json',
-        'nasb' => 'NASB_bible.json',
-        'niv' => 'NIV_bible.json',
-        'nkjv' => 'NKJV_bible.json',
-        'nlt' => 'NLT_bible.json',
-        default => 'AKJV_bible.json',
-    };
-
-    $path = public_path('bible/json/' . $filepath);
-    if (!file_exists($path)) {
-        return response()->json(['error' => 'JSON file not found']);
-    }
-
-    $bible = Cache::remember('bible_' . $language, 3600, function () use ($path) {
-        $data = json_decode(file_get_contents($path), true);
-        if (isset($data['verses'])) {
-            $nested = [];
-            foreach ($data['verses'] as $v) {
-                $book = $v['book_name'];
-                $chapter = (string)$v['chapter'];
-                $verse = (string)$v['verse'];
-                $nested[$book][$chapter][$verse] = $v['text'];
+        $bible = Cache::remember('bible_' . $language, 3600, function () use ($path) {
+            $data = json_decode(file_get_contents($path), true);
+            // Convert flat structure if needed
+            if (isset($data['verses'])) {
+                $nested = [];
+                foreach ($data['verses'] as $v) {
+                    $book = $v['book_name'];
+                    $chapter = (string)$v['chapter'];
+                    $verse = (string)$v['verse'];
+                    $nested[$book][$chapter][$verse] = $v['text'];
+                }
+                return $nested;
             }
-            return $nested;
-        }
-        return $data;
-    });
+            return $data;
+        });
 
-    $book = ucwords(strtolower($book));
-    $chapter = (string)(int)$chapter;
+        $book = ucwords(strtolower($book));
+        $chapter = (string)(int)$chapter;
+        $verse = (string)(int)$verse;
 
-    if (isset($bible[$book][$chapter])) {
-        return response()->json([
-            'book' => $book,
-            'chapter' => (int)$chapter,
-            'verses' => $bible[$book][$chapter]
-        ]);
-    }
-
-    // Flat format support
-    if (isset($bible[0]) && is_array($bible[0]) && isset($bible[0]['book_name'])) {
-        $verses = [];
-        foreach ($bible as $entry) {
-            if (
-                strtolower($entry['book_name']) === strtolower($book) &&
-                (int)$entry['chapter'] === (int)$chapter
-            ) {
-                $verses[(int)$entry['verse']] = $entry['text'];
-            }
-        }
-        if (!empty($verses)) {
-            ksort($verses);
+        if (isset($bible[$book][$chapter][$verse])) {
             return response()->json([
                 'book' => $book,
                 'chapter' => (int)$chapter,
-                'verses' => $verses
+                'verse' => (int)$verse,
+                'text' => $bible[$book][$chapter][$verse]
             ]);
         }
+
+        return response()->json(['error' => 'Verse not found'], 404);
     }
 
-    return response()->json(['error' => 'Chapter not found'], 404);
-}
 
-public function getBook($language, $book)
-{
-    $filepath = match ($language) {
-        'np'   => 'ne_ulb.json',
-        'kjv'  => 'AKJV_bible.json',
-        'asv'  => 'ASV_bible.json',
-        'esv'  => 'ESV_bible.json',
-        'nasb' => 'NASB_bible.json',
-        'niv'  => 'NIV_bible.json',
-        'nkjv' => 'NKJV_bible.json',
-        'nlt'  => 'NLT_bible.json',
-        default => 'AKJV_bible.json',
-    };
+    public function getChapter($language, $book, $chapter)
+    {
+        $filepath = match ($language) {
+            'np' => 'ne_ulb.json',
+            'kjv' => 'AKJV_bible.json',
+            'asv' => 'ASV_bible.json',
+            'esv' => 'ESV_bible.json',
+            'nasb' => 'NASB_bible.json',
+            'niv' => 'NIV_bible.json',
+            'nkjv' => 'NKJV_bible.json',
+            'nlt' => 'NLT_bible.json',
+            default => 'AKJV_bible.json',
+        };
 
-    $path = public_path('bible/json/' . $filepath);
+        $path = public_path('bible/json/' . $filepath);
+        if (!file_exists($path)) {
+            return response()->json(['error' => 'JSON file not found']);
+        }
 
-    if (!file_exists($path)) {
-        return response()->json([
-            'error' => 'JSON file not found'
-        ], 404);
-    }
-
-    $bible = Cache::remember('bible_' . $language, 3600, function () use ($path) {
-
-        $data = json_decode(file_get_contents($path), true);
-
-        if (isset($data['verses'])) {
-
-            $nested = [];
-
-            foreach ($data['verses'] as $v) {
-
-                $book = $v['book_name'];
-                $chapter = (string) $v['chapter'];
-                $verse = (string) $v['verse'];
-
-                $nested[$book][$chapter][$verse] = $v['text'];
+        $bible = Cache::remember('bible_' . $language, 3600, function () use ($path) {
+            $data = json_decode(file_get_contents($path), true);
+            if (isset($data['verses'])) {
+                $nested = [];
+                foreach ($data['verses'] as $v) {
+                    $book = $v['book_name'];
+                    $chapter = (string)$v['chapter'];
+                    $verse = (string)$v['verse'];
+                    $nested[$book][$chapter][$verse] = $v['text'];
+                }
+                return $nested;
             }
+            return $data;
+        });
 
-            return $nested;
+        $book = ucwords(strtolower($book));
+        $chapter = (string)(int)$chapter;
+
+        if (isset($bible[$book][$chapter])) {
+            return response()->json([
+                'book' => $book,
+                'chapter' => (int)$chapter,
+                'verses' => $bible[$book][$chapter]
+            ]);
         }
 
-        return $data;
-    });
-
-    $book = ucwords(strtolower($book));
-
-    /*
-    |--------------------------------------------------------------------------
-    | Nested format
-    |--------------------------------------------------------------------------
-    */
-
-    if (isset($bible[$book])) {
-
-        $chapters = [];
-
-        foreach ($bible[$book] as $chapter => $verses) {
-
-            $chapters[] = [
-                'chapter' => (int) $chapter,
-                'verseCount' => count($verses),
-            ];
-        }
-
-        return response()->json([
-            'book' => $book,
-            'chapters' => $chapters
-        ]);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Flat format
-    |--------------------------------------------------------------------------
-    */
-
-    if (isset($bible[0]) && isset($bible[0]['book_name'])) {
-
-        $chapters = [];
-
-        foreach ($bible as $entry) {
-
-            if (
-                strtolower($entry['book_name']) === strtolower($book)
-            ) {
-
-                $chapter = (int) $entry['chapter'];
-
-                $chapters[$chapter] = true;
+        // Flat format support
+        if (isset($bible[0]) && is_array($bible[0]) && isset($bible[0]['book_name'])) {
+            $verses = [];
+            foreach ($bible as $entry) {
+                if (
+                    strtolower($entry['book_name']) === strtolower($book) &&
+                    (int)$entry['chapter'] === (int)$chapter
+                ) {
+                    $verses[(int)$entry['verse']] = $entry['text'];
+                }
+            }
+            if (!empty($verses)) {
+                ksort($verses);
+                return response()->json([
+                    'book' => $book,
+                    'chapter' => (int)$chapter,
+                    'verses' => $verses
+                ]);
             }
         }
 
-        if (!empty($chapters)) {
+        return response()->json(['error' => 'Chapter not found'], 404);
+    }
 
-            $result = [];
+    public function getBook($language, $book)
+    {
+        $filepath = match ($language) {
+            'np'   => 'ne_ulb.json',
+            'kjv'  => 'AKJV_bible.json',
+            'asv'  => 'ASV_bible.json',
+            'esv'  => 'ESV_bible.json',
+            'nasb' => 'NASB_bible.json',
+            'niv'  => 'NIV_bible.json',
+            'nkjv' => 'NKJV_bible.json',
+            'nlt'  => 'NLT_bible.json',
+            default => 'AKJV_bible.json',
+        };
 
-            foreach (array_keys($chapters) as $chapter) {
+        $path = public_path('bible/json/' . $filepath);
 
-                $verseCount = 0;
+        if (!file_exists($path)) {
+            return response()->json([
+                'error' => 'JSON file not found'
+            ], 404);
+        }
 
-                foreach ($bible as $entry) {
+        $bible = Cache::remember('bible_' . $language, 3600, function () use ($path) {
 
-                    if (
-                        strtolower($entry['book_name']) === strtolower($book) &&
-                        (int) $entry['chapter'] === $chapter
-                    ) {
-                        $verseCount++;
-                    }
+            $data = json_decode(file_get_contents($path), true);
+
+            if (isset($data['verses'])) {
+
+                $nested = [];
+
+                foreach ($data['verses'] as $v) {
+
+                    $book = $v['book_name'];
+                    $chapter = (string) $v['chapter'];
+                    $verse = (string) $v['verse'];
+
+                    $nested[$book][$chapter][$verse] = $v['text'];
                 }
 
-                $result[] = [
-                    'chapter' => $chapter,
-                    'verseCount' => $verseCount,
+                return $nested;
+            }
+
+            return $data;
+        });
+
+        $book = ucwords(strtolower($book));
+
+        /*
+        |--------------------------------------------------------------------------
+        | Nested format
+        |--------------------------------------------------------------------------
+        */
+
+        if (isset($bible[$book])) {
+
+            $chapters = [];
+
+            foreach ($bible[$book] as $chapter => $verses) {
+
+                $chapters[] = [
+                    'chapter' => (int) $chapter,
+                    'verseCount' => count($verses),
                 ];
             }
 
             return response()->json([
                 'book' => $book,
-                'chapters' => $result
+                'chapters' => $chapters
             ]);
         }
-    }
 
-    return response()->json([
-        'error' => 'Book not found'
-    ], 404);
-}
+        /*
+        |--------------------------------------------------------------------------
+        | Flat format
+        |--------------------------------------------------------------------------
+        */
+
+        if (isset($bible[0]) && isset($bible[0]['book_name'])) {
+
+            $chapters = [];
+
+            foreach ($bible as $entry) {
+
+                if (
+                    strtolower($entry['book_name']) === strtolower($book)
+                ) {
+
+                    $chapter = (int) $entry['chapter'];
+
+                    $chapters[$chapter] = true;
+                }
+            }
+
+            if (!empty($chapters)) {
+
+                $result = [];
+
+                foreach (array_keys($chapters) as $chapter) {
+
+                    $verseCount = 0;
+
+                    foreach ($bible as $entry) {
+
+                        if (
+                            strtolower($entry['book_name']) === strtolower($book) &&
+                            (int) $entry['chapter'] === $chapter
+                        ) {
+                            $verseCount++;
+                        }
+                    }
+
+                    $result[] = [
+                        'chapter' => $chapter,
+                        'verseCount' => $verseCount,
+                    ];
+                }
+
+                return response()->json([
+                    'book' => $book,
+                    'chapters' => $result
+                ]);
+            }
+        }
+
+        return response()->json([
+            'error' => 'Book not found'
+        ], 404);
+    }
 }

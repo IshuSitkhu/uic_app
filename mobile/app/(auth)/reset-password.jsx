@@ -11,8 +11,8 @@ import {
     View,
 } from "react-native";
 import Toast from "react-native-toast-message";
-import API_URL from "../../services/api";
 import { COLORS } from "../../constants/colors";
+import API_URL from "../../services/api";
 
 const ResetPassword = () => {
   const { email, otp } = useLocalSearchParams();
@@ -20,7 +20,7 @@ const ResetPassword = () => {
   console.log("Reset password params:", {
     email,
     otp,
-});
+  });
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -202,7 +202,7 @@ export default ResetPassword;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f9f7fb",
   },
 
   content: {
