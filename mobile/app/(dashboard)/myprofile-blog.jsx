@@ -1,19 +1,18 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import API_URL from "../..//services/api";
+import API_URL from "../../services/api";
 
 import {
-  FlatList,
-  Image,
-  Modal,
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
+    FlatList,
+    Image,
+    Modal,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View
 } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -42,14 +41,14 @@ const stripHtml = (html = "") => {
 };
 
 export default function MyProfileBlog() {
-    const insets = useSafeAreaInsets();
-    const [activeTab, setActiveTab] = useState("myBlogs");
+  const insets = useSafeAreaInsets();
+  const [activeTab, setActiveTab] = useState("myBlogs");
 
-    const [myBlogs, setMyBlogs] = useState([]);
-    const [savedBlogs, setSavedBlogs] = useState([]);
+  const [myBlogs, setMyBlogs] = useState([]);
+  const [savedBlogs, setSavedBlogs] = useState([]);
 
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const [blogType, setBlogType] = useState("All");
   const [category, setCategory] = useState("All");
@@ -58,115 +57,109 @@ export default function MyProfileBlog() {
   const [filterModal, setFilterModal] = useState(null);
 
   const fetchMyBlogs = async () => {
-  try {
-    const token = await AsyncStorage.getItem("token");
+    try {
+      const token = await AsyncStorage.getItem("token");
 
-    if (!token) {
-      throw new Error("Authentication token not found.");
+      if (!token) {
+        throw new Error("Authentication token not found.");
+      }
+
+      const response = await fetch(`${API_URL}/blogs/my`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch your blogs.");
+      }
+
+      const formattedBlogs = (data.blogs || []).map((blog) => ({
+        id: String(blog.id),
+        title: blog.blog_title,
+        description: stripHtml(blog.blog),
+        category: blog.blog_category,
+        type: blog.blog_type,
+        date: blog.blog_date,
+        image: blog.blog_file,
+        original: blog,
+      }));
+
+      setMyBlogs(formattedBlogs);
+    } catch (error) {
+      console.log("MY BLOGS ERROR:", error);
+      setError(error.message || "Failed to load blogs.");
     }
-
-    const response = await fetch(`${API_URL}/blogs/my`, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to fetch your blogs.");
-    }
-
-    const formattedBlogs = (data.blogs || []).map((blog) => ({
-      id: String(blog.id),
-      title: blog.blog_title,
-      description: stripHtml(blog.blog),
-      category: blog.blog_category,
-      type: blog.blog_type,
-      date: blog.blog_date,
-      image: blog.blog_file,
-      original: blog,
-    }));
-
-    setMyBlogs(formattedBlogs);
-  } catch (error) {
-    console.log("MY BLOGS ERROR:", error);
-    setError(error.message || "Failed to load blogs.");
-  }
-};
-
-const fetchSavedBlogs = async () => {
-  try {
-    const token = await AsyncStorage.getItem("token");
-
-    if (!token) {
-      throw new Error("Authentication token not found.");
-    }
-
-    const response = await fetch(`${API_URL}/blogs/saved`, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to fetch saved blogs.");
-    }
-
-    const formattedBlogs = (data.blogs || []).map((blog) => ({
-      id: String(blog.id),
-      title: blog.blog_title,
-      description: stripHtml(blog.blog),
-      category: blog.blog_category,
-      type: blog.blog_type,
-      date: blog.blog_date,
-      image: blog.blog_file,
-      original: blog,
-    }));
-
-    setSavedBlogs(formattedBlogs);
-  } catch (error) {
-    console.log("SAVED BLOGS ERROR:", error);
-    setError(error.message || "Failed to load saved blogs.");
-  }
-};
-
-useEffect(() => {
-  const loadBlogs = async () => {
-    setLoading(true);
-    setError("");
-
-    await Promise.all([
-      fetchMyBlogs(),
-      fetchSavedBlogs(),
-    ]);
-
-    setLoading(false);
   };
 
-  loadBlogs();
-}, []);
+  const fetchSavedBlogs = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
 
-const filteredBlogs = useMemo(() => {
-  return myBlogs.filter((blog) => {
-    const typeMatch =
-      blogType === "All" || blog.type === blogType;
+      if (!token) {
+        throw new Error("Authentication token not found.");
+      }
 
-    const categoryMatch =
-      category === "All" || blog.category === category;
+      const response = await fetch(`${API_URL}/blogs/saved`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    const dateMatch =
-      !dateFrom || blog.date >= dateFrom;
+      const data = await response.json();
 
-    return typeMatch && categoryMatch && dateMatch;
-  });
-}, [myBlogs, blogType, category, dateFrom]);
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch saved blogs.");
+      }
+
+      const formattedBlogs = (data.blogs || []).map((blog) => ({
+        id: String(blog.id),
+        title: blog.blog_title,
+        description: stripHtml(blog.blog),
+        category: blog.blog_category,
+        type: blog.blog_type,
+        date: blog.blog_date,
+        image: blog.blog_file,
+        original: blog,
+      }));
+
+      setSavedBlogs(formattedBlogs);
+    } catch (error) {
+      console.log("SAVED BLOGS ERROR:", error);
+      setError(error.message || "Failed to load saved blogs.");
+    }
+  };
+
+  useEffect(() => {
+    const loadBlogs = async () => {
+      setLoading(true);
+      setError("");
+
+      await Promise.all([fetchMyBlogs(), fetchSavedBlogs()]);
+
+      setLoading(false);
+    };
+
+    loadBlogs();
+  }, []);
+
+  const filteredBlogs = useMemo(() => {
+    return myBlogs.filter((blog) => {
+      const typeMatch = blogType === "All" || blog.type === blogType;
+
+      const categoryMatch = category === "All" || blog.category === category;
+
+      const dateMatch = !dateFrom || blog.date >= dateFrom;
+
+      return typeMatch && categoryMatch && dateMatch;
+    });
+  }, [myBlogs, blogType, category, dateFrom]);
 
   const clearFilters = () => {
     setBlogType("All");
@@ -176,72 +169,47 @@ const filteredBlogs = useMemo(() => {
 
   return (
     <View
-        style={{
-          flex: 1,
-          backgroundColor: "#f9f7fb",
-          paddingTop: insets.top,
-          paddingBottom: insets.bottom,
-        }}
-      >
+      style={{
+        flex: 1,
+        backgroundColor: "#F9F7FB",
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+      }}
+    >
       <View style={styles.container}>
-
-        {/* HEADER */}
         <View style={styles.header}>
-          <Pressable
-            style={styles.headerButton}
-            onPress={() => router.back()}
-          >
-            <Ionicons
-              name="arrow-back"
-              size={24}
-              color={COLORS.text}
-            />
+          <Pressable style={styles.headerButton} onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color={COLORS.text} />
           </Pressable>
 
-          <Text style={styles.headerTitle}>
-            My Blogs
-          </Text>
+          <Text style={styles.headerTitle}>My Blogs</Text>
 
           <Pressable
             style={styles.addButton}
             onPress={() => router.push("/add-blog")}
           >
-            <Ionicons
-              name="add"
-              size={22}
-              color="#FFFFFF"
-            />
+            <Ionicons name="add" size={22} color="#FFFFFF" />
 
-            <Text style={styles.addButtonText}>
-              Add Blog
-            </Text>
+            <Text style={styles.addButtonText}>Add Blog</Text>
           </Pressable>
         </View>
 
         {/* TAB SWITCHER */}
         <View style={styles.tabContainer}>
           <Pressable
-            style={[
-              styles.tab,
-              activeTab === "myBlogs" && styles.activeTab,
-            ]}
+            style={[styles.tab, activeTab === "myBlogs" && styles.activeTab]}
             onPress={() => setActiveTab("myBlogs")}
           >
             <MaterialCommunityIcons
               name="clipboard-edit-outline"
               size={20}
-              color={
-                activeTab === "myBlogs"
-                  ? "#FFFFFF"
-                  : COLORS.muted
-              }
+              color={activeTab === "myBlogs" ? "#FFFFFF" : COLORS.muted}
             />
 
             <Text
               style={[
                 styles.tabText,
-                activeTab === "myBlogs" &&
-                  styles.activeTabText,
+                activeTab === "myBlogs" && styles.activeTabText,
               ]}
             >
               My Blogs
@@ -249,31 +217,19 @@ const filteredBlogs = useMemo(() => {
           </Pressable>
 
           <Pressable
-            style={[
-              styles.tab,
-              activeTab === "saved" && styles.activeTab,
-            ]}
+            style={[styles.tab, activeTab === "saved" && styles.activeTab]}
             onPress={() => setActiveTab("saved")}
           >
             <Ionicons
-              name={
-                activeTab === "saved"
-                  ? "bookmark"
-                  : "bookmark-outline"
-              }
+              name={activeTab === "saved" ? "bookmark" : "bookmark-outline"}
               size={20}
-              color={
-                activeTab === "saved"
-                  ? "#FFFFFF"
-                  : COLORS.muted
-              }
+              color={activeTab === "saved" ? "#FFFFFF" : COLORS.muted}
             />
 
             <Text
               style={[
                 styles.tabText,
-                activeTab === "saved" &&
-                  styles.activeTabText,
+                activeTab === "saved" && styles.activeTabText,
               ]}
             >
               Saved
@@ -286,17 +242,11 @@ const filteredBlogs = useMemo(() => {
             {/* FILTERS */}
             <View style={styles.filterSection}>
               <View style={styles.filterHeader}>
-                <Text style={styles.sectionTitle}>
-                  Your Blogs
-                </Text>
+                <Text style={styles.sectionTitle}>Your Blogs</Text>
 
-                {(blogType !== "All" ||
-                  category !== "All" ||
-                  dateFrom) && (
+                {(blogType !== "All" || category !== "All" || dateFrom) && (
                   <Pressable onPress={clearFilters}>
-                    <Text style={styles.clearText}>
-                      Clear
-                    </Text>
+                    <Text style={styles.clearText}>Clear</Text>
                   </Pressable>
                 )}
               </View>
@@ -310,18 +260,14 @@ const filteredBlogs = useMemo(() => {
                   icon="lock-open-outline"
                   label="Type"
                   value={blogType}
-                  onPress={() =>
-                    setFilterModal("type")
-                  }
+                  onPress={() => setFilterModal("type")}
                 />
 
                 <FilterButton
                   icon="pricetags-outline"
                   label="Category"
                   value={category}
-                  onPress={() =>
-                    setFilterModal("category")
-                  }
+                  onPress={() => setFilterModal("category")}
                 />
 
                 {/* <FilterButton
@@ -341,9 +287,7 @@ const filteredBlogs = useMemo(() => {
               keyExtractor={(item) => item.id}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={styles.listContent}
-              renderItem={({ item }) => (
-                <BlogCard blog={item} editable />
-              )}
+              renderItem={({ item }) => <BlogCard blog={item} editable />}
               ListEmptyComponent={
                 <EmptyState
                   title="No blogs found"
@@ -361,12 +305,7 @@ const filteredBlogs = useMemo(() => {
             keyExtractor={(item) => item.id}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.listContent}
-            renderItem={({ item }) => (
-              <BlogCard
-                blog={item}
-                saved
-              />
-            )}
+            renderItem={({ item }) => <BlogCard blog={item} saved />}
             ListEmptyComponent={
               <EmptyState
                 title="No saved blogs"
@@ -394,14 +333,11 @@ const filteredBlogs = useMemo(() => {
               <View style={styles.sheetHandle} />
 
               <Text style={styles.sheetTitle}>
-                {filterModal === "type" &&
-                  "Blog Type"}
+                {filterModal === "type" && "Blog Type"}
 
-                {filterModal === "category" &&
-                  "Category"}
+                {filterModal === "category" && "Category"}
 
-                {filterModal === "date" &&
-                  "Date"}
+                {filterModal === "date" && "Date"}
               </Text>
 
               {filterModal === "type" && (
@@ -477,27 +413,26 @@ const filteredBlogs = useMemo(() => {
                     label="Faith"
                     selected={category === "faith"}
                     onPress={() => {
-                        setCategory("faith");
-                        setFilterModal(null);
+                      setCategory("faith");
+                      setFilterModal(null);
                     }}
-                    />
+                  />
 
-                    <Option
+                  <Option
                     label="Relationship"
                     selected={category === "relationship"}
                     onPress={() => {
-                        setCategory("relationship");
-                        setFilterModal(null);
+                      setCategory("relationship");
+                      setFilterModal(null);
                     }}
-                    />
+                  />
                 </>
               )}
 
               {filterModal === "date" && (
                 <>
                   <Text style={styles.dateInfo}>
-                    Date filtering will use the
-                    date picker here.
+                    Date filtering will use the date picker here.
                   </Text>
 
                   <Pressable
@@ -513,9 +448,7 @@ const filteredBlogs = useMemo(() => {
                       color={COLORS.primary}
                     />
 
-                    <Text style={styles.dateOptionText}>
-                      From Aug 25, 2026
-                    </Text>
+                    <Text style={styles.dateOptionText}>From Aug 25, 2026</Text>
                   </Pressable>
 
                   <Pressable
@@ -531,9 +464,7 @@ const filteredBlogs = useMemo(() => {
                       color={COLORS.muted}
                     />
 
-                    <Text style={styles.dateOptionText}>
-                      Any date
-                    </Text>
+                    <Text style={styles.dateOptionText}>Any date</Text>
                   </Pressable>
                 </>
               )}
@@ -545,55 +476,32 @@ const filteredBlogs = useMemo(() => {
   );
 }
 
-
-function FilterButton({
-  icon,
-  label,
-  value,
-  onPress,
-}) {
+function FilterButton({ icon, label, value, onPress }) {
   const active = value !== "All" && value !== "Any date";
 
   return (
     <Pressable
-      style={[
-        styles.filterButton,
-        active && styles.activeFilterButton,
-      ]}
+      style={[styles.filterButton, active && styles.activeFilterButton]}
       onPress={onPress}
     >
       <Ionicons
         name={icon}
         size={18}
-        color={
-          active ? COLORS.primary : COLORS.muted
-        }
+        color={active ? COLORS.primary : COLORS.muted}
       />
 
       <View>
-        <Text style={styles.filterLabel}>
-          {label}
-        </Text>
+        <Text style={styles.filterLabel}>{label}</Text>
 
-        <Text
-          style={[
-            styles.filterValue,
-            active && styles.activeFilterValue,
-          ]}
-        >
+        <Text style={[styles.filterValue, active && styles.activeFilterValue]}>
           {value}
         </Text>
       </View>
 
-      <Ionicons
-        name="chevron-down"
-        size={16}
-        color={COLORS.muted}
-      />
+      <Ionicons name="chevron-down" size={16} color={COLORS.muted} />
     </Pressable>
   );
 }
-
 
 function BlogCard({ blog, saved, editable }) {
   return (
@@ -608,9 +516,7 @@ function BlogCard({ blog, saved, editable }) {
         })
       }
     >
-
       <View style={styles.blogMainRow}>
-
         <View style={styles.blogImageBox}>
           <Image
             source={
@@ -629,31 +535,18 @@ function BlogCard({ blog, saved, editable }) {
         </View>
 
         <View style={styles.blogContent}>
-
-          <Text
-            style={styles.blogTitle}
-            numberOfLines={1}
-          >
+          <Text style={styles.blogTitle} numberOfLines={1}>
             {blog.title}
           </Text>
 
-          <Text
-            style={styles.blogDescription}
-            numberOfLines={3}
-          >
+          <Text style={styles.blogDescription} numberOfLines={3}>
             {blog.description}
           </Text>
-
         </View>
 
         <View style={styles.blogCardActions}>
-
           {saved && (
-            <Ionicons
-              name="bookmark"
-              size={20}
-              color={COLORS.primary}
-            />
+            <Ionicons name="bookmark" size={20} color={COLORS.primary} />
           )}
 
           {editable && (
@@ -670,35 +563,25 @@ function BlogCard({ blog, saved, editable }) {
               />
             </Pressable>
           )}
-
         </View>
       </View>
 
-
       <View style={styles.blogMetaRow}>
-          
         <View style={styles.categoryContainer}>
-          <Ionicons
-            name="pricetag-outline"
-            size={14}
-            color="#C45A5A"
-          />
+          <Ionicons name="pricetag-outline" size={14} color="#C45A5A" />
 
           <Text style={styles.categoryText}>
             {blog.category
-              ? blog.category.charAt(0).toUpperCase() +
-                blog.category.slice(1)
+              ? blog.category.charAt(0).toUpperCase() + blog.category.slice(1)
               : ""}
           </Text>
         </View>
-        
 
         {!saved && (
           <View
             style={[
               styles.typeBadge,
-              blog.type === "personal" &&
-                styles.privateBadge,
+              blog.type === "personal" && styles.privateBadge,
             ]}
           >
             <Ionicons
@@ -712,67 +595,37 @@ function BlogCard({ blog, saved, editable }) {
             />
 
             <Text style={styles.typeBadgeText}>
-              {blog.type === "personal"
-                ? "Personal"
-                : "Public"}
+              {blog.type === "personal" ? "Personal" : "Public"}
             </Text>
           </View>
         )}
 
         {/* DATE */}
         <View style={styles.dateContainer}>
-          <Ionicons
-            name="calendar-outline"
-            size={14}
-            color={COLORS.muted}
-          />
+          <Ionicons name="calendar-outline" size={14} color={COLORS.muted} />
 
-          <Text style={styles.blogDate}>
-            {formatDate(blog.date)}
-          </Text>
+          <Text style={styles.blogDate}>{formatDate(blog.date)}</Text>
         </View>
-
       </View>
     </Pressable>
   );
 }
 
-
-function Option({
-  label,
-  selected,
-  onPress,
-}) {
+function Option({ label, selected, onPress }) {
   return (
-    <Pressable
-      style={styles.option}
-      onPress={onPress}
-    >
-      <Text
-        style={[
-          styles.optionText,
-          selected && styles.selectedOptionText,
-        ]}
-      >
+    <Pressable style={styles.option} onPress={onPress}>
+      <Text style={[styles.optionText, selected && styles.selectedOptionText]}>
         {label}
       </Text>
 
       {selected && (
-        <Ionicons
-          name="checkmark-circle"
-          size={23}
-          color={COLORS.primary}
-        />
+        <Ionicons name="checkmark-circle" size={23} color={COLORS.primary} />
       )}
     </Pressable>
   );
 }
 
-
-function EmptyState({
-  title,
-  message,
-}) {
+function EmptyState({ title, message }) {
   return (
     <View style={styles.emptyState}>
       <View style={styles.emptyIcon}>
@@ -783,17 +636,12 @@ function EmptyState({
         />
       </View>
 
-      <Text style={styles.emptyTitle}>
-        {title}
-      </Text>
+      <Text style={styles.emptyTitle}>{title}</Text>
 
-      <Text style={styles.emptyMessage}>
-        {message}
-      </Text>
+      <Text style={styles.emptyMessage}>{message}</Text>
     </View>
   );
 }
-
 
 function formatDate(date) {
   const d = new Date(date);
@@ -986,12 +834,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 6,
     gap: 5,
-    },
+  },
 
-    blogAuthor: {
+  blogAuthor: {
     fontSize: 12,
     color: COLORS.muted,
-    },
+  },
 
   typeBadge: {
     flexDirection: "row",
@@ -1014,63 +862,63 @@ const styles = StyleSheet.create({
   },
 
   dateContainer: {
-  flexDirection: "row",
-  alignItems: "center",
-  gap: 5,
-  marginLeft: "auto",
-},
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    marginLeft: "auto",
+  },
 
   blogCardActions: {
-  flexDirection: "row",
-  alignItems: "center",
-  gap: 8,
-},
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
 
-editButton: {
-  width: 34,
-  height: 34,
-  borderRadius: 17,
-  backgroundColor: "#FFF5F7",
-  alignItems: "center",
-  justifyContent: "center",
-},
+  editButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "#FFF5F7",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 
-blogMainRow: {
-  flexDirection: "row",
-  alignItems: "flex-start",
-},
+  blogMainRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
 
-blogImageBox: {
-  width: 122,
-  height: 102,
-  borderRadius: 16,
-  overflow: "hidden",
-  backgroundColor: "#F1EDF6",
-},
+  blogImageBox: {
+    width: 122,
+    height: 102,
+    borderRadius: 16,
+    overflow: "hidden",
+    backgroundColor: "#F1EDF6",
+  },
 
-blogImage: {
-  width: "100%",
-  height: "100%",
-},
+  blogImage: {
+    width: "100%",
+    height: "100%",
+  },
 
-blogContent: {
-  flex: 1,
-  marginLeft: 14,
-  paddingRight: 6,
-},
+  blogContent: {
+    flex: 1,
+    marginLeft: 14,
+    paddingRight: 6,
+  },
 
-blogCardActions: {
-  flexDirection: "row",
-  alignItems: "center",
-  gap: 4,
-},
+  blogCardActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
 
-moreButton: {
-  width: 32,
-  height: 32,
-  alignItems: "center",
-  justifyContent: "center",
-},
+  moreButton: {
+    width: 32,
+    height: 32,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 
   blogTitle: {
     marginTop: 13,
@@ -1107,30 +955,30 @@ moreButton: {
   },
 
   blogMetaRow: {
-  flexDirection: "row",
-  alignItems: "center",
-  marginTop: 14,
-  paddingTop: 11,
-  borderTopWidth: 1,
-  borderTopColor: COLORS.border,
-  gap: 10,
-},
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 14,
+    paddingTop: 11,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+    gap: 10,
+  },
 
-categoryContainer: {
-  flexDirection: "row",
-  alignItems: "center",
-  gap: 5,
-  backgroundColor: "#F8EFF2",
-  paddingHorizontal: 9,
-  paddingVertical: 5,
-  borderRadius: 8,
-},
+  categoryContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    backgroundColor: "#F8EFF2",
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 8,
+  },
 
   blogDate: {
     fontSize: 12,
     color: COLORS.muted,
     fontWeight: "500",
-    },
+  },
 
   /* EMPTY */
 

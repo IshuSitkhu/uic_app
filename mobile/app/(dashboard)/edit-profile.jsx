@@ -127,7 +127,7 @@ const EditProfile = () => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#f9f7fb" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F9F7FB" }}>
       <View style={styles.screen}>
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     justifyContent: "center",
     alignItems: "center",
 
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
   },
 
   section: {
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     borderRadius: 22,
     padding: 18,
 
@@ -542,7 +542,7 @@ const styles = StyleSheet.create({
 
   deleteButton: {
     minHeight: 78,
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     borderRadius: 18,
     paddingHorizontal: 16,
     flexDirection: "row",

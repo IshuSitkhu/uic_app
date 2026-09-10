@@ -13,6 +13,11 @@ export default function DashboardLayout() {
             <Stack.Screen  name="add-blog"  options={{ headerShown: false, }}/>
             <Stack.Screen  name="settings"  options={{ headerShown: false, }}/>
             <Stack.Screen name="edit-profile"   options={{ headerShown: false,  }}/>
+            <Stack.Screen name="user-profile"   options={{ headerShown: false,  }}/>
+            <Stack.Screen name="song-category"   options={{ headerShown: false,  }}/>
+            <Stack.Screen name="song-list"   options={{ headerShown: false,  }}/>
+            <Stack.Screen name="full-song"   options={{ headerShown: false,  }}/>
+            <Stack.Screen name="connections"   options={{ headerShown: false,  }}/>
             <Stack.Screen name="saved-bible"   options={{ headerShown: false,  }}/>
             <Stack.Screen name="highlight-bible"   options={{ headerShown: false,  }}/>
 

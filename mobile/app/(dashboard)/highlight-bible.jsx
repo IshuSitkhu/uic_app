@@ -4,19 +4,18 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
     ActivityIndicator,
-    SafeAreaView,
     ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
-    View,
+    View
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
 import API_URL from "../../services/api";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const highlightBible = () => {
-    const insets = useSafeAreaInsets();
+  const insets = useSafeAreaInsets();
   const [highlightBible, setHighlightBible] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -59,13 +58,13 @@ const highlightBible = () => {
 
   return (
     <View
-            style={{
-              flex: 1,
-              backgroundColor: "#f9f7fb",
-              paddingTop: insets.top,
-              paddingBottom: insets.bottom,
-            }}
-          >
+      style={{
+        flex: 1,
+        backgroundColor: "#F9F7FB",
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+      }}
+    >
       <View style={styles.screen}>
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -115,8 +114,8 @@ const highlightBible = () => {
                       {item.book} {item.chapter}:{item.verse}
                     </Text>
                     <Text style={styles.translation}>
-                        {item.translation?.toUpperCase()}
-                      </Text>
+                      {item.translation?.toUpperCase()}
+                    </Text>
                   </View>
 
                   <View style={styles.verseTextContainer}>
@@ -129,8 +128,6 @@ const highlightBible = () => {
 
                     <View>
                       <Text style={styles.verseText}>{item.text}</Text>
-
-                      
                     </View>
                   </View>
                 </View>

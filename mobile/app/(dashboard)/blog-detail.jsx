@@ -1,25 +1,23 @@
-import { EvilIcons, Feather, Fontisto, Ionicons } from "@expo/vector-icons";
+import { EvilIcons, Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Image,
-  ImageBackground,
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  Alert,
+    ActivityIndicator,
+    Alert,
+    ImageBackground,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from "react-native";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import { COLORS } from "../../constants/colors";
 import API_URL from "../../services/api";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Toast from "react-native-toast-message";
 
 const BlogDetail = () => {
   const insets = useSafeAreaInsets();
@@ -31,7 +29,6 @@ const BlogDetail = () => {
   //FavoriteBlog
   const [favoriteStatus, setFavoriteStatus] = useState({});
   const [isFavorited, setIsFavorited] = useState(false);
-  
 
   const handleFavorite = async (blogId) => {
     try {
@@ -42,16 +39,13 @@ const BlogDetail = () => {
         return;
       }
 
-      const response = await fetch(
-        `${API_URL}/blogs/${blogId}/favorite`,
-        {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/blogs/${blogId}/favorite`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const data = await response.json();
 
@@ -71,23 +65,21 @@ const BlogDetail = () => {
       }
 
       Toast.show({
-      type: "success",
-      text1: data.is_favorited ? "Blog Saved" : "Blog Unsaved",
-      position: "top",
-    });
-
+        type: "success",
+        text1: data.is_favorited ? "Blog Saved" : "Blog Unsaved",
+        position: "top",
+      });
     } catch (error) {
       console.error("Favorite error:", error.message);
       Toast.show({
-      type: "error",
-      text1: "Error",
-      text2: "Failed to update favorite.",
-      position: "top",
-    });
+        type: "error",
+        text1: "Error",
+        text2: "Failed to update favorite.",
+        position: "top",
+      });
     }
   };
 
-  
   useEffect(() => {
     const fetchBlog = async () => {
       try {
@@ -140,15 +132,15 @@ const BlogDetail = () => {
 
         const fetchedBlogs = data.blogs?.data || [];
 
-setBlogs(fetchedBlogs);
+        setBlogs(fetchedBlogs);
 
-const favoriteMap = {};
+        const favoriteMap = {};
 
-fetchedBlogs.forEach((blog) => {
-  favoriteMap[blog.id] = blog.is_favorited;
-});
+        fetchedBlogs.forEach((blog) => {
+          favoriteMap[blog.id] = blog.is_favorited;
+        });
 
-setFavoriteStatus(favoriteMap);
+        setFavoriteStatus(favoriteMap);
       } catch (error) {
         console.error("Error fetching blogs:", error.message);
       }
@@ -169,7 +161,7 @@ setFavoriteStatus(favoriteMap);
       <View
         style={{
           flex: 1,
-          backgroundColor: "#f9f7fb",
+          backgroundColor: "#F9F7FB",
           justifyContent: "center",
           alignItems: "center",
         }}
@@ -184,7 +176,7 @@ setFavoriteStatus(favoriteMap);
       <View
         style={{
           flex: 1,
-          backgroundColor: "#f9f7fb",
+          backgroundColor: "#F9F7FB",
           justifyContent: "center",
           alignItems: "center",
         }}
@@ -211,7 +203,7 @@ setFavoriteStatus(favoriteMap);
       <View
         style={{
           flex: 1,
-          backgroundColor: "#f9f7fb",
+          backgroundColor: "#F9F7FB",
           paddingTop: insets.top,
           paddingBottom: insets.bottom,
         }}
@@ -286,15 +278,21 @@ setFavoriteStatus(favoriteMap);
                 </Pressable>
               </View>
 
-              <Text style={styles.blogTitle}>
-                {blog.blog_title}
-              </Text>
+              <Text style={styles.blogTitle}>{blog.blog_title}</Text>
 
               <View style={styles.blogAuthorRow}>
-                <View
+                <Pressable
                   style={{
                     flexDirection: "row",
                     alignItems: "center",
+                  }}
+                  onPress={() => {
+                    router.push({
+                      pathname: "/user-profile",
+                      params: {
+                        userId: blog.userdetails.id,
+                      },
+                    });
                   }}
                 >
                   <Ionicons
@@ -303,8 +301,10 @@ setFavoriteStatus(favoriteMap);
                     color={COLORS.primary}
                   />
 
-                  <Text style={styles.blogAuthor}>By {blog.userdetails?.name || "Unknown"}</Text>
-                </View>
+                  <Text style={styles.blogAuthor}>
+                    By {blog.userdetails?.name || "Unknown"}
+                  </Text>
+                </Pressable>
 
                 <View style={styles.dateContainer}>
                   <EvilIcons
@@ -317,9 +317,7 @@ setFavoriteStatus(favoriteMap);
                 </View>
               </View>
 
-              <Text style={styles.blogDescription}>
-                {stripHtml(blog.blog)}
-              </Text>
+              <Text style={styles.blogDescription}>{stripHtml(blog.blog)}</Text>
             </View>
 
             <View style={styles.popularBlogsContainer}>
@@ -371,10 +369,7 @@ setFavoriteStatus(favoriteMap);
 
                     <View style={styles.inspirationTextContainer}>
                       <View style={styles.blogTopRow}>
-                        <Text
-                          style={styles.PopularBlogTitle}
-                          numberOfLines={1}
-                        >
+                        <Text style={styles.PopularBlogTitle} numberOfLines={1}>
                           {item.blog_title}
                         </Text>
 
@@ -397,10 +392,7 @@ setFavoriteStatus(favoriteMap);
                         </Pressable>
                       </View>
 
-                      <Text
-                        style={styles.inspirationSubText}
-                        numberOfLines={2}
-                      >
+                      <Text style={styles.inspirationSubText} numberOfLines={2}>
                         {stripHtml(item.blog)}
                       </Text>
 
@@ -424,9 +416,7 @@ setFavoriteStatus(favoriteMap);
 
                         <View style={styles.divider} />
 
-                        <Text style={styles.blogDate}>
-                          {item.blog_date}
-                        </Text>
+                        <Text style={styles.blogDate}>{item.blog_date}</Text>
                       </View>
                     </View>
                   </Pressable>
@@ -440,7 +430,7 @@ setFavoriteStatus(favoriteMap);
             </View>
           </ScrollView>
         </View>
-    </View>
+      </View>
     </>
   );
 };
@@ -452,7 +442,7 @@ const styles = StyleSheet.create({
     flex: 1,
     // paddingTop: 10,
     // paddingBottom: 50,
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
   },
 
   header: {
@@ -591,7 +581,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
     justifyContent: "space-between",
-    paddingBottom:5,
+    paddingBottom: 5,
   },
 
   divider: {
@@ -661,7 +651,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: "#fff",
     overflow: "hidden",
-  shadowColor: "#000",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -670,7 +660,6 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
 
     elevation: 2,
-    
   },
 
   inspirationImage: {
@@ -705,7 +694,7 @@ const styles = StyleSheet.create({
   },
 
   categoryText: {
-    fontSize:10,
+    fontSize: 10,
     fontWeight: "600",
     color: "#C45A5A",
   },

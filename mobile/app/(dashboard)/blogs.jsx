@@ -12,10 +12,9 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
 import API_URL from "../../services/api";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const Blogs = () => {
   const insets = useSafeAreaInsets();
@@ -69,7 +68,7 @@ const Blogs = () => {
       <View
         style={{
           flex: 1,
-          backgroundColor: "#f9f7fb",
+          backgroundColor: "#F9F7FB",
           paddingTop: insets.top,
           paddingBottom: insets.bottom,
         }}
@@ -309,7 +308,7 @@ const styles = StyleSheet.create({
 
   blogCard: {
     marginTop: 10,
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     borderRadius: 16,
     padding: 12,
 

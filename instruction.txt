@@ -27,3 +27,16 @@ http://10.0.2.2:8000/api
 
 Therefore, the app is currently intended to run on the Android Emulator.
 A physical device will require a different API URL using the laptop's local IP address.
+
+
+configured EAS and set up the Android development build for the Expo project 
+npx expo install expo-dev-client
+npx expo-doctor
+eas --version
+eas login
+eas whoami
+eas build:configure
+cat eas.json
+eas build --platform android --profile development
+
+to run using an EAS development build :npx expo start --dev-client

@@ -1,13 +1,13 @@
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useRef, useState } from "react";
 import {
-    Dimensions,
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  Dimensions,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../../constants/colors";
@@ -64,20 +64,15 @@ const Explore = () => {
           paddingBottom: Platform.OS === "ios" ? 50 : 5,
         }}
       >
-        {/* <View style={styles.header}>
-                    <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-                        <Ionicons name="arrow-back" size={24} color="#333" />
-                    </TouchableOpacity>
+        <View style={styles.header}>
+            <Text style={styles.title}>Explore</Text>
+        </View>
 
-                    
-
-                </View> */}
-        <View style={styles.exploreTitle}>
-          <Text style={styles.title}>Explore</Text>
+          
           <Text style={styles.subtitle}>
             Growth in faith. Be inspired. Walk with God.
           </Text>
-        </View>
+
 
         <View style={styles.categoryContainer}>
           <CategoryButton
@@ -176,13 +171,16 @@ export default Explore;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
   },
 
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+
+    paddingTop: 18,
+    // paddingBottom: 15,
   },
 
   // exploreTitle:{
@@ -190,25 +188,25 @@ const styles = StyleSheet.create({
   // },
 
   title: {
-    marginHorizontal: 25,
-    fontSize: 20,
+    fontSize: 27,
     fontWeight: "700",
-    color: "#222",
-    marginTop: 15,
+    color: "#211D26",
+    letterSpacing: -0.6,
+    marginLeft:25,
   },
 
   subtitle: {
     marginHorizontal: 25,
     fontSize: 14,
     color: "#777",
-    marginVertical: 10,
+    // marginVertical: 10,
   },
 
   categoryContainer: {
     flexDirection: "row",
     paddingHorizontal: 10,
     // gap: 2,
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     paddingVertical: 10,
     //
     borderRadius: 50,

@@ -1,18 +1,19 @@
 import {
-    EvilIcons,
-    Feather,
-    Ionicons,
-    MaterialIcons,
+  EvilIcons,
+  Feather,
+  Ionicons,
+  MaterialIcons,
 } from "@expo/vector-icons";
+import { router } from "expo-router";
 import {
-    Image,
-    ImageBackground,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  ImageBackground,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { COLORS } from "../../constants/colors";
 
@@ -20,7 +21,7 @@ const SongContent = () => {
   return (
     <View>
       <ImageBackground
-        source={require("../../assets/images/song.jpg")}
+        source={require("../../assets/images/popularSongs4.jpg")}
         style={styles.featuredBlog}
         imageStyle={styles.featuredBlogImage}
       >
@@ -44,32 +45,38 @@ const SongContent = () => {
           }}
           style={{ marginTop: 14 }}
         >
-          <ImageBackground
-            source={require("../../assets/images/song.jpg")}
-            style={styles.songlist}
-            imageStyle={styles.songImage}
-          >
-            <View style={styles.songOverlay}>
-              <View style={styles.faithIcon}>
-                <Ionicons name="musical-notes-outline" size={28} color="#fff" />
-              </View>
-
-              <Pressable style={styles.readBadge}>
-                <View>
-                  <Text style={styles.readText}>English</Text>
-
-                  <Text style={styles.readSubText}>Praise & Worship</Text>
+          <Pressable onPress={() => router.push("/song-category")}>
+            <ImageBackground
+              source={require("../../assets/images/popularSongs3.jpg")}
+              style={styles.songlist}
+              imageStyle={styles.songImage}
+            >
+              <View style={styles.songOverlay}>
+                <View style={styles.faithIcon}>
+                  <Ionicons
+                    name="musical-notes-outline"
+                    size={28}
+                    color="#fff"
+                  />
                 </View>
 
-                <TouchableOpacity style={styles.nextButton}>
-                  <Feather name="arrow-right" size={24} color="#fff" />
-                </TouchableOpacity>
-              </Pressable>
-            </View>
-          </ImageBackground>
+                <Pressable style={styles.readBadge}>
+                  <View>
+                    <Text style={styles.readText}>English</Text>
+
+                    <Text style={styles.readSubText}>Praise & Worship</Text>
+                  </View>
+
+                  <TouchableOpacity style={styles.nextButton}>
+                    <Feather name="arrow-right" size={24} color="#fff" />
+                  </TouchableOpacity>
+                </Pressable>
+              </View>
+            </ImageBackground>
+          </Pressable>
 
           <ImageBackground
-            source={require("../../assets/images/song.jpg")}
+            source={require("../../assets/images/popularSongs3.jpg")}
             style={styles.songlist}
             imageStyle={styles.songImage}
           >
@@ -133,18 +140,21 @@ const SongContent = () => {
           </Pressable>
         </View>
 
-        <Pressable style={styles.blogCard}>
-          <View style={styles.blogContent}>
-            <View style={styles.blogImageContainer}>
+        <Pressable
+          style={styles.prayerCard}
+          onPress={() => router.push("/full-song")}
+        >
+          <View style={styles.prayerContent}>
+            <View style={styles.prayerImageContainer}>
               <Image
-                source={require("../../assets/images/blogs.jpg")}
-                style={styles.blogImage}
+                source={require("../../assets/images/popularSongs2.jpg")}
+                style={styles.prayerImage}
               />
             </View>
 
-            <View style={styles.blogDetails}>
-              <View style={styles.blogTopRow}>
-                <Text style={styles.blogTitle}>
+            <View style={styles.prayerDetails}>
+              <View style={styles.prayerTopRow}>
+                <Text style={styles.prayerTitle} numberOfLines={2}>
                   These are the days of Elijah
                 </Text>
 
@@ -157,36 +167,41 @@ const SongContent = () => {
                 </Pressable>
               </View>
 
-              <View style={styles.blogAuthorRow}>
+              <View style={styles.prayerAuthorRow}>
                 <Ionicons
                   name="person-circle-outline"
                   size={19}
                   color={COLORS.primary}
                 />
 
-                <Text style={styles.blogAuthor}>By Willam</Text>
+                <Text style={styles.prayerAuthor}>By Willam</Text>
 
                 <View style={styles.divider} />
+
                 <Pressable style={styles.like}>
                   <EvilIcons name="like" size={19} color={COLORS.primary} />
-                  <Text style={styles.blogDate}>Likes</Text>
+
+                  <Text style={styles.likes}>Likes</Text>
                 </Pressable>
               </View>
             </View>
           </View>
         </Pressable>
-        <Pressable style={styles.blogCard}>
-          <View style={styles.blogContent}>
-            <View style={styles.blogImageContainer}>
+        <Pressable
+          style={styles.prayerCard}
+          onPress={() => router.push("/full-song")}
+        >
+          <View style={styles.prayerContent}>
+            <View style={styles.prayerImageContainer}>
               <Image
-                source={require("../../assets/images/blogs.jpg")}
-                style={styles.blogImage}
+                source={require("../../assets/images/popularSongs2.jpg")}
+                style={styles.prayerImage}
               />
             </View>
 
-            <View style={styles.blogDetails}>
-              <View style={styles.blogTopRow}>
-                <Text style={styles.blogTitle}>
+            <View style={styles.prayerDetails}>
+              <View style={styles.prayerTopRow}>
+                <Text style={styles.prayerTitle} numberOfLines={2}>
                   These are the days of Elijah
                 </Text>
 
@@ -199,36 +214,41 @@ const SongContent = () => {
                 </Pressable>
               </View>
 
-              <View style={styles.blogAuthorRow}>
+              <View style={styles.prayerAuthorRow}>
                 <Ionicons
                   name="person-circle-outline"
                   size={19}
                   color={COLORS.primary}
                 />
 
-                <Text style={styles.blogAuthor}>By Willam</Text>
+                <Text style={styles.prayerAuthor}>By Willam</Text>
 
                 <View style={styles.divider} />
+
                 <Pressable style={styles.like}>
                   <EvilIcons name="like" size={19} color={COLORS.primary} />
-                  <Text style={styles.blogDate}>Likes</Text>
+
+                  <Text style={styles.likes}>Likes</Text>
                 </Pressable>
               </View>
             </View>
           </View>
         </Pressable>
-        <Pressable style={styles.blogCard}>
-          <View style={styles.blogContent}>
-            <View style={styles.blogImageContainer}>
+        <Pressable
+          style={styles.prayerCard}
+          onPress={() => router.push("/full-song")}
+        >
+          <View style={styles.prayerContent}>
+            <View style={styles.prayerImageContainer}>
               <Image
-                source={require("../../assets/images/blogs.jpg")}
-                style={styles.blogImage}
+                source={require("../../assets/images/popularSongs2.jpg")}
+                style={styles.prayerImage}
               />
             </View>
 
-            <View style={styles.blogDetails}>
-              <View style={styles.blogTopRow}>
-                <Text style={styles.blogTitle}>
+            <View style={styles.prayerDetails}>
+              <View style={styles.prayerTopRow}>
+                <Text style={styles.prayerTitle} numberOfLines={2}>
                   These are the days of Elijah
                 </Text>
 
@@ -241,19 +261,68 @@ const SongContent = () => {
                 </Pressable>
               </View>
 
-              <View style={styles.blogAuthorRow}>
+              <View style={styles.prayerAuthorRow}>
                 <Ionicons
                   name="person-circle-outline"
                   size={19}
                   color={COLORS.primary}
                 />
 
-                <Text style={styles.blogAuthor}>By Willam</Text>
+                <Text style={styles.prayerAuthor}>By Willam</Text>
 
                 <View style={styles.divider} />
+
                 <Pressable style={styles.like}>
                   <EvilIcons name="like" size={19} color={COLORS.primary} />
-                  <Text style={styles.blogDate}>Likes</Text>
+
+                  <Text style={styles.likes}>Likes</Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </Pressable>
+        <Pressable
+          style={styles.prayerCard}
+          onPress={() => router.push("/full-song")}
+        >
+          <View style={styles.prayerContent}>
+            <View style={styles.prayerImageContainer}>
+              <Image
+                source={require("../../assets/images/popularSongs2.jpg")}
+                style={styles.prayerImage}
+              />
+            </View>
+
+            <View style={styles.prayerDetails}>
+              <View style={styles.prayerTopRow}>
+                <Text style={styles.prayerTitle} numberOfLines={2}>
+                  These are the days of Elijah
+                </Text>
+
+                <Pressable style={styles.saveButton}>
+                  <Ionicons
+                    name="heart-outline"
+                    size={18}
+                    color={COLORS.primary}
+                  />
+                </Pressable>
+              </View>
+
+              <View style={styles.prayerAuthorRow}>
+                <Ionicons
+                  name="person-circle-outline"
+                  size={19}
+                  color={COLORS.primary}
+                />
+
+                <Text style={styles.prayerAuthor}>By Willam</Text>
+
+                <View style={styles.divider} />
+
+                <Pressable style={styles.like}>
+                  <EvilIcons name="like" size={19} color={COLORS.primary} />
+
+                  <Text style={styles.likes}>Likes</Text>
                 </Pressable>
               </View>
             </View>
@@ -295,6 +364,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 18,
     gap: 60,
+    backgroundColor: "rgba(40, 25, 70, 0.32)",
+
     // justifyContent: "flex-end",
   },
 
@@ -347,7 +418,7 @@ const styles = StyleSheet.create({
 
   readBadge: {
     alignSelf: "flex-start",
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     paddingHorizontal: 14,
     paddingVertical: 5,
     borderRadius: 8,
@@ -457,131 +528,99 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  like: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
   viewAllText: {
     fontSize: 13,
     fontWeight: "600",
     color: COLORS.secondary,
   },
 
-  blogCard: {
-    marginTop: 14,
-    backgroundColor: "#f9f7fb",
-    borderRadius: 16,
+  prayerCard: {
+    backgroundColor: "#fff",
+    borderRadius: 18,
+    // marginHorizontal: 16,
+    marginTop: 10,
+    marginBottom: 12,
     padding: 12,
-
-    elevation: 3,
-
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    shadowColor: "#000",
   },
 
-  blogContent: {
+  prayerContent: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
   },
 
-  blogImageContainer: {
-    width: 75,
-    height: 75,
-    borderRadius: 12,
+  prayerImageContainer: {
+    width: 82,
+    height: 82,
+    borderRadius: 14,
     overflow: "hidden",
   },
 
-  blogImage: {
+  prayerImage: {
     width: "100%",
     height: "100%",
     resizeMode: "cover",
   },
 
-  blogDetails: {
+  prayerDetails: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: 14,
+    justifyContent: "center",
+    minWidth: 0,
   },
 
-  blogTopRow: {
+  prayerTopRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    marginBottom: 5,
   },
 
-  smallCategoryBadge: {
-    backgroundColor: "#F4E0E0",
-    paddingHorizontal: 9,
-    paddingVertical: 4,
-    borderRadius: 15,
-  },
-
-  smallCategoryText: {
-    fontSize: 10,
+  prayerTitle: {
+    flex: 1,
+    fontSize: 15,
     fontWeight: "600",
-    color: "#C45A5A",
+    color: "#222",
+    marginRight: 10,
   },
 
   saveButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    justifyContent: "center",
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     alignItems: "center",
+    justifyContent: "center",
   },
 
-  blogTitle: {
-    marginTop: 7,
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: "700",
-    color: "#222",
-  },
-
-  blogDescription: {
-    fontSize: 12,
-    lineHeight: 17,
-    color: "#666",
-    marginBottom: 10,
-  },
-
-  blogAuthorRow: {
+  prayerAuthorRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 10,
   },
 
-  blogAuthor: {
-    marginLeft: 4,
+  prayerAuthor: {
     fontSize: 12,
+    color: "#666",
+    marginLeft: 5,
     color: COLORS.primary,
-    fontWeight: "500",
   },
 
   divider: {
     width: 1,
-    height: 14,
-    backgroundColor: "#ccc",
-    marginHorizontal: 8,
+    height: 16,
+    backgroundColor: "#ddd",
+    marginHorizontal: 10,
   },
 
-  blogDate: {
-    fontSize: 11,
-    color: COLORS.primary,
-    fontWeight: "500",
-  },
-
-  dateContainer: {
+  like: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
-    marginVertical: 10,
+    color: COLORS.primary,
+  },
+
+  likes: {
+    fontSize: 12,
+    color: "#666",
+    marginLeft: 3,
+    color: COLORS.primary,
   },
 
   nextButton: {

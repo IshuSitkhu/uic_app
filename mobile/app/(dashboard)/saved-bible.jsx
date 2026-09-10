@@ -56,7 +56,7 @@ const savedBible = () => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#f9f7fb" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F9F7FB" }}>
       <View style={styles.screen}>
         <ScrollView
           showsVerticalScrollIndicator={false}

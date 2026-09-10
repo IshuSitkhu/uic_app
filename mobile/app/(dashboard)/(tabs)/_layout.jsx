@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     bottom: 15,
     height: 65,
     borderRadius: 35,
-    // backgroundColor: "#f9f7fb",
+    // backgroundColor: "#F9F7FB",
     borderTopWidth: 0,
     elevation: 5,
 
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
 
   androidTabBar: {
     height: 60,
-    // backgroundColor: "#f9f7fb",
+    // backgroundColor: "#F9F7FB",
     borderTopWidth: 0,
     elevation: 0,
     paddingTop: 0,

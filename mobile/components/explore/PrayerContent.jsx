@@ -1,16 +1,16 @@
 import {
-    EvilIcons,
-    Feather,
-    Ionicons,
-    MaterialIcons,
+  EvilIcons,
+  Feather,
+  Ionicons,
+  MaterialIcons,
 } from "@expo/vector-icons";
 import { router } from "expo-router";
 import {
-    ImageBackground,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
+  ImageBackground,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { COLORS } from "../../constants/colors";
 
@@ -65,54 +65,63 @@ const PrayerContent = () => {
             <View style={styles.blogDetails}>
               <View style={styles.blogTopRow}>
                 <View style={styles.smallCategoryBadge}>
-                  <Text style={styles.smallCategoryText}>Motivation</Text>
+                  <Ionicons
+                    name="pricetag-outline"
+                    size={14}
+                    color={COLORS.primary}
+                  />
+                  <Text style={styles.blogDate}>Motivation</Text>
+                </View>
+
+                <View style={styles.dateContainer}>
+                  <EvilIcons name="calendar" size={20} color={COLORS.primary} />
+
+                  <Text style={styles.blogDate}>Aug 10, 2025</Text>
                 </View>
 
                 <Pressable style={styles.saveButton}>
-                  <Feather name="bookmark" size={17} color={COLORS.primary} />
+                  <Feather name="bookmark" size={14} color={COLORS.primary} />
+                  <Text style={styles.blogDate}>Save</Text>
                 </Pressable>
               </View>
 
-              <Text style={styles.blogTitle} numberOfLines={2}>
-                Pray for World Due to War
-              </Text>
+              <View style={{ paddingHorizontal: 12 }}>
+                <Text style={styles.blogTitle} numberOfLines={2}>
+                  Pray for World Due to War
+                </Text>
 
-              <View style={styles.dateContainer}>
-                <EvilIcons name="calendar" size={20} color={COLORS.secondary} />
+                <Text style={styles.blogDescription} numberOfLines={2}>
+                  Lord guide my heart and steps today. Give me peace and
+                  strength.
+                </Text>
 
-                <Text style={styles.blogDate}>Aug 10, 2025</Text>
-              </View>
+                <View
+                  style={{
+                    justifyContent: "space-between",
+                    flexDirection: "row",
+                    marginVertical: 10,
+                  }}
+                >
+                  <View style={styles.blogAuthorRow}>
+                    <Ionicons
+                      name="person-circle-outline"
+                      size={32}
+                      color={COLORS.primary}
+                    />
 
-              <Text style={styles.blogDescription} numberOfLines={2}>
-                Lord guide my heart and steps today. Give me peace and strength.
-              </Text>
+                    <Text style={styles.blogAuthor}>By Willam</Text>
+                  </View>
 
-              <View
-                style={{
-                  justifyContent: "space-between",
-                  flexDirection: "row",
-                }}
-              >
-                <View style={styles.blogAuthorRow}>
-                  <Ionicons
-                    name="person-circle-outline"
-                    size={32}
-                    color={COLORS.primary}
-                  />
+                  <Pressable style={styles.readFullBadge}>
+                    <Text style={styles.readFullText}>Read Full Prayer</Text>
 
-                  <Text style={styles.blogAuthor}>By Willam</Text>
+                    <Feather name="arrow-right" size={18} color="#fff" />
+                  </Pressable>
                 </View>
-
-                <Pressable style={styles.readFullBadge}>
-                  <Text style={styles.readFullText}>Read Full Prayer</Text>
-
-                  <Feather name="arrow-right" size={18} color="#fff" />
-                </Pressable>
               </View>
             </View>
           </View>
         </Pressable>
-
         <Pressable
           style={styles.blogCard}
           onPress={() => router.push("/prayer-detail")}
@@ -121,49 +130,189 @@ const PrayerContent = () => {
             <View style={styles.blogDetails}>
               <View style={styles.blogTopRow}>
                 <View style={styles.smallCategoryBadge}>
-                  <Text style={styles.smallCategoryText}>Motivation</Text>
+                  <Ionicons
+                    name="pricetag-outline"
+                    size={14}
+                    color={COLORS.primary}
+                  />
+                  <Text style={styles.blogDate}>Motivation</Text>
+                </View>
+
+                <View style={styles.dateContainer}>
+                  <EvilIcons name="calendar" size={20} color={COLORS.primary} />
+
+                  <Text style={styles.blogDate}>Aug 10, 2025</Text>
                 </View>
 
                 <Pressable style={styles.saveButton}>
-                  <Feather name="bookmark" size={17} color={COLORS.primary} />
+                  <Feather name="bookmark" size={14} color={COLORS.primary} />
+                  <Text style={styles.blogDate}>Save</Text>
                 </Pressable>
               </View>
 
-              <Text style={styles.blogTitle} numberOfLines={2}>
-                Pray for World Due to War
-              </Text>
+              <View style={{ paddingHorizontal: 12 }}>
+                <Text style={styles.blogTitle} numberOfLines={2}>
+                  Pray for World Due to War
+                </Text>
 
-              <View style={styles.dateContainer}>
-                <EvilIcons name="calendar" size={20} color={COLORS.secondary} />
+                <Text style={styles.blogDescription} numberOfLines={2}>
+                  Lord guide my heart and steps today. Give me peace and
+                  strength.
+                </Text>
 
-                <Text style={styles.blogDate}>Aug 10, 2025</Text>
+                <View
+                  style={{
+                    justifyContent: "space-between",
+                    flexDirection: "row",
+                    marginVertical: 10,
+                  }}
+                >
+                  <View style={styles.blogAuthorRow}>
+                    <Ionicons
+                      name="person-circle-outline"
+                      size={32}
+                      color={COLORS.primary}
+                    />
+
+                    <Text style={styles.blogAuthor}>By Willam</Text>
+                  </View>
+
+                  <Pressable style={styles.readFullBadge}>
+                    <Text style={styles.readFullText}>Read Full Prayer</Text>
+
+                    <Feather name="arrow-right" size={18} color="#fff" />
+                  </Pressable>
+                </View>
               </View>
-
-              <Text style={styles.blogDescription} numberOfLines={2}>
-                Lord guide my heart and steps today. Give me peace and strength.
-              </Text>
-
-              <View
-                style={{
-                  justifyContent: "space-between",
-                  flexDirection: "row",
-                }}
-              >
-                <View style={styles.blogAuthorRow}>
+            </View>
+          </View>
+        </Pressable>
+        <Pressable
+          style={styles.blogCard}
+          onPress={() => router.push("/prayer-detail")}
+        >
+          <View style={styles.blogContent}>
+            <View style={styles.blogDetails}>
+              <View style={styles.blogTopRow}>
+                <View style={styles.smallCategoryBadge}>
                   <Ionicons
-                    name="person-circle-outline"
-                    size={32}
+                    name="pricetag-outline"
+                    size={14}
                     color={COLORS.primary}
                   />
-
-                  <Text style={styles.blogAuthor}>By Willam</Text>
+                  <Text style={styles.blogDate}>Motivation</Text>
                 </View>
 
-                <Pressable style={styles.readFullBadge}>
-                  <Text style={styles.readFullText}>Read Full Prayer</Text>
+                <View style={styles.dateContainer}>
+                  <EvilIcons name="calendar" size={20} color={COLORS.primary} />
 
-                  <Feather name="arrow-right" size={18} color="#fff" />
+                  <Text style={styles.blogDate}>Aug 10, 2025</Text>
+                </View>
+
+                <Pressable style={styles.saveButton}>
+                  <Feather name="bookmark" size={14} color={COLORS.primary} />
+                  <Text style={styles.blogDate}>Save</Text>
                 </Pressable>
+              </View>
+
+              <View style={{ paddingHorizontal: 12 }}>
+                <Text style={styles.blogTitle} numberOfLines={2}>
+                  Pray for World Due to War
+                </Text>
+
+                <Text style={styles.blogDescription} numberOfLines={2}>
+                  Lord guide my heart and steps today. Give me peace and
+                  strength.
+                </Text>
+
+                <View
+                  style={{
+                    justifyContent: "space-between",
+                    flexDirection: "row",
+                    marginVertical: 10,
+                  }}
+                >
+                  <View style={styles.blogAuthorRow}>
+                    <Ionicons
+                      name="person-circle-outline"
+                      size={32}
+                      color={COLORS.primary}
+                    />
+
+                    <Text style={styles.blogAuthor}>By Willam</Text>
+                  </View>
+
+                  <Pressable style={styles.readFullBadge}>
+                    <Text style={styles.readFullText}>Read Full Prayer</Text>
+
+                    <Feather name="arrow-right" size={18} color="#fff" />
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          </View>
+        </Pressable>
+        <Pressable
+          style={styles.blogCard}
+          onPress={() => router.push("/prayer-detail")}
+        >
+          <View style={styles.blogContent}>
+            <View style={styles.blogDetails}>
+              <View style={styles.blogTopRow}>
+                <View style={styles.smallCategoryBadge}>
+                  <Ionicons
+                    name="pricetag-outline"
+                    size={14}
+                    color={COLORS.primary}
+                  />
+                  <Text style={styles.blogDate}>Motivation</Text>
+                </View>
+
+                <View style={styles.dateContainer}>
+                  <EvilIcons name="calendar" size={20} color={COLORS.primary} />
+
+                  <Text style={styles.blogDate}>Aug 10, 2025</Text>
+                </View>
+
+                <Pressable style={styles.saveButton}>
+                  <Feather name="bookmark" size={14} color={COLORS.primary} />
+                  <Text style={styles.blogDate}>Save</Text>
+                </Pressable>
+              </View>
+
+              <View style={{ paddingHorizontal: 12 }}>
+                <Text style={styles.blogTitle} numberOfLines={2}>
+                  Pray for World Due to War
+                </Text>
+
+                <Text style={styles.blogDescription} numberOfLines={2}>
+                  Lord guide my heart and steps today. Give me peace and
+                  strength.
+                </Text>
+
+                <View
+                  style={{
+                    justifyContent: "space-between",
+                    flexDirection: "row",
+                    marginVertical: 10,
+                  }}
+                >
+                  <View style={styles.blogAuthorRow}>
+                    <Ionicons
+                      name="person-circle-outline"
+                      size={32}
+                      color={COLORS.primary}
+                    />
+
+                    <Text style={styles.blogAuthor}>By Willam</Text>
+                  </View>
+
+                  <Pressable style={styles.readFullBadge}>
+                    <Text style={styles.readFullText}>Read Full Prayer</Text>
+
+                    <Feather name="arrow-right" size={18} color="#fff" />
+                  </Pressable>
+                </View>
               </View>
             </View>
           </View>
@@ -193,6 +342,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 28,
     justifyContent: "flex-end",
+    ...StyleSheet.absoluteFillObject,
+
+    backgroundColor: "rgba(40, 25, 70, 0.32)",
   },
 
   categoryBadge: {
@@ -212,7 +364,7 @@ const styles = StyleSheet.create({
 
   readBadge: {
     alignSelf: "flex-start",
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     paddingHorizontal: 14,
     paddingVertical: 5,
     borderRadius: 8,
@@ -290,7 +442,8 @@ const styles = StyleSheet.create({
 
   blogSection: {
     marginTop: 28,
-    marginBottom: 30,
+    // marginBottom: 30,
+    gap: 20,
   },
 
   sectionHeader: {
@@ -317,10 +470,8 @@ const styles = StyleSheet.create({
   },
 
   blogCard: {
-    marginTop: 14,
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     borderRadius: 16,
-    padding: 12,
 
     elevation: 3,
 
@@ -361,31 +512,33 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    backgroundColor: "#EDE8F7",
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
   },
 
   smallCategoryBadge: {
-    backgroundColor: "#F4E0E0",
-    paddingHorizontal: 9,
-    paddingVertical: 4,
-    borderRadius: 15,
+    flexDirection: "row",
+    gap: 6,
   },
 
   smallCategoryText: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: "600",
-    color: "#C45A5A",
+    // color: "#C45A5A",
   },
 
   saveButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
     justifyContent: "center",
     alignItems: "center",
+    flexDirection: "row",
+    gap: 4,
   },
 
   blogTitle: {
-    marginTop: 7,
+    marginVertical: 7,
     fontSize: 15,
     lineHeight: 20,
     fontWeight: "700",
@@ -396,13 +549,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 17,
     color: "#666",
-    marginBottom: 10,
+    // marginBottom: 10,
   },
 
   blogAuthorRow: {
     flexDirection: "row",
     alignItems: "center",
-    // marginTop: 10,
   },
 
   blogAuthor: {
@@ -420,15 +572,15 @@ const styles = StyleSheet.create({
   },
 
   blogDate: {
-    fontSize: 11,
-    color: COLORS.primary,
+    fontSize: 12,
+    // color: COLORS.primary,
     fontWeight: "500",
   },
 
   dateContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
+    gap: 3,
     marginVertical: 10,
   },
 });

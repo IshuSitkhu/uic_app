@@ -51,7 +51,7 @@ export default PendingApproval;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     padding: 25,
     justifyContent: "center",
     alignItems: "center",

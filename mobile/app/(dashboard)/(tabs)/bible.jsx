@@ -4,16 +4,16 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
-  Dimensions,
-  FlatList,
-  Modal,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Dimensions,
+    FlatList,
+    Modal,
+    Platform,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TabBar, TabView } from "react-native-tab-view";
@@ -165,14 +165,6 @@ const Bible = () => {
     green: "#C8E6C9",
     red: "#FFCDD2",
   };
-
-  //   const highlightColors = {
-  //     yellow: '#e1d031',
-  //     blue: '#8dc7f6',
-  //     purple: '#ac8fe1',
-  //     green: '#6fe679',
-  //     red: '#f65353',
-  // };
 
   const renderScene = ({ route }) => {
     switch (route.key) {
@@ -408,43 +400,6 @@ const Bible = () => {
     }
   };
 
-  // const fetchDefaultVerse = async () => {
-  //   try {
-  //     const url = `${API_URL}/bible/nasb/Genesis/1`;
-
-  //     console.log("Fetching default verse:", url);
-
-  //     const response = await fetch(url, {
-  //       headers: {
-  //         Accept: "application/json",
-  //       },
-  //     });
-
-  //     const data = await response.json();
-
-  //     console.log("Default verse:", data);
-
-  //     if (!response.ok) {
-  //       throw new Error(data.message || "Failed to fetch default verse");
-  //     }
-
-  //     setSelectedLanguage("nasb");
-  //     setSelectedBook(data.book);
-  //     setSelectedChapter(data.chapter);
-  //     setVerses(data.verses);
-  //     await fetchHighlights("nasb", data.book, data.chapter);
-
-  //     // No individual verse selected initially
-  //     setSelectedVerse(null);
-  //     setVerseText("");
-  //     setReadAllVerses(true);
-
-  //     await fetchChaptersForNavigation(data.book, "nasb");
-  //   } catch (error) {
-  //     console.error("Error fetching default verse:", error.message);
-  //   }
-  // };
-
   const fetchDefaultVerse = async () => {
     try {
       const url = `${API_URL}/bible/nasb/Genesis/1`;
@@ -616,7 +571,6 @@ const Bible = () => {
   };
 
   //highlights
-
   const fetchHighlights = async (translation, book, chapter) => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -911,10 +865,6 @@ const Bible = () => {
                 style={[
                   styles.selectedVerseText,
                   {
-                    backgroundColor: highlights[selectedVerse]
-                      ? highlightColors[highlights[selectedVerse].color]
-                      : "transparent",
-
                     textDecorationLine: selectedHighlightVerses.includes(
                       Number(selectedVerse),
                     )
@@ -924,7 +874,15 @@ const Bible = () => {
                 ]}
                 onPress={() => toggleHighlightVerse(selectedVerse)}
               >
-                {verseText}
+                <Text
+                  style={{
+                    backgroundColor: highlights[selectedVerse]
+                      ? highlightColors[highlights[selectedVerse].color]
+                      : "transparent",
+                  }}
+                >
+                  {verseText}
+                </Text>
               </Text>
 
               <TouchableOpacity
@@ -999,17 +957,6 @@ const Bible = () => {
                     <Text
                       key={verseNumber}
                       onPress={() => toggleHighlightVerse(verseNumber)}
-                      style={{
-                        backgroundColor: highlights[verseNumber]
-                          ? highlightColors[highlights[verseNumber].color]
-                          : "transparent",
-
-                        textDecorationLine: selectedHighlightVerses.includes(
-                          Number(verseNumber),
-                        )
-                          ? "underline"
-                          : "none",
-                      }}
                     >
                       <Text
                         style={[
@@ -1029,6 +976,19 @@ const Bible = () => {
                           {
                             fontSize: fontSizes[fontSize],
                             lineHeight: lineHeights[lineSpacing],
+
+                            backgroundColor: highlights[verseNumber]
+                              ? highlightColors[highlights[verseNumber].color]
+                              : "transparent",
+
+                            borderRadius: 5,
+
+                            textDecorationLine:
+                              selectedHighlightVerses.includes(
+                                Number(verseNumber),
+                              )
+                                ? "underline"
+                                : "none",
                           },
                         ]}
                       >
@@ -1054,17 +1014,6 @@ const Bible = () => {
                           {
                             fontSize: fontSizes[fontSize],
                             lineHeight: lineHeights[lineSpacing],
-
-                            backgroundColor: highlights[verseNumber]
-                              ? highlightColors[highlights[verseNumber].color]
-                              : "transparent",
-
-                            textDecorationLine:
-                              selectedHighlightVerses.includes(
-                                Number(verseNumber),
-                              )
-                                ? "underline"
-                                : "none",
                           },
                         ]}
                       >
@@ -1080,7 +1029,24 @@ const Bible = () => {
                           {verseNumber}{" "}
                         </Text>
 
-                        {text}
+                        <Text
+                          style={{
+                            backgroundColor: highlights[verseNumber]
+                              ? highlightColors[highlights[verseNumber].color]
+                              : "transparent",
+
+                            borderRadius: 4,
+
+                            textDecorationLine:
+                              selectedHighlightVerses.includes(
+                                Number(verseNumber),
+                              )
+                                ? "underline"
+                                : "none",
+                          }}
+                        >
+                          {text}
+                        </Text>
                       </Text>
                     </Pressable>
                   ))}
@@ -1516,6 +1482,39 @@ const Bible = () => {
                         </Text>
                       </TouchableOpacity>
                     </View>
+
+                    {/* Reading mode sample */}
+                    <Text style={styles.sampleLabel}>Preview</Text>
+                    <View style={styles.readingModeSample}>
+                      {readAllVerses ? (
+                        <Text style={styles.sampleText}>
+                          1. In the beginning God created the heavens and the
+                          earth..... 2. And the earth was a formless and
+                          desolate emptiness..... 3. Then God said, Let there be
+                          light..... 4. God saw that the light was good; and God
+                          separated..... 5. God called the light.....
+                        </Text>
+                      ) : (
+                        <View>
+                          <Text style={styles.sampleText}>
+                            1. In the beginning God created the heaven.....
+                          </Text>
+
+                          <Text style={styles.sampleText}>
+                            2. And the earth was a formless and desolate
+                            emptiness.....
+                          </Text>
+
+                          <Text style={styles.sampleText}>
+                            3. Then God said, Let there be light.....
+                          </Text>
+                          <Text style={styles.sampleText}>
+                            4. God saw that the light was good; and God
+                            separated.....
+                          </Text>
+                        </View>
+                      )}
+                    </View>
                   </View>
                 </View>
               </>
@@ -1565,6 +1564,7 @@ export default Bible;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#F9F7FB",
   },
 
   //bible
@@ -1575,7 +1575,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 5,
     height: 65,
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     borderTopWidth: 0,
   },
 
@@ -1593,7 +1593,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ddd",
     borderRadius: 8,
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     overflow: "hidden",
   },
 
@@ -1726,7 +1726,7 @@ const styles = StyleSheet.create({
 
   // Bottom sheet
   bottomSheet: {
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     height: "85%",
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
@@ -1786,7 +1786,7 @@ const styles = StyleSheet.create({
   // Individual book
 
   tabBar: {
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     elevation: 0,
   },
 
@@ -1966,7 +1966,7 @@ const styles = StyleSheet.create({
 
   navigationButtons: {
     position: "absolute",
-    bottom: Platform.OS === "ios" ? 120 : 20,
+    bottom: Platform.OS === "ios" ? 120 : 80,
     left: 10,
     right: 10,
 
@@ -2022,50 +2022,98 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  settingFont: {
+  settingTitle: {
     fontSize: 16,
-    paddingVertical: 5,
-    paddingHorizontal: 14,
-    // margin:10,
-  },
-
-  settingSmallFont: {
-    fontSize: 16,
-  },
-
-  settingMediumFont: {
-    fontSize: 18,
-  },
-
-  settingLargeFont: {
-    fontSize: 21,
-  },
-
-  settingExtraLargeFont: {
-    fontSize: 24,
+    fontWeight: "600",
+    color: "#222",
+    marginBottom: 14,
+    marginTop: 8,
   },
 
   arrange: {
     flexDirection: "row",
+    alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 14,
-    // paddingHorizontal: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    marginBottom: 28,
+    paddingHorizontal: 4,
   },
 
-  settingTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    padding: 10,
+  settingSmallFont: {
+    fontSize: 13,
+    color: "#555",
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+  },
+
+  settingMediumFont: {
+    fontSize: 15,
+    color: "#555",
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+  },
+
+  settingLargeFont: {
+    fontSize: 17,
+    color: "#555",
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+  },
+
+  settingExtraLargeFont: {
+    fontSize: 19,
+    color: "#555",
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+  },
+
+  settingFont: {
+    fontSize: 15,
+    color: "#555",
+    paddingVertical: 10,
+    paddingHorizontal: 12,
   },
 
   selectedSettingFont: {
-    fontWeight: "bold",
     color: COLORS.primary,
-    borderBottomColor: COLORS.primary,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.primary,
+    fontWeight: "700",
+  },
+
+  sampleLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#888",
+    marginBottom: 7,
+    marginLeft: 2,
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+  },
+
+  readingModeSample: {
+    marginTop: 6,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    borderRadius: 12,
+    backgroundColor: "#F9F7FB",
+    borderWidth: 1,
+    borderColor: "#e6e1e8",
+
+    // subtle depth
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.04,
+    shadowRadius: 3,
+    elevation: 5,
+  },
+
+  sampleText: {
+    fontSize: 14,
+    lineHeight: 23,
+    color: "#444",
+    fontWeight: "400",
+    letterSpacing: 0.15,
   },
 
   highlightToolbar: {

@@ -4,20 +4,60 @@ import { router } from "expo-router";
 import {
   ActivityIndicator,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
-  View,
+  View
 } from "react-native";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback, useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { COLORS } from "../../../constants/colors";
 import { useAuth } from "../../../context/AuthContext";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import API_URL from "../../../services/api";
 
 const You = () => {
   const insets = useSafeAreaInsets();
   const { user, loading } = useAuth();
+
+  const [friendsCount, setFriendsCount] = useState(0);
+  const [followersCount, setFollowersCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
+
+  const fetchSocialCounts = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      const headers = {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      };
+
+      const [friendsRes, followersRes, followingRes] = await Promise.all([
+        fetch(`${API_URL}/user/friends`, { headers }),
+        fetch(`${API_URL}/user/followers`, { headers }),
+        fetch(`${API_URL}/user/following`, { headers }),
+      ]);
+
+      const friendsData = await friendsRes.json();
+      const followersData = await followersRes.json();
+      const followingData = await followingRes.json();
+
+      setFriendsCount(friendsData.count || 0);
+      setFollowersCount(followersData.count || 0);
+      setFollowingCount(followingData.count || 0);
+    } catch (error) {
+      console.log("Error fetching social counts:", error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchSocialCounts();
+    }, []),
+  );
 
   if (loading) {
     return (
@@ -27,13 +67,16 @@ const You = () => {
     );
   }
 
-  // =========================================
-  // LOGGED OUT
-  // =========================================
-
   if (!user) {
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "#F9F7FB",
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
+        }}
+      >
         <View style={styles.loggedOutScreen}>
           <View style={styles.header}>
             <Text style={styles.title}>My Profile</Text>
@@ -41,16 +84,10 @@ const You = () => {
 
           <View style={styles.loggedOutContainer}>
             <View style={styles.loginIcon}>
-              <Ionicons
-                name="person-outline"
-                size={42}
-                color="#FFFFFF"
-              />
+              <Ionicons name="person-outline" size={42} color="#FFFFFF" />
             </View>
 
-            <Text style={styles.loginTitle}>
-              Sign in to your account
-            </Text>
+            <Text style={styles.loginTitle}>Sign in to your account</Text>
 
             <Text style={styles.loginSubtitle}>
               Log in to access your profile and connect with others.
@@ -64,44 +101,32 @@ const You = () => {
             </Pressable>
 
             <View style={styles.registerRow}>
-              <Text style={styles.registerText}>
-                Don't have an account?
-              </Text>
+              <Text style={styles.registerText}>Don't have an account?</Text>
 
-              <Pressable
-                onPress={() => router.push("/(auth)/register")}
-              >
+              <Pressable onPress={() => router.push("/(auth)/register")}>
                 <Text style={styles.registerLink}>Register</Text>
               </Pressable>
             </View>
           </View>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
-  // =========================================
-  // LOGGED IN
-  // =========================================
-
   return (
     <View
-        style={{
-          flex: 1,
-          backgroundColor: "#f9f7fb",
-          paddingTop: insets.top,
-          // paddingBottom: insets.bottom,
-        }}
-      >
+      style={{
+        flex: 1,
+        backgroundColor: "#F9F7FB",
+        paddingTop: insets.top,
+        // paddingBottom: insets.bottom,
+      }}
+    >
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        {/* =========================================
-            HEADER
-        ========================================= */}
-
         <View style={styles.header}>
           <Text style={styles.title}>My Profile</Text>
 
@@ -112,17 +137,9 @@ const You = () => {
             ]}
             onPress={() => router.push("/settings")}
           >
-            <Ionicons
-              name="settings-outline"
-              size={24}
-              color="#333"
-            />
+            <Ionicons name="settings-outline" size={24} color="#333" />
           </Pressable>
         </View>
-
-        {/* =========================================
-            PROFILE
-        ========================================= */}
 
         <View style={styles.profileSection}>
           {/* AVATAR */}
@@ -136,13 +153,9 @@ const You = () => {
 
           {/* PROFILE INFO */}
           <View style={styles.profileInfo}>
-            <Text style={styles.name}>
-              {user.name}
-            </Text>
+            <Text style={styles.name}>{user.name}</Text>
 
-            <Text style={styles.username}>
-              @{user.username}
-            </Text>
+            <Text style={styles.username}>@{user.username}</Text>
 
             <Pressable
               style={({ pressed }) => [
@@ -156,46 +169,72 @@ const You = () => {
                 color={COLORS.primary}
               />
 
-              <Text style={styles.shareText}>
-                Share Profile
-              </Text>
+              <Text style={styles.shareText}>Share</Text>
             </Pressable>
           </View>
         </View>
 
+        <View style={styles.statsContainer}>
+          <Pressable
+            style={styles.statItem}
+            onPress={() =>
+              router.push({
+                pathname: "/connections",
+                params: { tab: "friends" },
+              })
+            }
+          >
+            <Text style={styles.statNumber}> {friendsCount}</Text>
+            <Text style={styles.statLabel}> Friends </Text>
+          </Pressable>
 
-        
+          <View style={styles.divider} />
+          <Pressable
+            style={styles.statItem}
+            onPress={() =>
+              router.push({
+                pathname: "/connections",
+                params: { tab: "followers" },
+              })
+            }
+          >
+            <Text style={styles.statNumber}> {followersCount} </Text>
+            <Text style={styles.statLabel}> Followers </Text>
+          </Pressable>
+          <View style={styles.divider} />
+          <Pressable
+            style={styles.statItem}
+            onPress={() =>
+              router.push({
+                pathname: "/connections",
+                params: { tab: "following" },
+              })
+            }
+          >
+            <Text style={styles.statNumber}> {followingCount} </Text>
+            <Text style={styles.statLabel}> Following </Text>
+          </Pressable>
+        </View>
+
         <View style={styles.sectionHeader}>
           <View>
-            <Text style={styles.sectionTitle}>
-              My Collection
-            </Text>
+            <Text style={styles.sectionTitle}>My Collection</Text>
 
-            <Text style={styles.sectionDescription}>
-              Things you've saved
-            </Text>
+            <Text style={styles.sectionDescription}>Things you've saved</Text>
           </View>
         </View>
 
-<Pressable
-  style={({ pressed }) => [
-    styles.savedButton,
-    pressed && { opacity: 0.7 },
-  ]}
-  onPress={() => router.push("/saved-bible")}
->
-  <Ionicons
-    name="bookmark"
-    size={27}
-    color={COLORS.primary}
-  />
+        <Pressable
+          style={({ pressed }) => [
+            styles.savedButton,
+            pressed && { opacity: 0.7 },
+          ]}
+          onPress={() => router.push("/saved-bible")}
+        >
+          <Ionicons name="bookmark" size={27} color={COLORS.primary} />
 
-  <Text style={styles.savedText}>Saved</Text>
-</Pressable>
-
-        {/* =========================================
-            YOUR SPACE
-        ========================================= */}
+          <Text style={styles.savedText}>Saved</Text>
+        </Pressable>
 
         <View style={styles.sectionHeader}>
           <View>
@@ -205,10 +244,6 @@ const You = () => {
             </Text>
           </View>
         </View>
-
-        {/* =========================================
-            FEATURED PRAYER
-        ========================================= */}
 
         <Pressable
           style={({ pressed }) => [
@@ -227,35 +262,21 @@ const You = () => {
           </View>
 
           <View style={styles.featureTextContainer}>
-            <Text style={styles.featureLabel}>
-              PRAYER
-            </Text>
+            <Text style={styles.featureLabel}>PRAYER</Text>
 
-            <Text style={styles.featureTitle}>
-              Your Prayer Space
-            </Text>
+            <Text style={styles.featureTitle}>Your Prayer Space</Text>
 
             <Text style={styles.featureSubtitle}>
-              Keep your prayers and moments with God
-              together.
+              Keep your prayers and moments with God together.
             </Text>
           </View>
 
           <View style={styles.featureArrow}>
-            <Ionicons
-              name="arrow-forward"
-              size={20}
-              color="#6B4FA1"
-            />
+            <Ionicons name="arrow-forward" size={20} color="#6B4FA1" />
           </View>
         </Pressable>
 
-        {/* =========================================
-            WORSHIP + BLOG
-        ========================================= */}
-
         <View style={styles.twoColumnRow}>
-
           {/* WORSHIP */}
 
           <Pressable
@@ -265,38 +286,18 @@ const You = () => {
               pressed && styles.featurePressed,
             ]}
           >
-            <View
-              style={[
-                styles.largeIconContainer,
-                styles.worshipIcon,
-              ]}
-            >
-              <FontAwesome5
-                name="pray"
-                size={32}
-                color="#3D7DA8"
-              />
+            <View style={[styles.largeIconContainer, styles.worshipIcon]}>
+              <FontAwesome5 name="pray" size={32} color="#3D7DA8" />
             </View>
 
-            <Text
-              style={[
-                styles.smallCardLabel,
-                { color: "#3D7DA8" },
-              ]}
-            >
+            <Text style={[styles.smallCardLabel, { color: "#3D7DA8" }]}>
               WORSHIP
             </Text>
 
-            <Text style={styles.smallCardTitle}>
-              Your Worship
-            </Text>
+            <Text style={styles.smallCardTitle}>Your Worship</Text>
 
             <View style={styles.smallCardArrow}>
-              <Ionicons
-                name="arrow-forward"
-                size={18}
-                color="#3D7DA8"
-              />
+              <Ionicons name="arrow-forward" size={18} color="#3D7DA8" />
             </View>
           </Pressable>
 
@@ -308,14 +309,9 @@ const You = () => {
               styles.blogCard,
               pressed && styles.featurePressed,
             ]}
-           onPress={() => router.push("/myprofile-blog")}
+            onPress={() => router.push("/myprofile-blog")}
           >
-            <View
-              style={[
-                styles.largeIconContainer,
-                styles.blogIcon,
-              ]}
-            >
+            <View style={[styles.largeIconContainer, styles.blogIcon]}>
               <MaterialCommunityIcons
                 name="clipboard-edit-outline"
                 size={34}
@@ -323,32 +319,17 @@ const You = () => {
               />
             </View>
 
-            <Text
-              style={[
-                styles.smallCardLabel,
-                { color: "#B45D72" },
-              ]}
-            >
+            <Text style={[styles.smallCardLabel, { color: "#B45D72" }]}>
               BLOG
             </Text>
 
-            <Text style={styles.smallCardTitle}>
-              Your Blogs
-            </Text>
+            <Text style={styles.smallCardTitle}>Your Blogs</Text>
 
             <View style={styles.smallCardArrow}>
-              <Ionicons
-                name="arrow-forward"
-                size={18}
-                color="#B45D72"
-              />
+              <Ionicons name="arrow-forward" size={18} color="#B45D72" />
             </View>
           </Pressable>
         </View>
-
-        {/* =========================================
-            QUESTIONS
-        ========================================= */}
 
         <Pressable
           style={({ pressed }) => [
@@ -356,27 +337,14 @@ const You = () => {
             pressed && styles.featurePressed,
           ]}
         >
-          <View
-            style={[
-              styles.questionIconContainer,
-              styles.questionIcon,
-            ]}
-          >
-            <MaterialCommunityIcons
-              name="help"
-              size={34}
-              color="#5A9C91"
-            />
+          <View style={[styles.questionIconContainer, styles.questionIcon]}>
+            <MaterialCommunityIcons name="help" size={34} color="#5A9C91" />
           </View>
 
           <View style={styles.questionText}>
-            <Text style={styles.questionLabel}>
-              QUESTIONS
-            </Text>
+            <Text style={styles.questionLabel}>QUESTIONS</Text>
 
-            <Text style={styles.questionTitle}>
-              Ask, explore & discover
-            </Text>
+            <Text style={styles.questionTitle}>Ask, explore & discover</Text>
 
             <Text style={styles.questionSubtitle}>
               Your questions and conversations
@@ -384,28 +352,13 @@ const You = () => {
           </View>
 
           <View style={styles.questionArrow}>
-            <Ionicons
-              name="arrow-forward"
-              size={20}
-              color="#5A9C91"
-            />
+            <Ionicons name="arrow-forward" size={20} color="#5A9C91" />
           </View>
         </Pressable>
 
-        {/* =========================================
-            MY COLLECTION
-        ========================================= */}
-
-
-        {/* =========================================
-            BIBLE JOURNAL
-        ========================================= */}
-
         <View style={styles.sectionHeader}>
           <View>
-            <Text style={styles.sectionTitle}>
-              Bible Journal
-            </Text>
+            <Text style={styles.sectionTitle}>Bible Journal</Text>
 
             <Text style={styles.sectionDescription}>
               Your personal Bible study
@@ -414,7 +367,6 @@ const You = () => {
         </View>
 
         <View style={styles.bibleGrid}>
-
           {/* HIGHLIGHTS */}
 
           <Pressable
@@ -432,13 +384,9 @@ const You = () => {
               />
             </View>
 
-            <Text style={styles.bibleTitle}>
-              Highlights
-            </Text>
+            <Text style={styles.bibleTitle}>Highlights</Text>
 
-            <Text style={styles.bibleSubtitle}>
-              Your highlighted verses
-            </Text>
+            <Text style={styles.bibleSubtitle}>Your highlighted verses</Text>
 
             <Ionicons
               name="arrow-forward"
@@ -489,15 +437,6 @@ const You = () => {
 };
 
 const styles = StyleSheet.create({
-  // =========================================
-  // SCREEN
-  // =========================================
-
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#F8F6FA",
-  },
-
   container: {
     flex: 1,
   },
@@ -513,10 +452,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#F8F6FA",
   },
-
-  // =========================================
-  // HEADER
-  // =========================================
 
   header: {
     flexDirection: "row",
@@ -555,18 +490,14 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
 
-  // =========================================
-  // PROFILE
-  // =========================================
-
   profileSection: {
     flexDirection: "row",
-  alignItems: "center",
+    alignItems: "center",
 
-  paddingTop: 8,
-  paddingBottom: 20,
+    paddingTop: 8,
+    paddingBottom: 20,
 
-  paddingHorizontal: 4,
+    paddingHorizontal: 4,
   },
 
   avatarOuter: {
@@ -612,53 +543,86 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
-profileInfo: {
-  flex: 1,
-  marginLeft: 18,
-},
+  profileInfo: {
+    flex: 1,
+    marginLeft: 18,
+  },
 
-name: {
-  fontSize: 23,
-  fontWeight: "700",
-  color: "#29232F",
-},
+  name: {
+    fontSize: 23,
+    fontWeight: "700",
+    color: "#29232F",
+  },
 
-username: {
-  marginTop: 4,
-  fontSize: 14,
-  color: "#89838F",
-},
+  username: {
+    marginTop: 4,
+    fontSize: 14,
+    color: "#89838F",
+  },
 
-shareButton: {
-  flexDirection: "row",
-  alignItems: "center",
-  alignSelf: "flex-start",
+  shareButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
 
-  marginTop: 12,
+    marginTop: 12,
 
-  paddingHorizontal: 16,
-  paddingVertical: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
 
-  borderRadius: 20,
+    borderRadius: 20,
 
-  backgroundColor: "#FFFFFF",
+    backgroundColor: "#FFFFFF",
 
-  borderWidth: 1,
-  borderColor: "#DDD5E8",
-},
+    borderWidth: 1,
+    borderColor: "#DDD5E8",
+  },
 
-shareText: {
-  marginLeft: 7,
+  shareText: {
+    marginLeft: 7,
 
-  fontSize: 13,
-  fontWeight: "600",
+    fontSize: 13,
+    fontWeight: "600",
 
-  color: COLORS.primary,
-},
+    color: COLORS.primary,
+  },
 
-  // =========================================
-  // SECTION HEADERS
-  // =========================================
+  statsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingVertical: 14,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 15,
+    shadowColor: "#000",
+
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+  },
+
+  statItem: {
+    alignItems: "center",
+    minWidth: 80,
+  },
+
+  statNumber: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: COLORS.primary,
+  },
+
+  statLabel: {
+    fontSize: 13,
+    color: "#777",
+    marginTop: 4,
+  },
+
+  divider: {
+    width: 2,
+    height: 38,
+    borderRadius: 3,
+    backgroundColor: "#e8e6eb",
+    alignSelf: "center",
+  },
 
   sectionHeader: {
     marginTop: 17,
@@ -681,10 +645,6 @@ shareText: {
 
     color: "#96909A",
   },
-
-  // =========================================
-  // PRAYER FEATURE
-  // =========================================
 
   prayerFeatureCard: {
     minHeight: 190,
@@ -719,7 +679,7 @@ shareText: {
 
     right: -45,
     top: -45,
-    backgroundColor:COLORS.primary,
+    backgroundColor: COLORS.primary,
     // backgroundColor: "#E7D9F4",
   },
 
@@ -784,10 +744,6 @@ shareText: {
     alignItems: "center",
     justifyContent: "center",
   },
-
-  // =========================================
-  // WORSHIP / BLOG
-  // =========================================
 
   twoColumnRow: {
     flexDirection: "row",
@@ -878,10 +834,6 @@ shareText: {
     alignItems: "center",
     justifyContent: "center",
   },
-
-  // =========================================
-  // QUESTIONS
-  // =========================================
 
   questionCard: {
     minHeight: 110,
@@ -974,48 +926,45 @@ shareText: {
     justifyContent: "center",
   },
 
-  // =========================================
-  // COLLECTION
-  // =========================================
-savedButton: {
-  alignSelf: "flex-start",
+  savedButton: {
+    alignSelf: "flex-start",
 
-  minWidth: 75,
-  paddingHorizontal: 14,
-  paddingVertical: 10,
+    minWidth: 75,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
 
-  borderRadius: 18,
+    borderRadius: 18,
 
-  backgroundColor: "#FFFFFF",
+    backgroundColor: "#FFFFFF",
 
-  alignItems: "center",
-  justifyContent: "center",
+    alignItems: "center",
+    justifyContent: "center",
 
-  shadowColor: "#000",
-  shadowOffset: {
-    width: 0,
-    height: 3,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+
+    elevation: 2,
+
+    marginBottom: 15,
   },
-  shadowOpacity: 0.06,
-  shadowRadius: 8,
 
-  elevation: 2,
-
-  marginBottom: 15,
-},
-
-savedText: {
-  marginTop: 5,
-  fontSize: 13,
-  fontWeight: "600",
-  color: "#30263D",
-},
+  savedText: {
+    marginTop: 5,
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#30263D",
+  },
 
   collectionCard: {
     minHeight: 92,
 
     borderRadius: 22,
-    flexDirection:"row",
+    flexDirection: "row",
     paddingHorizontal: 15,
     paddingVertical: 14,
 
@@ -1079,10 +1028,6 @@ savedText: {
     alignItems: "center",
     justifyContent: "center",
   },
-
-  // =========================================
-  // BIBLE JOURNAL
-  // =========================================
 
   bibleGrid: {
     flexDirection: "row",
@@ -1151,10 +1096,6 @@ savedText: {
     bottom: 14,
   },
 
-  // =========================================
-  // PRESS STATES
-  // =========================================
-
   pressed: {
     opacity: 0.7,
   },
@@ -1163,10 +1104,6 @@ savedText: {
     transform: [{ scale: 0.98 }],
     opacity: 0.9,
   },
-
-  // =========================================
-  // LOGGED OUT
-  // =========================================
 
   loggedOutScreen: {
     flex: 1,

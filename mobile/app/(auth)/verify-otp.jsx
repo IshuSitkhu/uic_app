@@ -170,7 +170,7 @@ export default VerifyOtp;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
   },
 
   content: {

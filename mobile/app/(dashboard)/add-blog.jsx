@@ -1,16 +1,15 @@
 import {
-  ActivityIndicator,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -21,18 +20,18 @@ import { router } from "expo-router";
 import { useRef, useState } from "react";
 import { Keyboard } from "react-native";
 import {
-  RichEditor,
-  RichToolbar,
-  actions,
+    RichEditor,
+    RichToolbar,
+    actions,
 } from "react-native-pell-rich-editor";
-import Toast from "react-native-toast-message";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
 import { COLORS } from "../../constants/colors";
 import API_URL from "../../services/api";
 
 const AddBlog = () => {
-      const insets = useSafeAreaInsets();
+  const insets = useSafeAreaInsets();
   const [saving, setSaving] = useState(false);
 
   const [blogTitle, setBlogTitle] = useState("");
@@ -209,13 +208,13 @@ const AddBlog = () => {
   };
   return (
     <View
-        style={{
-          flex: 1,
-          backgroundColor: "#f9f7fb",
-          paddingTop: insets.top,
-          paddingBottom: insets.bottom,
-        }}
-      >
+      style={{
+        flex: 1,
+        backgroundColor: "#F9F7FB",
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+      }}
+    >
       <View style={styles.screen}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
@@ -430,8 +429,6 @@ const AddBlog = () => {
                 <ActivityIndicator size="small" color={COLORS.secondary} />
               ) : (
                 <>
-                  
-
                   <Text style={styles.saveButtonText}>Publish </Text>
                 </>
               )}
@@ -589,7 +586,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#DDD",
     borderRadius: 10,
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -625,7 +622,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#DDD",
     borderRadius: 10,
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     marginBottom: 25,
   },
 
@@ -668,7 +665,7 @@ const styles = StyleSheet.create({
   },
 
   modal: {
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingHorizontal: 20,
@@ -708,7 +705,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#DDD",
     borderRadius: 10,
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -747,14 +744,14 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     borderRadius: 8,
     overflow: "hidden",
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     height: 250,
     marginBottom: 20,
   },
 
   richToolbar: {
-  justifyContent: "flex-start",
-},
+    justifyContent: "flex-start",
+  },
 
   richEditor: {
     minHeight: 250,

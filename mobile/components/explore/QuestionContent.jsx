@@ -144,52 +144,6 @@ const QuestionContent = () => {
             </View>
           </View>
         </Pressable>
-
-        <Pressable style={styles.blogCard}>
-          <View style={styles.blogContent}>
-            <View style={styles.blogDetails}>
-              <View style={styles.blogTopRow}>
-                <View style={styles.smallCategoryBadge}>
-                  <Text style={styles.smallCategoryText}>Church</Text>
-                </View>
-
-                <Pressable style={styles.saveButton}>
-                  <Feather name="bookmark" size={17} color={COLORS.primary} />
-                </Pressable>
-              </View>
-
-              <Text style={styles.blogTitle} numberOfLines={2}>
-                How can I understnad the Bible better?
-              </Text>
-
-              <Text style={styles.blogDescription} numberOfLines={3}>
-                I want to read the Bible and understand it better. Can you give
-                me some tips?
-              </Text>
-
-              <View
-                style={{
-                  justifyContent: "space-between",
-                  flexDirection: "row",
-                }}
-              >
-                <View style={styles.authorRow}>
-                  <Ionicons
-                    name="person-circle-outline"
-                    size={32}
-                    color={COLORS.primary}
-                  />
-
-                  <View>
-                    <Text style={styles.blogAuthor}>Sarah Johnson</Text>
-
-                    <Text style={styles.authorDate}>2 days ago</Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-          </View>
-        </Pressable>
       </View>
 
       <View style={styles.AskQuestion}>
@@ -260,88 +214,6 @@ const QuestionContent = () => {
             </View>
           </View>
         </Pressable>
-
-        <Pressable style={styles.blogCard}>
-          <View style={styles.blogContent}>
-            <View style={styles.blogDetails}>
-              <View style={styles.blogTopRow}>
-                <View style={styles.smallCategoryBadge}>
-                  <Text style={styles.smallCategoryText}>Church</Text>
-                </View>
-
-                <Pressable style={styles.saveButton}>
-                  <Feather name="bookmark" size={17} color={COLORS.primary} />
-                </Pressable>
-              </View>
-
-              <Text style={styles.blogTitle} numberOfLines={2}>
-                How can I understnad the Bible better?
-              </Text>
-
-              <View
-                style={{
-                  justifyContent: "space-between",
-                  flexDirection: "row",
-                }}
-              >
-                <View style={styles.authorRow}>
-                  <Ionicons
-                    name="person-circle-outline"
-                    size={32}
-                    color={COLORS.primary}
-                  />
-
-                  <View>
-                    <Text style={styles.blogAuthor}>Sarah Johnson</Text>
-
-                    <Text style={styles.authorDate}>2 days ago</Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-          </View>
-        </Pressable>
-
-        <Pressable style={styles.blogCard}>
-          <View style={styles.blogContent}>
-            <View style={styles.blogDetails}>
-              <View style={styles.blogTopRow}>
-                <View style={styles.smallCategoryBadge}>
-                  <Text style={styles.smallCategoryText}>Church</Text>
-                </View>
-
-                <Pressable style={styles.saveButton}>
-                  <Feather name="bookmark" size={17} color={COLORS.primary} />
-                </Pressable>
-              </View>
-
-              <Text style={styles.blogTitle} numberOfLines={2}>
-                How can I understnad the Bible better?
-              </Text>
-
-              <View
-                style={{
-                  justifyContent: "space-between",
-                  flexDirection: "row",
-                }}
-              >
-                <View style={styles.authorRow}>
-                  <Ionicons
-                    name="person-circle-outline"
-                    size={32}
-                    color={COLORS.primary}
-                  />
-
-                  <View>
-                    <Text style={styles.blogAuthor}>Sarah Johnson</Text>
-
-                    <Text style={styles.authorDate}>2 days ago</Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-          </View>
-        </Pressable>
       </View>
     </View>
   );
@@ -367,6 +239,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 28,
     justifyContent: "flex-end",
+    ...StyleSheet.absoluteFillObject,
+
+    backgroundColor: "rgba(40, 25, 70, 0.32)",
   },
 
   categoryBadge: {
@@ -386,7 +261,7 @@ const styles = StyleSheet.create({
 
   readBadge: {
     alignSelf: "flex-start",
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     paddingHorizontal: 14,
     paddingVertical: 5,
     borderRadius: 8,
@@ -458,7 +333,7 @@ const styles = StyleSheet.create({
 
   blogCard: {
     marginTop: 14,
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     borderRadius: 16,
     padding: 12,
 
@@ -612,7 +487,7 @@ const styles = StyleSheet.create({
   },
 
   questionBadge: {
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 8,

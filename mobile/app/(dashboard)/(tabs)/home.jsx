@@ -314,7 +314,7 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
   },
 
   header: {
@@ -643,7 +643,7 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
 
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
 
     alignItems: "center",
     justifyContent: "center",
@@ -687,7 +687,7 @@ const styles = StyleSheet.create({
 
   prayerCard: {
     marginTop: 14,
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     borderRadius: 16,
     padding: 16,
 

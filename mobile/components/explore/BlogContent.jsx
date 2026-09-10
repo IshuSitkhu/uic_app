@@ -1,21 +1,21 @@
-import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  ImageBackground,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
+    ActivityIndicator,
+    Alert,
+    Image,
+    ImageBackground,
+    Pressable,
+    StyleSheet,
+    Text,
+    View,
 } from "react-native";
 
-import { COLORS } from "../../constants/colors";
-import API_URL from "../../services/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
+import { COLORS } from "../../constants/colors";
+import API_URL from "../../services/api";
 
 const BlogContent = () => {
   const [blogs, setBlogs] = useState([]);
@@ -50,7 +50,7 @@ const BlogContent = () => {
       const favoriteMap = {};
 
       fetchedBlogs.forEach((blog) => {
-            favoriteMap[Number(blog.id)] = blog.is_favorited;
+        favoriteMap[Number(blog.id)] = blog.is_favorited;
       });
 
       setFavoriteStatus(favoriteMap);
@@ -74,16 +74,13 @@ const BlogContent = () => {
         return;
       }
 
-      const response = await fetch(
-        `${API_URL}/blogs/${blogId}/favorite`,
-        {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/blogs/${blogId}/favorite`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const data = await response.json();
 
@@ -98,18 +95,18 @@ const BlogContent = () => {
         [blogId]: data.is_favorited,
       }));
       Toast.show({
-            type: "success",
-            text1: data.is_favorited ? "Blog Saved" : "Blog Unsaved",
-            position: "top",
-          });
+        type: "success",
+        text1: data.is_favorited ? "Blog Saved" : "Blog Unsaved",
+        position: "top",
+      });
     } catch (error) {
       console.error("Favorite error:", error.message);
       Toast.show({
-            type: "error",
-            text1: "Error",
-            text2: "Failed to update favorite.",
-            position: "top",
-          });
+        type: "error",
+        text1: "Error",
+        text2: "Failed to update favorite.",
+        position: "top",
+      });
     }
   };
 
@@ -221,18 +218,18 @@ const BlogContent = () => {
                   <View style={styles.blogTopRow}>
                     <View style={styles.smallCategoryBadge}>
                       <View style={styles.categoryContainer}>
-                      <Ionicons
+                        <Ionicons
                           name="pricetag-outline"
                           size={14}
                           color="#C45A5A"
                         />
-                      <Text style={styles.smallCategoryText}>
-                        {/* {blog.blog_category || "Other"} */}
-                        {blog.blog_category
-                        ? blog.blog_category.charAt(0).toUpperCase() +
-                          blog.blog_category.slice(1)
-                        : ""}
-                      </Text>
+                        <Text style={styles.smallCategoryText}>
+                          {/* {blog.blog_category || "Other"} */}
+                          {blog.blog_category
+                            ? blog.blog_category.charAt(0).toUpperCase() +
+                              blog.blog_category.slice(1)
+                            : ""}
+                        </Text>
                       </View>
                     </View>
 
@@ -276,9 +273,7 @@ const BlogContent = () => {
 
                     <View style={styles.divider} />
 
-                    <Text style={styles.blogDate}>
-                      {blog.blog_date}
-                    </Text>
+                    <Text style={styles.blogDate}>{blog.blog_date}</Text>
                   </View>
                 </View>
               </View>
@@ -289,8 +284,6 @@ const BlogContent = () => {
     </View>
   );
 };
-
-
 
 export default BlogContent;
 
@@ -312,6 +305,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 28,
     justifyContent: "flex-end",
+    // ...StyleSheet.absoluteFillObject,
+
+    backgroundColor: "rgba(40, 25, 70, 0.32)",
   },
 
   categoryBadge: {
@@ -401,7 +397,7 @@ const styles = StyleSheet.create({
 
   blogCard: {
     marginTop: 14,
-    backgroundColor: "#f9f7fb",
+    backgroundColor: "#F9F7FB",
     borderRadius: 16,
     padding: 12,
 
@@ -457,9 +453,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 10,
-    flexDirection:"row" ,
-    gap:5,
-   },
+    flexDirection: "row",
+    gap: 5,
+  },
 
   smallCategoryText: {
     fontSize: 10,
@@ -517,8 +513,8 @@ const styles = StyleSheet.create({
   },
 
   loadingContainer: {
-  paddingVertical: 30,
-  alignItems: "center",
-  justifyContent: "center",
-},
+    paddingVertical: 30,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
