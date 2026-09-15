@@ -291,7 +291,7 @@ const FullSong = () => {
               source={
                 song.song_cover
                   ? { uri: song.song_cover }
-                  : require("../../assets/images/popularSongs2.jpg")
+                  : require("../../assets/images/popularSongs4.jpg")
               }
               style={styles.songImage}
             />
