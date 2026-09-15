@@ -437,25 +437,25 @@ const SongContent = () => {
 
                     <View style={styles.divider} />
 
-                      <Pressable
-                        style={styles.like}
-                        onPress={() => handleLikeSong(song.id)}
-                      >
-                        <FontAwesome
-                          name={
-                            song.is_liked
-                              ? "thumbs-up"
-                              : "thumbs-o-up"
-                          }
-                          size={17}
-                          color={COLORS.primary}
-                        />
+                    <Pressable
+                      style={styles.like}
+                      onPress={() => handleLikeSong(song.id)}
+                    >
+                      <FontAwesome
+                        name={
+                          song.is_liked
+                            ? "thumbs-up"
+                            : "thumbs-o-up"
+                        }
+                        size={17}
+                        color={COLORS.primary}
+                      />
 
-                        <Text style={styles.likes}>
-                          {song.like_count ?? 0}{" "}
-                          {/* {song.is_liked ? "Liked" : "Like"} */}
-                        </Text>
-                      </Pressable>
+                      <Text style={styles.likes}>
+                        {song.like_count ?? 0}{" "}
+                        {/* {song.is_liked ? "Liked" : "Like"} */}
+                      </Text>
+                    </Pressable>
                   </View>
                 </View>
               </View>

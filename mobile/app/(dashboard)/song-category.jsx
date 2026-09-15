@@ -1,5 +1,6 @@
 import {
   EvilIcons,
+  FontAwesome,
   Ionicons,
   MaterialIcons
 } from "@expo/vector-icons";
@@ -14,13 +15,15 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { COLORS } from "../../constants/colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import API_URL from "../../services/api";
 
 const SongCategory = () => {
+  const [recentSongs, setRecentSongs] = useState([]);
+  const [loadingRecent, setLoadingRecent] = useState(true);
   const [songCounts, setSongCounts] = useState({
     hymn_chorus: 0,
     others: 0,
@@ -61,6 +64,169 @@ const SongCategory = () => {
   const { language } = useLocalSearchParams();
 
   console.log("SELECTED SONG LANGUAGE:", language);
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchRecentSongs = async () => {
+        try {
+          setLoadingRecent(true);
+
+          const token = await AsyncStorage.getItem("token");
+
+          const response = await fetch(
+            `${API_URL}/songs/${language}/recent`,
+            {
+              headers: {
+                Accept: "application/json",
+                ...(token && {
+                  Authorization: `Bearer ${token}`,
+                }),
+              },
+            }
+          );
+
+          const data = await response.json();
+
+          console.log("LANGUAGE RECENT SONGS:", data);
+
+          if (!response.ok) {
+            throw new Error(
+              data.message || "Failed to fetch recent songs."
+            );
+          }
+
+          setRecentSongs(data.songs || []);
+        } catch (error) {
+          console.log("RECENT SONGS ERROR:", error);
+        } finally {
+          setLoadingRecent(false);
+        }
+      };
+
+      if (language) {
+        fetchRecentSongs();
+      }
+    }, [language])
+  );
+
+  const handleFavoriteSong = async (songId) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      if (!token) {
+        Alert.alert(
+          "Login Required",
+          "Please login first to save this song.",
+          [
+            {
+              text: "Cancel",
+              style: "cancel",
+            },
+            {
+              text: "OK",
+              onPress: () => router.push("/(auth)/login"),
+            },
+          ]
+        );
+        return;
+      }
+
+      const response = await fetch(
+        `${API_URL}/songs/favorite`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            song_id: songId,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("FAVORITE SONG RESPONSE:", data);
+
+      if (response.ok) {
+        setRecentSongs((previousSongs) =>
+          previousSongs.map((song) =>
+            song.id === songId
+              ? {
+                  ...song,
+                  is_favorited: data.is_favorited,
+                }
+              : song
+          )
+        );
+      }
+    } catch (error) {
+      console.log("Favorite song error:", error);
+    }
+  };
+
+  const handleLikeSong = async (songId) =>{
+    try{
+      const token = await AsyncStorage.getItem("token");
+
+      if(!token){
+        Alert.alert(
+          "Login Required",
+          "Please login first to like this song,",
+          [
+            {
+              text: "Cancel",
+              style:"cancel",              
+            },{
+              text:"OK",
+              onPress: () => router.push("/(auth)/login"),
+            }
+          ]
+        );
+        return;
+      }
+      
+      const response = await fetch(
+        `${API_URL}/songs/like`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            song_id: songId,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("LIKED SONG RESPONSE:", data);
+
+      if(response.ok) {
+        setRecentSongs((previousSongs) =>
+          previousSongs.map((song) =>
+            song.id === songId
+              ? {
+                  ...song,
+                  is_liked: data.is_liked,
+                  like_count: data.is_liked
+                    ? (song.like_count ?? 0) + 1
+                    : Math.max(0, (song.like_count ?? 0) - 1),
+                }
+              : song
+          )
+        );
+      }
+
+    }catch(error){
+      console.log("Like song error:", error);
+    }
+  }
 
   return (
     <View
@@ -182,7 +348,7 @@ const SongCategory = () => {
 
         <View style={styles.blogSection}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Featured Songs</Text>
+            <Text style={styles.sectionTitle}>Recent Songs</Text>
 
             <Pressable style={styles.viewAll}>
               <Text style={styles.viewAllText}>View All</Text>
@@ -194,7 +360,7 @@ const SongCategory = () => {
               />
             </Pressable>
           </View>
-          <Pressable
+          {/* <Pressable
             style={styles.prayerCard}
             onPress={() => router.push("/full-song")}
           >
@@ -240,101 +406,102 @@ const SongCategory = () => {
                 </View>
               </View>
             </View>
-          </Pressable>
-          <Pressable
-            style={styles.prayerCard}
-            onPress={() => router.push("/full-song")}
-          >
-            <View style={styles.prayerContent}>
-              <View style={styles.prayerImageContainer}>
-                <Image
-                  source={require("../../assets/images/popularSongs3.jpg")}
-                  style={styles.prayerImage}
-                />
-              </View>
+          </Pressable> */}
 
-              <View style={styles.prayerDetails}>
-                <View style={styles.prayerTopRow}>
-                  <Text style={styles.prayerTitle} numberOfLines={2}>
-                    These are the days of Elijah
-                  </Text>
+          {loadingRecent ? (
+            <Text style={styles.emptyText}>
+              Loading SOngs...
+            </Text>
+          ) : recentSongs.length === 0 ?(
+            <Text style={styles.emptyText}>
+              No songs found.
+            </Text>
+          ) : (recentSongs.map((song) => (
+            <Pressable
+              key={song.id}
+              style={styles.prayerCard}
+              onPress={() =>
+                router.push({
+                  pathname: "/full-song",
+                  params: {
+                    id: String(song.id),
+                  },
+                })
+              }
+            >
+              <View style={styles.prayerContent}>
+                <View style={styles.prayerImageContainer}>
+                  <Image
+                    source={
+                      song.song_cover
+                        ? { uri: song.song_cover }
+                        : require("../../assets/images/popularSongs2.jpg")
+                    }
+                    style={styles.prayerImage}
+                  />
+                </View>
 
-                  <Pressable style={styles.saveButton}>
+                <View style={styles.prayerDetails}>
+                  <View style={styles.prayerTopRow}>
+                    <Text
+                      style={styles.prayerTitle}
+                      numberOfLines={2}
+                    >
+                      {song.song_title}
+                    </Text>
+                    <Pressable style={styles.saveButton}
+                      onPress={() => handleFavoriteSong(song.id)}
+                    >
+                      <Ionicons
+                        name={
+                          song.is_favorited
+                            ? "heart"
+                            : "heart-outline"
+                        }
+                        size={20}
+                        color={COLORS.primary}
+                      />
+                    </Pressable>
+                  </View>
+
+                  <View style={styles.prayerAuthorRow}>
                     <Ionicons
-                      name="heart-outline"
-                      size={18}
+                      name="person-circle-outline"
+                      size={19}
                       color={COLORS.primary}
                     />
-                  </Pressable>
-                </View>
 
-                <View style={styles.prayerAuthorRow}>
-                  <Ionicons
-                    name="person-circle-outline"
-                    size={19}
-                    color={COLORS.primary}
-                  />
+                    <Text style={styles.prayerAuthor}>
+                      By {song.song_author}
+                    </Text>
+                    <View style={styles.divider} />
 
-                  <Text style={styles.prayerAuthor}>By Willam</Text>
+                    <Pressable
+                      style={styles.like}
+                      onPress={() => handleLikeSong(song.id)}
+                    >
+                      <FontAwesome
+                        name={
+                          song.is_liked
+                            ? "thumbs-up"
+                            : "thumbs-o-up"
+                        }
+                        size={17}
+                        color={COLORS.primary}
+                      />
 
-                  <View style={styles.divider} />
-
-                  <Pressable style={styles.like}>
-                    <EvilIcons name="like" size={19} color={COLORS.primary} />
-
-                    <Text style={styles.likes}>Likes</Text>
-                  </Pressable>
-                </View>
-              </View>
-            </View>
-          </Pressable>
-          <Pressable
-            style={styles.prayerCard}
-            onPress={() => router.push("/full-song")}
-          >
-            <View style={styles.prayerContent}>
-              <View style={styles.prayerImageContainer}>
-                <Image
-                  source={require("../../assets/images/popularSongs4.jpg")}
-                  style={styles.prayerImage}
-                />
-              </View>
-
-              <View style={styles.prayerDetails}>
-                <View style={styles.prayerTopRow}>
-                  <Text style={styles.prayerTitle} numberOfLines={2}>
-                    These are the days of Elijah
-                  </Text>
-
-                  <Pressable style={styles.saveButton}>
-                    <Ionicons
-                      name="heart-outline"
-                      size={18}
-                      color={COLORS.primary}
-                    />
-                  </Pressable>
-                </View>
-
-                <View style={styles.prayerAuthorRow}>
-                  <Ionicons
-                    name="person-circle-outline"
-                    size={19}
-                    color={COLORS.primary}
-                  />
-
-                  <Text style={styles.prayerAuthor}>By Willam</Text>
-
-                  <View style={styles.divider} />
-
-                  <Pressable style={styles.like}>
-                    <EvilIcons name="like" size={19} color={COLORS.primary} />
-
-                    <Text style={styles.likes}>Likes</Text>
-                  </Pressable>
+                      <Text style={styles.likes}>
+                        {song.like_count ?? 0}{" "}
+                        {/* {song.is_liked ? "Liked" : "Like"} */}
+                      </Text>
+                    </Pressable>
+                  </View>
                 </View>
               </View>
-            </View>
-          </Pressable>
+            </Pressable>
+          ))
+          )}
+          
         </View>
 
         <View style={styles.popularSection}>
@@ -364,7 +531,6 @@ const SongCategory = () => {
 
               <View style={styles.inspirationTextContainer}>
                 <View style={styles.popularDetails}>
-                  {/* Category + Save */}
                   <View style={styles.popularTopRow}>
                     <View style={styles.smallCategoryBadge}>
                       <Text style={styles.smallCategoryText}>Worship</Text>
@@ -650,6 +816,13 @@ const styles = StyleSheet.create({
     color: COLORS.secondary,
   },
 
+  emptyText: {
+    textAlign: "center",
+    marginTop: 25,
+    fontSize: 13,
+    color: "#777",
+  },
+
   prayerCard: {
     backgroundColor: "#fff",
     borderRadius: 18,
@@ -735,7 +908,7 @@ const styles = StyleSheet.create({
   likes: {
     fontSize: 12,
     color: "#666",
-    marginLeft: 3,
+    marginLeft: 5,
     color: COLORS.primary,
   },
 
@@ -800,39 +973,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  prayerTitle: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#222",
-    marginBottom: 7,
-  },
 
-  prayerAuthorRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
 
-  prayerAuthor: {
-    fontSize: 12,
-    color: "#666",
-    marginLeft: 4,
-  },
 
-  divider: {
-    width: 1,
-    height: 15,
-    backgroundColor: "#DDD",
-    marginHorizontal: 9,
-  },
 
-  like: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
 
-  likes: {
-    fontSize: 12,
-    color: "#666",
-    marginLeft: 2,
-  },
+ 
+
+ 
 });
