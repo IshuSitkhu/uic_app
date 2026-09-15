@@ -1,10 +1,12 @@
 import {
   EvilIcons,
+  FontAwesome,
   Ionicons,
   MaterialIcons
 } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import {
+  Alert,
   Image,
   ImageBackground,
   Pressable,
@@ -16,9 +18,10 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useFocusEffect} from "expo-router";
 import API_URL from "../../services/api";
-import { useEffect, useState } from "react";
+import { useEffect, useCallback, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SongList = () => {
   const { language, category } = useLocalSearchParams();
@@ -29,31 +32,45 @@ const SongList = () => {
   const insets = useSafeAreaInsets();
 
   const [songs, setSongs] = useState([]);
-  const [loading, setLoading] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchSongs = async () =>{
-      try{
-        setLoading(true);
+  useFocusEffect(
+    useCallback(() => {
+      const fetchSongs = async () => {
+        try {
+          setLoading(true);
 
-        const response = await fetch(
-            `${API_URL}/songs/${language}/list/${category}`
-        );
+          const token = await AsyncStorage.getItem("token");
 
-        const data = await response.json();
+          const response = await fetch(
+            `${API_URL}/songs/${language}/list/${category}`,
+            {
+              headers: {
+                Accept: "application/json",
+                ...(token && {
+                  Authorization: `Bearer ${token}`,
+                }),
+              },
+            }
+          );
 
-        console.log("song list response api: ", data);
-        setSongs(data.songs ?? []);
-      } catch (error){
-        console.error("Song list error:", error);
-      } finally{
-        setLoading(false);
-      }
-    };
-    if (language && category) {
+          const data = await response.json();
+
+          console.log("SONG LIST API RESPONSE:", data);
+
+          setSongs(data.songs ?? []);
+        } catch (error) {
+          console.error("Song list error:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      if (language && category) {
         fetchSongs();
       }
-  }, [language, category]);
+    }, [language, category])
+  );
 
   const pageTitle = category === "hymn_chorus" ? "Hymn/Chorus" : "Others";
 
@@ -65,6 +82,122 @@ const SongList = () => {
     : language === "hindi"
     ? "HI"
     : "";
+
+  const handleFavoriteSong = async (songId) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      if (!token) {
+        Alert.alert(
+          "Login Required",
+          "Please login first to save this song.",
+          [
+            {
+              text: "Cancel",
+              style: "cancel",
+            },
+            {
+              text: "OK",
+              onPress: () => router.push("/(auth)/login"),
+            },
+          ]
+        );
+        return;
+      }
+
+      const response = await fetch(
+        `${API_URL}/songs/favorite`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            song_id: songId,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("FAVORITE SONG RESPONSE:", data);
+
+      if (response.ok) {
+        setSongs((previousSongs) =>
+          previousSongs.map((song) =>
+            song.id === songId
+              ? {
+                  ...song,
+                  is_favorited: data.is_favorited,
+                }
+              : song
+          )
+        );
+      }
+    } catch (error) {
+      console.log("Favorite song error:", error);
+    }
+  };
+
+  const handleLikeSong = async (songId) =>{
+    try{
+      const token = await AsyncStorage.getItem("token");
+
+      if(!token){
+        Alert.alert(
+          "Login Required",
+          "Please login first to like this song,",
+          [
+            {
+              text: "Cancel",
+              style:"cancel",              
+            },{
+              text:"OK",
+              onPress: () => router.push("/(auth)/login"),
+            }
+          ]
+        );
+        return;
+      }
+      
+      const response = await fetch(
+        `${API_URL}/songs/like`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            song_id: songId,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("LIKED SONG RESPONSE:", data);
+
+      if(response.ok) {
+        setSongs((previousSongs) =>
+          previousSongs.map((song) =>
+            song.id === songId
+            ?{
+              ...song,
+              is_liked: data.is_liked,
+            }
+            : song
+          )
+        );
+      }
+
+    }catch(error){
+      console.log("Like song error:", error);
+    }
+  }
 
   return (
     <View
@@ -179,22 +312,25 @@ const SongList = () => {
 
                       <Pressable
                         style={styles.saveButton}
-                        onPress={(event) => {
-                          event.stopPropagation();
-                        }}
+                        onPress={() => handleFavoriteSong(song.id)}
                       >
                         <Ionicons
-                          name="heart-outline"
-                          size={18}
+                          name={
+                            song.is_favorited
+                              ? "heart"
+                              : "heart-outline"
+                          }
+                          size={20}
                           color={COLORS.primary}
                         />
+                    
                       </Pressable>
                     </View>
 
                     <View style={styles.prayerAuthorRow}>
                       <Ionicons
                         name="person-circle-outline"
-                        size={19}
+                        size={22}
                         color={COLORS.primary}
                       />
 
@@ -204,13 +340,14 @@ const SongList = () => {
 
                       <Pressable
                           style={styles.like}
-                          onPress={(event) => {
-                            event.stopPropagation();
-                          }}
+                          onPress={() => handleLikeSong(song.id)}
                         >
-                        <EvilIcons name="like" size={19} color={COLORS.primary} />
+                        <FontAwesome 
+                          name={
+                            song.is_liked ? "thumbs-up" :"thumbs-o-up" 
+                           } size={17} color={COLORS.primary} />
 
-                        <Text style={styles.likes}>Likes</Text>
+                        <Text style={styles.likes}>{song.is_liked ? "Liked" : "Like" }</Text>
                       </Pressable>
                     </View>
                   </View>
@@ -218,54 +355,6 @@ const SongList = () => {
               </Pressable>
             ))
           )}
-          {/* <Pressable
-            style={styles.prayerCard}
-            onPress={() => router.push("/full-song")}
-          >
-            <View style={styles.prayerContent}>
-              <View style={styles.prayerImageContainer}>
-                <Image
-                  source={require("../../assets/images/popularSongs2.jpg")}
-                  style={styles.prayerImage}
-                />
-              </View>
-
-              <View style={styles.prayerDetails}>
-                <View style={styles.prayerTopRow}>
-                  <Text style={styles.prayerTitle} numberOfLines={2}>
-                    These are the days of Elijah
-                  </Text>
-
-                  <Pressable style={styles.saveButton}>
-                    <Ionicons
-                      name="heart-outline"
-                      size={18}
-                      color={COLORS.primary}
-                    />
-                  </Pressable>
-                </View>
-
-                <View style={styles.prayerAuthorRow}>
-                  <Ionicons
-                    name="person-circle-outline"
-                    size={19}
-                    color={COLORS.primary}
-                  />
-
-                  <Text style={styles.prayerAuthor}>By Willam</Text>
-
-                  <View style={styles.divider} />
-
-                  <Pressable style={styles.like}>
-                    <EvilIcons name="like" size={19} color={COLORS.primary} />
-
-                    <Text style={styles.likes}>Likes</Text>
-                  </Pressable>
-                </View>
-              </View>
-            </View>
-          </Pressable> */}
-
         </View>
 
         <View style={styles.blogSection}>
@@ -621,13 +710,21 @@ const styles = StyleSheet.create({
   like: {
     flexDirection: "row",
     alignItems: "center",
-    color: COLORS.primary,
+    justifyContent: "center",
+
+    paddingRight: 20,
+    paddingVertical: 10,
+
+    minHeight: 44,
+    minWidth: 70,
+
+    borderRadius: 8,
   },
 
   likes: {
     fontSize: 12,
     color: "#666",
-    marginLeft: 3,
+    marginLeft: 5,
     color: COLORS.primary,
   },
 

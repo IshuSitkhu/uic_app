@@ -18,53 +18,90 @@ import { COLORS } from "../../constants/colors";
 import API_URL from "../../services/api";
 
 const SavedPrayer = () => {
-    const insets = useSafeAreaInsets();
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [savedPrayers, setSavedPrayers] = useState([]);
+  const insets = useSafeAreaInsets();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [savedPrayers, setSavedPrayers] = useState([]);
 
-    const fetchSavedPrayers = async () => {
-        try {
-            setLoading(true);
-            setError(null);
+  const fetchSavedPrayers = async () => {
+      try {
+          setLoading(true);
+          setError(null);
 
-            const token = await AsyncStorage.getItem("token");
+          const token = await AsyncStorage.getItem("token");
 
-            if (!token) {
-                throw new Error("Authentication token not found.");
-            }
-            console.log("API_URL:", API_URL);
-            console.log("SAVED PRAYER URL:", `${API_URL}/prayers/saved`);
+          if (!token) {
+              throw new Error("Authentication token not found.");
+          }
+          console.log("API_URL:", API_URL);
+          console.log("SAVED PRAYER URL:", `${API_URL}/prayers/saved`);
 
-            const response = await fetch(`${API_URL}/prayers/saved`, {
-                method: "GET",
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+          const response = await fetch(`${API_URL}/prayers/saved`, {
+              method: "GET",
+              headers: {
+                  Accept: "application/json",
+                  Authorization: `Bearer ${token}`,
+              },
+          });
 
-            const data = await response.json();
+          const data = await response.json();
 
-            console.log("SAVED PRAYERS RESPONSE:", data);
+          console.log("SAVED PRAYERS RESPONSE:", data);
 
-            if (!response.ok) {
-                throw new Error(
-                    data.message || "Failed to fetch saved prayers."
-                );
-            }
+          if (!response.ok) {
+              throw new Error(
+                  data.message || "Failed to fetch saved prayers."
+              );
+          }
 
-            setSavedPrayers(data.prayers || []);
-        } catch (error) {
-            console.log("SAVED PRAYERS ERROR:", error);
+          setSavedPrayers(data.prayers || []);
+      } catch (error) {
+          console.log("SAVED PRAYERS ERROR:", error);
 
-            setError(
-                error.message || "Failed to load saved prayers."
-            );
-        } finally {
-            setLoading(false);
+          setError(
+              error.message || "Failed to load saved prayers."
+          );
+      } finally {
+          setLoading(false);
+      }
+  };
+
+  const handleFavoritePrayer = async (prayerId) => {
+    try{
+      const token = await AsyncStorage.getItem("token");
+        if (!token) {
+          throw new Error("Authentication token not found.");
+          }
+
+          const response = await fetch(`${API_URL}/prayers/{id}/favorite`, {
+          method: "POST",
+          headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+
+        console.log("FAVORITE prayer RESPONSE:", data);
+
+        if (!response.ok) {
+        throw new Error(
+            data.message || "Failed to update favorite."
+        );
         }
-    };
+
+        // Since this is the Saved Prayers page,
+        // removing favorite should remove the pryaer from this list.
+        if (!data.is_favorited) {
+        setSavedSongs((previousPrayers) =>
+            previousPrayers.filter((prayer) => prayer.id !== prayerId)
+        );
+        }
+    }catch(error){
+      console.log("FAVORITE SONG ERROR:", error);
+    }
+  }
 
   useEffect(() => {
     fetchSavedPrayers();
@@ -193,11 +230,7 @@ const SavedPrayer = () => {
                                 onPress={() => handleFavoritePrayer(prayer.id)}
                                 >
                                 <Ionicons
-                                    name={
-                                    prayer.is_favorited
-                                        ? "bookmark"
-                                        : "bookmark-outline"
-                                    }
+                                    name="bookmark"
                                     size={16}
                                     color={COLORS.primary}
                                 />

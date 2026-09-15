@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
+  Alert,
   Image,
   Pressable,
   ScrollView,
@@ -12,14 +13,16 @@ import {
 import {
   EvilIcons,
   Ionicons,
+  FontAwesome,
 } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import RenderHtml from "react-native-render-html";
 import { useWindowDimensions } from "react-native";
 import { COLORS } from "../../constants/colors";
 import API_URL from "../../services/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const FullSong = () => {
   const insets = useSafeAreaInsets();
@@ -30,13 +33,25 @@ const FullSong = () => {
   const [song, setSong] = useState(null);
   const [loading, setLoading] = useState(true);
 
+
+
   useEffect(() => {
       const fetchSong = async () => {
         try {
           setLoading(true);
   
+          const token = await AsyncStorage.getItem("token");
+
           const response = await fetch(
-            `${API_URL}/songs/detail/${id}`
+            `${API_URL}/songs/detail/${id}`,
+            {
+              headers: {
+                Accept: "application/json",
+                ...(token && {
+                  Authorization: `Bearer ${token}`,
+                }),
+              },
+            }
           );
   
           const data = await response.json();
@@ -55,6 +70,125 @@ const FullSong = () => {
         fetchSong();
       }
     }, [id]);
+
+ const handleFavoriteSong = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      if (!token) {
+        Alert.alert(
+          "Login Required",
+          "Please login first to save this song.",
+          [
+            {
+              text: "Cancel",
+              style: "cancel",
+            },
+            {
+              text: "OK",
+              onPress: () => router.push("/(auth)/login"),
+            },
+          ]
+        );
+        return;
+      }
+
+      const response = await fetch(
+        `${API_URL}/songs/favorite`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            song_id: id,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("FULL SONG FAVORITE RESPONSE:", data);
+
+      if (response.ok) {
+        setSong((previousSong) => {
+          const newFavoriteCount = data.is_favorited
+            ? previousSong.favorite_count + 1
+            : previousSong.favorite_count - 1;
+
+          return {
+            ...previousSong,
+            is_favorited: data.is_favorited,
+            favorite_count: Math.max(0, newFavoriteCount),
+          };
+        });
+      }
+    } catch (error) {
+      console.log("Favorite song error:", error);
+    }
+  };
+
+  const handleLikeSOng = async () => {
+    try{
+      const token = await AsyncStorage.getItem("token");
+
+      if(!token){
+        Alert.alert(
+          "Login Required",
+          "Please login first to like this song.",
+          [
+            {
+              text:"Cancel",
+              style:"cancel",
+            },
+            {
+              text:"OK",
+              onPress: () => router.push("/(auth)/login"),
+            },
+          ]
+        );
+        return;
+      }
+
+      const response = await fetch(
+        `${API_URL}/songs/like`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            song_id: id,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("FULL SONG LIKED:", data);
+
+      if(response.ok) {
+        setSong((previousSong) => {
+          const newLikeCount = data.is_liked
+            ? previousSong.like_count + 1
+            : previousSong.like_count - 1;
+
+          return {
+            ...previousSong,
+            is_liked: data.is_liked,
+            like_count: Math.max(0, newLikeCount),
+          };
+        });
+      }
+
+    }catch(error){
+       console.log("Like song error:", error);
+    }
+  }
 
   const getCategoryName = (type) => {
     if (type === "hymn" || type === "chorus") {
@@ -120,6 +254,8 @@ const FullSong = () => {
   
     const lyricsHtml = song.description || "";
     const chordsHtml = song.description_chords || "";
+    console.log("LYRICS HTML:", lyricsHtml);
+    console.log("CHORDS HTML:", chordsHtml);
 
   return (
     <View
@@ -187,18 +323,25 @@ const FullSong = () => {
 
             <View style={styles.BottomRow}>
               <View style={styles.smallCategoryBadge}>
-                <View style={styles.categoryContainer}>
-                  <EvilIcons name="like" size={19} color={COLORS.primary} />
-                  <Text style={styles.smallCategoryText}>03</Text>
-                </View>
-                <View style={styles.languageContainer}>
+                <Pressable style={styles.languageContainer} onPress={handleLikeSOng}>
+                  <FontAwesome 
+                    name={
+                      song.is_liked ? "thumbs-up" :"thumbs-o-up" 
+                      } size={17} color={COLORS.primary} />
+                  <Text style={styles.smalllanguageText}>{song.like_count ?? 0}</Text>
+                </Pressable>
+                <Pressable style={styles.languageContainer} onPress={handleFavoriteSong}>
                   <Ionicons
-                    name="heart-outline"
+                    name={
+                      song.is_favorited
+                        ? "heart"
+                        : "heart-outline"
+                    }
                     size={17}
                     color={COLORS.primary}
                   />
-                  <Text style={styles.smalllanguageText}>03</Text>
-                </View>
+                  <Text style={styles.smalllanguageText}>{song.favorite_count ?? 0}</Text>
+                </Pressable>
                 <View style={styles.languageContainer}>
                   <AntDesign name="download" size={17} color={COLORS.primary} />
                   <Text style={styles.smalllanguageText}>PDF</Text>
@@ -223,40 +366,36 @@ const FullSong = () => {
         </View>
         <View style={styles.divider} />
         <View style={styles.songContent}>
-          <ScrollView 
-            showsVerticalScrollIndicator={false}>
-            {activeTab === "lyrics" ? (
-              <Text style={styles.lyricsText}>
-                Verse 1{"\n"}I love You Lord{"\n"}
-                Oh Your mercy never fails me{"\n"}
-                All my days{"\n"}
-                I’ve been held in Your hands{"\n"}
-                From the moment that I wake up{"\n"}
-                Until I lay my head{"\n"}I will sing of the goodness of God
-                {"\n"}
-                {"\n"}
-                Chorus{"\n"}
-                All my life You have been faithful{"\n"}
-                All my life You have been so, so good{"\n"}
-                With every breath that I am able{"\n"}I will sing of the
-                goodness of God{"\n"}
-                {"\n"}
-                Verse 2{"\n"}I love Your voice{"\n"}
-                You have led me through the fire{"\n"}
-                In darkest nights{"\n"}
-                You are close like no other{"\n"}
-                I’ve known You as a father{"\n"}
-                I’ve known You as a friend{"\n"}I have lived in the goodness of
-                God{"\n"}
-                {"\n"}
-                Bridge Your goodness is running after, it’s running after me
-                Your goodness is running after, it’s running after me With my
-                life laid down, I’m surrendered now, I give You everything Your
-                goodness is running after, it’s running after me
-              </Text>
-            ) : (
-              <Text style={styles.lyricsText}>chords here...</Text>
-            )}
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            nestedScrollEnabled
+          >
+            <RenderHtml
+              contentWidth={width - 36}
+              source={{
+                html:
+                  activeTab === "lyrics"
+                    ? lyricsHtml
+                    : chordsHtml,
+              }}
+              tagsStyles={{
+                table: {
+                  width: "100%",
+                },
+
+                td: {
+                  fontSize: 15,
+                  lineHeight: 25,
+                  color: "#333",
+                },
+
+                p: {
+                  fontSize: 15,
+                  lineHeight: 25,
+                  color: "#333",
+                },
+              }}
+            />
           </ScrollView>
         </View>
       </ScrollView>

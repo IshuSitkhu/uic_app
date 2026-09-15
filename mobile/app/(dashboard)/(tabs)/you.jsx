@@ -245,7 +245,7 @@ const You = () => {
               styles.savedButton,
               pressed && { opacity: 0.7 },
             ]}
-            onPress={() => router.push("/saved-bible")}
+            onPress={() => router.push("/saved-song")}
           >
             <MaterialCommunityIcons name="music" size={34} color="#3D7DA8" />
 

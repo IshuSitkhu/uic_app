@@ -317,9 +317,9 @@ const styles = StyleSheet.create({
   featuredOverlay: {
     flex: 1,
     paddingHorizontal: 18,
-    paddingVertical: 28,
+    paddingVertical: 20,
     justifyContent: "flex-end",
-    // ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFillObject,
 
     backgroundColor: "rgba(40, 25, 70, 0.32)",
   },

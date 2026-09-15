@@ -6,6 +6,7 @@ import {
 } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
 import { 
+  Alert,
   ImageBackground, 
   Pressable, 
   StyleSheet, 
@@ -40,25 +41,25 @@ useFocusEffect(
           },
         });
 
-const data = await response.json();
+        const data = await response.json();
 
-console.log("PRAYER API RESPONSE:", JSON.stringify(data, null, 2));
+        console.log("PRAYER API RESPONSE:", JSON.stringify(data, null, 2));
 
-if (response.ok) {
-  if (Array.isArray(data)) {
-    console.log(
-      "PRAYER FAVORITE STATES:",
-      data.map((prayer) => ({
-        id: prayer.id,
-        is_favorited: prayer.is_favorited,
-      }))
-    );
+        if (response.ok) {
+          if (Array.isArray(data)) {
+            console.log(
+              "PRAYER FAVORITE STATES:",
+              data.map((prayer) => ({
+                id: prayer.id,
+                is_favorited: prayer.is_favorited,
+              }))
+            );
 
-    setPrayers(data);
-  } else {
-    console.log("Prayer API returned an object, not an array:", data);
-  }
-}
+            setPrayers(data);
+          } else {
+            console.log("Prayer API returned an object, not an array:", data);
+          }
+        }
       } catch (error) {
         console.log("Prayer API error:", error);
       }
@@ -73,7 +74,20 @@ const handleFavoritePrayer = async (prayerId) => {
     const token = await AsyncStorage.getItem("token");
 
     if (!token) {
-      console.log("No token found");
+      Alert.alert(
+        "Login Required",
+        "Please login first to save this song.",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "OK",
+            onPress: () => router.push("/(auth)/login"),
+          },
+        ]
+      );
       return;
     }
 
