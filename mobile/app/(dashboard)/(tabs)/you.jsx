@@ -224,17 +224,50 @@ const You = () => {
           </View>
         </View>
 
-        <Pressable
-          style={({ pressed }) => [
-            styles.savedButton,
-            pressed && { opacity: 0.7 },
-          ]}
-          onPress={() => router.push("/saved-bible")}
-        >
-          <Ionicons name="bookmark" size={27} color={COLORS.primary} />
+        <View style={{flexDirection:"row", justifyContent:"space-between"}}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.savedButton,
+              pressed && { opacity: 0.7 },
+            ]}
+            onPress={() => router.push("/saved-blog")}
+          >
+            <MaterialCommunityIcons
+                name="clipboard-edit-outline"
+                size={34}
+                color="#B45D72"
+              />
 
-          <Text style={styles.savedText}>Saved</Text>
-        </Pressable>
+            <Text style={styles.savedText}>Blog</Text>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              styles.savedButton,
+              pressed && { opacity: 0.7 },
+            ]}
+            onPress={() => router.push("/saved-bible")}
+          >
+            <MaterialCommunityIcons name="music" size={34} color="#3D7DA8" />
+
+            <Text style={styles.savedText}>Song</Text>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              styles.savedButton,
+              pressed && { opacity: 0.7 },
+            ]}
+            onPress={() => router.push("/saved-prayer")}
+          >
+            <MaterialCommunityIcons
+              name="hands-pray"
+              size={34}
+              color="#6B4FA1"
+            />
+
+            <Text style={styles.savedText}>Prayer</Text>
+          </Pressable>
+          
+        </View>
 
         <View style={styles.sectionHeader}>
           <View>
@@ -929,9 +962,9 @@ const styles = StyleSheet.create({
   savedButton: {
     alignSelf: "flex-start",
 
-    minWidth: 75,
+    minWidth: 100,
     paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingVertical: 14,
 
     borderRadius: 18,
 

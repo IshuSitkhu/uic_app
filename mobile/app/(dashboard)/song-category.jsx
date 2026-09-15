@@ -3,7 +3,6 @@ import {
   Ionicons,
   MaterialIcons
 } from "@expo/vector-icons";
-import { router } from "expo-router";
 import {
   Image,
   ImageBackground,
@@ -15,10 +14,53 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { router, useLocalSearchParams } from "expo-router";
 import { COLORS } from "../../constants/colors";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect, useState } from "react";
+import API_URL from "../../services/api";
 
 const SongCategory = () => {
+  const [songCounts, setSongCounts] = useState({
+    hymn_chorus: 0,
+    others: 0,
+  });
+
+  useEffect(() => {
+    const fetchSongCounts = async () => {
+      try {
+        setLoading(true);
+
+        const response = await fetch(
+          `${API_URL}/songs/${language}/count`
+        );
+
+        const data = await response.json();
+
+        console.log("SONG COUNT RESPONSE:", data);
+
+        setSongCounts({
+          hymn_chorus: data.hymn_chorus ?? 0,
+          others: data.others ?? 0,
+        });
+      } catch (error) {
+        console.error("SONG COUNT ERROR:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (language) {
+      fetchSongCounts();
+    }
+  }, [language]);
+
+  const [loading, setLoading] = useState(true);
   const insets = useSafeAreaInsets();
+  
+  const { language } = useLocalSearchParams();
+
+  console.log("SELECTED SONG LANGUAGE:", language);
 
   return (
     <View
@@ -62,7 +104,15 @@ const SongCategory = () => {
               styles.inspirationCard,
               pressed && styles.cardPressed,
             ]}
-            onPress={() => router.push("/song-list")}
+            onPress={() =>
+              router.push({
+                pathname: "/song-list",
+                params: {
+                  language: language,
+                  category: "hymn_chorus",
+                },
+              })
+            }
           >
             <ImageBackground
               source={require("../../assets/images/popularSongs.jpg")}
@@ -86,7 +136,7 @@ const SongCategory = () => {
                   CHORUS
                 </Text>
 
-                <Text style={styles.featuredDescription}>2 Songs</Text>
+                <Text style={styles.featuredDescription}>{loading ? "Loading..." : `${songCounts.hymn_chorus} Songs`}</Text>
               </View>
             </ImageBackground>
           </Pressable>
@@ -96,6 +146,15 @@ const SongCategory = () => {
               styles.inspirationCard,
               pressed && styles.cardPressed,
             ]}
+            onPress={() =>
+              router.push({
+                pathname: "/song-list",
+                params: {
+                  language: language,
+                  category: "others",
+                },
+              })
+            }
           >
             <ImageBackground
               source={require("../../assets/images/popularSongs2.jpg")}
@@ -115,7 +174,7 @@ const SongCategory = () => {
 
                 <Text style={styles.featuredTitle}>OTHERS</Text>
 
-                <Text style={styles.featuredDescription}>2 Songs</Text>
+                <Text style={styles.featuredDescription}>{loading ? "Loading..." : `${songCounts.others} Songs`}</Text>
               </View>
             </ImageBackground>
           </Pressable>
@@ -142,7 +201,7 @@ const SongCategory = () => {
             <View style={styles.prayerContent}>
               <View style={styles.prayerImageContainer}>
                 <Image
-                  source={require("../../assets/images/popularSongs2.jpg")}
+                  source={require("../../assets/images/popularSongs5.jpg")}
                   style={styles.prayerImage}
                 />
               </View>
@@ -189,7 +248,7 @@ const SongCategory = () => {
             <View style={styles.prayerContent}>
               <View style={styles.prayerImageContainer}>
                 <Image
-                  source={require("../../assets/images/popularSongs2.jpg")}
+                  source={require("../../assets/images/popularSongs3.jpg")}
                   style={styles.prayerImage}
                 />
               </View>
@@ -236,7 +295,7 @@ const SongCategory = () => {
             <View style={styles.prayerContent}>
               <View style={styles.prayerImageContainer}>
                 <Image
-                  source={require("../../assets/images/popularSongs2.jpg")}
+                  source={require("../../assets/images/popularSongs4.jpg")}
                   style={styles.prayerImage}
                 />
               </View>
@@ -299,7 +358,7 @@ const SongCategory = () => {
           >
             <Pressable style={styles.popularCard}>
               <Image
-                source={require("../../assets/images/popularSongs.jpg")}
+                source={require("../../assets/images/popularSongs5.jpg")}
                 style={styles.popularImage}
               />
 
@@ -319,8 +378,6 @@ const SongCategory = () => {
                       />
                     </Pressable>
                   </View>
-
-                  {/* Title */}
                   <Text style={styles.prayerTitle} numberOfLines={1}>
                     These are the days of Elijah
                   </Text>
@@ -350,7 +407,7 @@ const SongCategory = () => {
             {/* Second card */}
             <Pressable style={styles.popularCard}>
               <Image
-                source={require("../../assets/images/popularSongs.jpg")}
+                source={require("../../assets/images/popularSongs4.jpg")}
                 style={styles.popularImage}
               />
 

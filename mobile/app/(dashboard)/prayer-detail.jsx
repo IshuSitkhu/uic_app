@@ -5,7 +5,7 @@ import {
     MaterialCommunityIcons,
     MaterialIcons,
 } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import {
     Pressable,
     ScrollView,
@@ -13,12 +13,109 @@ import {
     Text,
     TouchableOpacity,
     View,
+    Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
+import React, { useEffect, useState } from "react";
+import API_URL from "../../services/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const PrayerDetail = () => {
   const insets = useSafeAreaInsets();
+    const { id } = useLocalSearchParams();
+
+  console.log("SELECTED PRAYER ID:", id);
+  const [prayer, setPrayer] = useState(null);
+
+useEffect(() => {
+  const fetchPrayer = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      const response = await fetch(`${API_URL}/prayers`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+
+      const data = await response.json();
+
+      console.log("PRAYER DETAIL API RESPONSE:", data);
+
+      if (!response.ok) {
+        console.log("Prayer detail API failed:", response.status);
+        return;
+      }
+
+      const selectedPrayer = data.find(
+        (item) => item.id.toString() === id.toString()
+      );
+
+      console.log("SELECTED PRAYER:", selectedPrayer);
+
+      setPrayer(selectedPrayer);
+    } catch (error) {
+      console.log("Prayer detail API error:", error);
+    }
+  };
+
+  fetchPrayer();
+}, [id]);
+
+const handleFavoritePrayer = async () => {
+  try {
+    const token = await AsyncStorage.getItem("token");
+
+    if (!token) {
+      Alert.alert(
+        "Login Required",
+        "Please login first to save this prayer.",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "OK",
+            onPress: () => router.push("/(auth)/login"),
+          },
+        ]
+      );
+
+      return;
+    }
+
+    const response = await fetch(
+      `${API_URL}/prayers/${id}/favorite`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    console.log("PRAYER DETAIL FAVORITE RESPONSE:", data);
+
+    if (!response.ok) {
+      console.log("Prayer favorite failed:", response.status);
+      return;
+    }
+
+    setPrayer((previousPrayer) => ({
+      ...previousPrayer,
+      is_favorited: data.is_favorited,
+    }));
+  } catch (error) {
+    console.log("Prayer detail favorite error:", error);
+  }
+};
 
   return (
     <View
@@ -55,25 +152,35 @@ const PrayerDetail = () => {
         <View style={styles.prayerSection}>
           <View style={styles.prayerHeader}>
             <View style={styles.smallCategoryBadge}>
-              <Text style={styles.smallCategoryText}>Friend</Text>
+              <Text style={styles.smallCategoryText}>
+                {prayer?.prayer_category &&
+                  prayer.prayer_category.charAt(0).toUpperCase() +
+                    prayer.prayer_category.slice(1)}
+              </Text>
             </View>
 
             <View style={styles.dateContainer}>
               <EvilIcons name="calendar" size={19} color={COLORS.secondary} />
 
-              <Text style={styles.prayerDate}>Aug 10, 2025</Text>
+              <Text style={styles.prayerDate}>
+                {prayer?.prayer_start_date &&
+                  new Date(prayer.prayer_start_date).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+              </Text>
             </View>
           </View>
 
           <Text style={styles.prayerTitle}>
-            Trusting God in Uncertain Times and Resurrection in your Life
+            {prayer?.prayer_title}
           </Text>
 
           <View style={styles.divider} />
 
           <Text style={styles.prayerDescription}>
-            And it came to pass, when all the people were clean passed over
-            Jordan, that the Lord spake unto Joshua, saying,
+            {prayer?.prayer}
           </Text>
 
           <View style={styles.authorActionRow}>
@@ -84,15 +191,26 @@ const PrayerDetail = () => {
                 color={COLORS.primary}
               />
 
-              <Text style={styles.blogAuthor}>By William</Text>
+              <Text style={styles.blogAuthor}>By Amin</Text>
             </View>
 
             <Pressable
               style={styles.saveButton}
-              //   android_ripple={{ color: "#ddd" }}
+              onPress={handleFavoritePrayer}
             >
-              <Feather name="bookmark" size={17} color={COLORS.primary} />
-              <Text style={styles.saveText}>Save</Text>
+              <Ionicons
+                name={
+                  prayer?.is_favorited
+                    ? "bookmark"
+                    : "bookmark-outline"
+                }
+                size={17}
+                color={COLORS.primary}
+              />
+
+              <Text style={styles.saveText}>
+                {prayer?.is_favorited ? "Saved" : "Save"}
+              </Text>
             </Pressable>
           </View>
         </View>

@@ -1,26 +1,125 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-    Image,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import {
-    EvilIcons,
-    Ionicons
+  EvilIcons,
+  Ionicons,
 } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import RenderHtml from "react-native-render-html";
+import { useWindowDimensions } from "react-native";
 import { COLORS } from "../../constants/colors";
+import API_URL from "../../services/api";
 
 const FullSong = () => {
   const insets = useSafeAreaInsets();
+  const { id } = useLocalSearchParams();
+  const { width } = useWindowDimensions();
+
   const [activeTab, setActiveTab] = useState("lyrics");
+  const [song, setSong] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+      const fetchSong = async () => {
+        try {
+          setLoading(true);
+  
+          const response = await fetch(
+            `${API_URL}/songs/detail/${id}`
+          );
+  
+          const data = await response.json();
+  
+          console.log("FULL SONG API RESPONSE:", data);
+  
+          setSong(data);
+        } catch (error) {
+          console.error("FULL SONG ERROR:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      if (id) {
+        fetchSong();
+      }
+    }, [id]);
+
+  const getCategoryName = (type) => {
+    if (type === "hymn" || type === "chorus") {
+      return "Hymn/Chorus";
+    }
+
+    return "Others";
+  };
+
+  const getLanguageName = (language) => {
+    if (language === "english") {
+      return "English";
+    }
+
+    if (language === "nepali") {
+      return "Nepali";
+    }
+
+    if (language === "hindi") {
+      return "Hindi";
+    }
+
+    return language;
+  };
+
+  if (loading) {
+      return (
+        <View
+          style={[
+            styles.screen,
+            {
+              paddingTop: insets.top,
+              alignItems: "center",
+              justifyContent: "center",
+            },
+          ]}
+        >
+          <Text style={styles.loadingText}>
+            Loading song...
+          </Text>
+        </View>
+      );
+    }
+  
+    if (!song) {
+      return (
+        <View
+          style={[
+            styles.screen,
+            {
+              paddingTop: insets.top,
+              alignItems: "center",
+              justifyContent: "center",
+            },
+          ]}
+        >
+          <Text style={styles.loadingText}>
+            Song not found.
+          </Text>
+        </View>
+      );
+    }
+  
+    const lyricsHtml = song.description || "";
+    const chordsHtml = song.description_chords || "";
 
   return (
     <View
@@ -53,7 +152,11 @@ const FullSong = () => {
         <View style={styles.SongHeader}>
           <View style={styles.songImageContainer}>
             <Image
-              source={require("../../assets/images/popularSongs2.jpg")}
+              source={
+                song.song_cover
+                  ? { uri: song.song_cover }
+                  : require("../../assets/images/popularSongs2.jpg")
+              }
               style={styles.songImage}
             />
           </View>
@@ -61,16 +164,16 @@ const FullSong = () => {
             <View style={styles.TopRow}>
               <View style={styles.smallCategoryBadge}>
                 <View style={styles.categoryContainer}>
-                  <Text style={styles.smallCategoryText}>Hymn/Chorus</Text>
+                  <Text style={styles.smallCategoryText}>{getCategoryName(song.song_type)}</Text>
                 </View>
                 <View style={styles.languageContainer}>
-                  <Text style={styles.smalllanguageText}>English</Text>
+                  <Text style={styles.smalllanguageText}>{getLanguageName(song.song_language)}</Text>
                 </View>
               </View>
             </View>
 
             <Text style={styles.songTitle} numberOfLines={1}>
-              I Love You Lord
+              {song.song_title}
             </Text>
 
             <View style={styles.recentLyricsAuthorRow}>
@@ -79,7 +182,7 @@ const FullSong = () => {
                 size={19}
                 color={COLORS.primary}
               />
-              <Text style={styles.recentLyricsAuthor}>By Laurie Kliein</Text>
+              <Text style={styles.recentLyricsAuthor}>By {song.song_author} </Text>
             </View>
 
             <View style={styles.BottomRow}>
@@ -121,7 +224,6 @@ const FullSong = () => {
         <View style={styles.divider} />
         <View style={styles.songContent}>
           <ScrollView 
-            // horizontal
             showsVerticalScrollIndicator={false}>
             {activeTab === "lyrics" ? (
               <Text style={styles.lyricsText}>

@@ -70,7 +70,21 @@ const BlogContent = () => {
       const token = await AsyncStorage.getItem("token");
 
       if (!token) {
-        Alert.alert("Error", "Please login first.");
+        Alert.alert(
+          "Login Required",
+          "Please login first to save this prayer.",
+          [
+            {
+              text: "Cancel",
+              style: "cancel",
+            },
+            {
+              text: "OK",
+              onPress: () => router.push("/(auth)/login"),
+            },
+          ]
+        );
+
         return;
       }
 
@@ -469,14 +483,15 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#F5F2FA",
   },
 
   blogTitle: {
-    marginTop: 7,
-    fontSize: 15,
-    lineHeight: 20,
+    marginTop: 8,
+    fontSize: 16,
+    lineHeight: 21,
     fontWeight: "700",
-    color: "#222",
+    color: "#1D1D1F",
   },
 
   blogDescription: {
@@ -501,7 +516,7 @@ const styles = StyleSheet.create({
 
   divider: {
     width: 1,
-    height: 14,
+    height: 12,
     backgroundColor: "#ccc",
     marginHorizontal: 8,
   },

@@ -14,10 +14,33 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Animated,
 } from "react-native";
 import { COLORS } from "../../constants/colors";
+import React, { useEffect, useRef, useState } from "react";
 
 const SongContent = () => {
+
+  
+  const arrowAnimation = useRef(new Animated.Value(0)).current;
+  
+  
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(arrowAnimation, {
+          toValue: 8,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(arrowAnimation, {
+          toValue: 0,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
   return (
     <View>
       <ImageBackground
@@ -38,6 +61,7 @@ const SongContent = () => {
         </View>
         <ScrollView
           horizontal
+          nestedScrollEnabled={true}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{
             gap: 18,
@@ -45,7 +69,7 @@ const SongContent = () => {
           }}
           style={{ marginTop: 14 }}
         >
-          <Pressable onPress={() => router.push("/song-category")}>
+
             <ImageBackground
               source={require("../../assets/images/popularSongs3.jpg")}
               style={styles.songlist}
@@ -60,20 +84,35 @@ const SongContent = () => {
                   />
                 </View>
 
-                <Pressable style={styles.readBadge}>
+                <Pressable 
+                  style={styles.readBadge}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/song-category",
+                      params: { language: "english" },
+                    })
+                  }
+                >
                   <View>
                     <Text style={styles.readText}>English</Text>
 
                     <Text style={styles.readSubText}>Praise & Worship</Text>
                   </View>
 
-                  <TouchableOpacity style={styles.nextButton}>
-                    <Feather name="arrow-right" size={24} color="#fff" />
-                  </TouchableOpacity>
+                  <Animated.View
+                    style={{
+                      transform: [{ translateX: arrowAnimation }],
+                    }}
+                  >
+                    <Feather
+                      name="arrow-right"
+                      size={24}
+                      color={COLORS.primary}
+                    />
+                  </Animated.View>
                 </Pressable>
               </View>
             </ImageBackground>
-          </Pressable>
 
           <ImageBackground
             source={require("../../assets/images/popularSongs3.jpg")}
@@ -85,19 +124,36 @@ const SongContent = () => {
                 <Ionicons name="musical-notes-outline" size={28} color="#fff" />
               </View>
 
-              <Pressable style={styles.readBadge}>
+              <Pressable 
+                  style={styles.readBadge}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/song-category",
+                      params: { language: "nepali" },
+                    })
+                  }
+                >
                 <View>
                   <Text style={styles.readText}>Nepali</Text>
 
                   <Text style={styles.readSubText}>Praise & Worship</Text>
                 </View>
 
-                <TouchableOpacity style={styles.nextButton}>
-                  <Feather name="arrow-right" size={24} color="#fff" />
-                </TouchableOpacity>
+                <Animated.View
+                    style={{
+                      transform: [{ translateX: arrowAnimation }],
+                    }}
+                  >
+                    <Feather
+                      name="arrow-right"
+                      size={24}
+                      color={COLORS.primary}
+                    />
+                  </Animated.View>
               </Pressable>
             </View>
           </ImageBackground>
+
 
           <ImageBackground
             source={require("../../assets/images/song.jpg")}
@@ -109,16 +165,32 @@ const SongContent = () => {
                 <Ionicons name="musical-notes-outline" size={28} color="#fff" />
               </View>
 
-              <Pressable style={styles.readBadge}>
+              <Pressable 
+                  style={styles.readBadge}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/song-category",
+                      params: { language: "hindi" },
+                    })
+                  }
+                >
                 <View>
                   <Text style={styles.readText}>Hindi</Text>
 
                   <Text style={styles.readSubText}>Praise & Worship</Text>
                 </View>
 
-                <TouchableOpacity style={styles.nextButton}>
-                  <Feather name="arrow-right" size={24} color="#fff" />
-                </TouchableOpacity>
+                <Animated.View
+                    style={{
+                      transform: [{ translateX: arrowAnimation }],
+                    }}
+                  >
+                    <Feather
+                      name="arrow-right"
+                      size={24}
+                      color={COLORS.primary}
+                    />
+                  </Animated.View>
               </Pressable>
             </View>
           </ImageBackground>

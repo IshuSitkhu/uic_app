@@ -13,8 +13,10 @@ import {
 } from "react-native";
 import { COLORS } from "../../constants/colors";
 import API_URL from "../../services/api";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const savedBible = () => {
+  const insets = useSafeAreaInsets();
   const [savedBible, setSavedBible] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -56,7 +58,14 @@ const savedBible = () => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F9F7FB" }}>
+    <View
+              style={[
+                styles.screen,
+                {
+                  paddingTop: insets.top,
+                },
+              ]}
+            >
       <View style={styles.screen}>
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -125,7 +134,7 @@ const savedBible = () => {
           )}
         </ScrollView>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -146,8 +155,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingTop: 25,
-    paddingBottom: 28,
+    // paddingTop: 15,
+    // paddingBottom: 28,
   },
 
   backButton: {
@@ -215,6 +224,7 @@ const styles = StyleSheet.create({
 
   listContainer: {
     gap: 12,
+    paddingTop:10,
   },
 
   verseCard: {

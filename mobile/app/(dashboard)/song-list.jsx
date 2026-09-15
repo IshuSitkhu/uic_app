@@ -4,7 +4,6 @@ import {
   MaterialIcons
 } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { router } from "expo-router";
 import {
   Image,
   ImageBackground,
@@ -17,9 +16,55 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
+import { router, useLocalSearchParams } from "expo-router";
+import API_URL from "../../services/api";
+import { useEffect, useState } from "react";
 
 const SongList = () => {
+  const { language, category } = useLocalSearchParams();
+
+  console.log("SONG LIST LANGUAGE:", language);
+  console.log("SONG LIST CATEGORY:", category);
+
   const insets = useSafeAreaInsets();
+
+  const [songs, setSongs] = useState([]);
+  const [loading, setLoading] = useState([]);
+
+  useEffect(() => {
+    const fetchSongs = async () =>{
+      try{
+        setLoading(true);
+
+        const response = await fetch(
+            `${API_URL}/songs/${language}/list/${category}`
+        );
+
+        const data = await response.json();
+
+        console.log("song list response api: ", data);
+        setSongs(data.songs ?? []);
+      } catch (error){
+        console.error("Song list error:", error);
+      } finally{
+        setLoading(false);
+      }
+    };
+    if (language && category) {
+        fetchSongs();
+      }
+  }, [language, category]);
+
+  const pageTitle = category === "hymn_chorus" ? "Hymn/Chorus" : "Others";
+
+  const languageCode =
+  language === "english"
+    ? "EN"
+    : language === "nepali"
+    ? "NP"
+    : language === "hindi"
+    ? "HI"
+    : "";
 
   return (
     <View
@@ -48,11 +93,11 @@ const SongList = () => {
             <Ionicons name="arrow-back" size={22} color="#222" />
           </TouchableOpacity>
 
-          <Text style={styles.title}>Hymn/Chorus</Text>
+          <Text style={styles.title}>{pageTitle}</Text>
 
           <View style={styles.headerPlaceholder} />
         </View>
-        <Text style={styles.featuredDescription}>2 Songs</Text>
+        <Text style={styles.featuredDescription}>{loading ? "Loading..." : `${songs.length} Songs`}</Text>
 
         <ImageBackground
           source={require("../../assets/images/quoteCard.jpeg")}
@@ -88,10 +133,92 @@ const SongList = () => {
 
             <Pressable style={styles.langugagebutton}>
               <AntDesign name="global" size={17} color="#fff" />
-              <Text style={styles.languageText}>EN</Text>
+              <Text style={styles.languageText}>{languageCode}</Text>
             </Pressable>
           </View>
-          <Pressable
+
+          {loading ? (
+            <Text style={styles.emptyText}>
+              Loading SOngs...
+            </Text>
+          ) : songs.length === 0 ?(
+            <Text style={styles.emptyText}>
+              No songs found.
+            </Text>
+          ) : (
+            songs.map((song) =>(
+               <Pressable
+                key={song.id}
+                style={styles.prayerCard}
+                onPress={() => 
+                  router.push({
+                    pathname: "/full-song",
+                    params:{
+                      id:String(song.id),
+                    },
+                  })
+                }
+              >
+                <View style={styles.prayerContent}>
+                  <View style={styles.prayerImageContainer}>
+                    <Image
+                      source={
+                        song.song_cover
+                          ? { uri: song.song_cover }
+                          : require("../../assets/images/popularSongs2.jpg")
+                      }
+                      style={styles.prayerImage}
+                    />
+                  </View>
+
+                  <View style={styles.prayerDetails}>
+                    <View style={styles.prayerTopRow}>
+                      <Text style={styles.prayerTitle} numberOfLines={2}>
+                        {song.song_title}
+                      </Text>
+
+                      <Pressable
+                        style={styles.saveButton}
+                        onPress={(event) => {
+                          event.stopPropagation();
+                        }}
+                      >
+                        <Ionicons
+                          name="heart-outline"
+                          size={18}
+                          color={COLORS.primary}
+                        />
+                      </Pressable>
+                    </View>
+
+                    <View style={styles.prayerAuthorRow}>
+                      <Ionicons
+                        name="person-circle-outline"
+                        size={19}
+                        color={COLORS.primary}
+                      />
+
+                      <Text style={styles.prayerAuthor}>By {song.song_author}</Text>
+
+                      <View style={styles.divider} />
+
+                      <Pressable
+                          style={styles.like}
+                          onPress={(event) => {
+                            event.stopPropagation();
+                          }}
+                        >
+                        <EvilIcons name="like" size={19} color={COLORS.primary} />
+
+                        <Text style={styles.likes}>Likes</Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                </View>
+              </Pressable>
+            ))
+          )}
+          {/* <Pressable
             style={styles.prayerCard}
             onPress={() => router.push("/full-song")}
           >
@@ -137,101 +264,8 @@ const SongList = () => {
                 </View>
               </View>
             </View>
-          </Pressable>
-          <Pressable
-            style={styles.prayerCard}
-            onPress={() => router.push("/full-song")}
-          >
-            <View style={styles.prayerContent}>
-              <View style={styles.prayerImageContainer}>
-                <Image
-                  source={require("../../assets/images/popularSongs2.jpg")}
-                  style={styles.prayerImage}
-                />
-              </View>
+          </Pressable> */}
 
-              <View style={styles.prayerDetails}>
-                <View style={styles.prayerTopRow}>
-                  <Text style={styles.prayerTitle} numberOfLines={2}>
-                    These are the days of Elijah
-                  </Text>
-
-                  <Pressable style={styles.saveButton}>
-                    <Ionicons
-                      name="heart-outline"
-                      size={18}
-                      color={COLORS.primary}
-                    />
-                  </Pressable>
-                </View>
-
-                <View style={styles.prayerAuthorRow}>
-                  <Ionicons
-                    name="person-circle-outline"
-                    size={19}
-                    color={COLORS.primary}
-                  />
-
-                  <Text style={styles.prayerAuthor}>By Willam</Text>
-
-                  <View style={styles.divider} />
-
-                  <Pressable style={styles.like}>
-                    <EvilIcons name="like" size={19} color={COLORS.primary} />
-
-                    <Text style={styles.likes}>Likes</Text>
-                  </Pressable>
-                </View>
-              </View>
-            </View>
-          </Pressable>
-          <Pressable
-            style={styles.prayerCard}
-            onPress={() => router.push("/full-song")}
-          >
-            <View style={styles.prayerContent}>
-              <View style={styles.prayerImageContainer}>
-                <Image
-                  source={require("../../assets/images/popularSongs2.jpg")}
-                  style={styles.prayerImage}
-                />
-              </View>
-
-              <View style={styles.prayerDetails}>
-                <View style={styles.prayerTopRow}>
-                  <Text style={styles.prayerTitle} numberOfLines={2}>
-                    These are the days of Elijah
-                  </Text>
-
-                  <Pressable style={styles.saveButton}>
-                    <Ionicons
-                      name="heart-outline"
-                      size={18}
-                      color={COLORS.primary}
-                    />
-                  </Pressable>
-                </View>
-
-                <View style={styles.prayerAuthorRow}>
-                  <Ionicons
-                    name="person-circle-outline"
-                    size={19}
-                    color={COLORS.primary}
-                  />
-
-                  <Text style={styles.prayerAuthor}>By Willam</Text>
-
-                  <View style={styles.divider} />
-
-                  <Pressable style={styles.like}>
-                    <EvilIcons name="like" size={19} color={COLORS.primary} />
-
-                    <Text style={styles.likes}>Likes</Text>
-                  </Pressable>
-                </View>
-              </View>
-            </View>
-          </Pressable>
         </View>
 
         <View style={styles.blogSection}>
@@ -679,5 +713,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#666",
     marginLeft: 5,
+  },
+  emptyText: {
+    textAlign: "center",
+    marginTop: 25,
+    fontSize: 13,
+    color: "#777",
   },
 });
