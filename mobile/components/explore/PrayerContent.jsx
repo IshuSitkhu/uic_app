@@ -76,7 +76,7 @@ const handleFavoritePrayer = async (prayerId) => {
     if (!token) {
       Alert.alert(
         "Login Required",
-        "Please login first to save this song.",
+        "Please login first to save this prayer.",
         [
           {
             text: "Cancel",
@@ -109,7 +109,7 @@ const handleFavoritePrayer = async (prayerId) => {
     if (response.ok) {
       setPrayers((previousPrayers) =>
         previousPrayers.map((prayer) =>
-          prayer.id === prayerId
+          Number(prayer.id) === Number(prayerId)
             ? {
                 ...prayer,
                 is_favorited: data.is_favorited,
@@ -176,7 +176,7 @@ const handleFavoritePrayer = async (prayerId) => {
                         <View style={styles.smallCategoryBadge}>
                           <Ionicons
                             name="pricetag-outline"
-                            size={14}
+                            size={17}
                             color={COLORS.primary}
                           />
                           <Text style={styles.blogDate}>
@@ -187,7 +187,7 @@ const handleFavoritePrayer = async (prayerId) => {
                         </View>
 
                         <View style={styles.dateContainer}>
-                          <EvilIcons name="calendar" size={20} color={COLORS.primary} />
+                          <EvilIcons name="calendar" size={24} color={COLORS.primary} />
 
                           <Text style={styles.blogDate}>
                             {new Date(prayer.prayer_start_date).toLocaleDateString("en-US", {
@@ -197,46 +197,27 @@ const handleFavoritePrayer = async (prayerId) => {
                             })}
                           </Text>
                         </View>
-
-                        {/* <Pressable
+                        <Pressable
                           style={styles.saveButton}
                           onPress={() => handleFavoritePrayer(prayer.id)}
                         >
                           <Ionicons
                             name={
-                              favoriteStates[Number(prayer.id)]
+                              prayer.is_favorited
                                 ? "bookmark"
                                 : "bookmark-outline"
                             }
-                            size={16}
+                            size={17}
                             color={COLORS.primary}
                           />
 
                           <Text style={styles.blogDate}>
-                            {favoriteStates[Number(prayer.id)] ? "Saved" : "Save"}
+                            {prayer.is_favorited ? "Saved" : "Save"}
                           </Text>
-                        </Pressable> */}
-                        <Pressable
-  style={styles.saveButton}
-  onPress={() => handleFavoritePrayer(prayer.id)}
->
-  <Ionicons
-    name={
-      prayer.is_favorited
-        ? "bookmark"
-        : "bookmark-outline"
-    }
-    size={16}
-    color={COLORS.primary}
-  />
-
-  <Text style={styles.blogDate}>
-    {prayer.is_favorited ? "Saved" : "Save"}
-  </Text>
-</Pressable>
+                        </Pressable>
                       </View>
 
-                      <View style={{ paddingHorizontal: 12 }}>
+                      <View style={{ margin:10, }}>
                         <Text style={styles.blogTitle} numberOfLines={2}>
                             {prayer.prayer_title}
                         </Text>
@@ -248,14 +229,13 @@ const handleFavoritePrayer = async (prayerId) => {
                         <View
                           style={{
                             justifyContent: "space-between",
-                            flexDirection: "row",
-                            marginVertical: 10,
+                            flexDirection: "row",                          
                           }}
                         >
                           <View style={styles.blogAuthorRow}>
                             <Ionicons
                               name="person-circle-outline"
-                              size={32}
+                              size={28}
                               color={COLORS.primary}
                             />
 
@@ -343,13 +323,11 @@ const styles = StyleSheet.create({
   readFullBadge: {
     alignSelf: "flex-start",
     backgroundColor: COLORS.primary,
-    paddingHorizontal: 8,
-    paddingVertical: 5,
+    padding:8,
     borderRadius: 15,
     flexDirection: "row",
     alignItems: "center",
-
-    gap: 5,
+    gap: 12,
   },
 
   readFullText: {
@@ -477,10 +455,10 @@ const styles = StyleSheet.create({
   blogTopRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "space-evenly",
     backgroundColor: "#EDE8F7",
-    paddingHorizontal: 20,
-    paddingVertical: 8,
+    // paddingHorizontal: 20,
+    // paddingVertical: 8,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
   },
@@ -488,6 +466,8 @@ const styles = StyleSheet.create({
   smallCategoryBadge: {
     flexDirection: "row",
     gap: 6,
+    // backgroundColor:"#101010",
+    padding: 10,
   },
 
   smallCategoryText: {
@@ -501,40 +481,36 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     gap: 4,
+    // backgroundColor:"#100f0f",
+    padding: 10,
   },
 
   blogTitle: {
-    marginVertical: 7,
+    
     fontSize: 15,
     lineHeight: 20,
     fontWeight: "700",
     color: "#222",
+    
   },
 
   blogDescription: {
     fontSize: 12,
     lineHeight: 17,
     color: "#666",
-    // marginBottom: 10,
+    marginVertical:5,
   },
 
   blogAuthorRow: {
     flexDirection: "row",
     alignItems: "center",
+    gap:4,
   },
 
   blogAuthor: {
-    marginLeft: 4,
     fontSize: 12,
     color: COLORS.primary,
     fontWeight: "500",
-  },
-
-  divider: {
-    width: 1,
-    height: 14,
-    backgroundColor: "#ccc",
-    marginHorizontal: 8,
   },
 
   blogDate: {
@@ -547,6 +523,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 3,
-    marginVertical: 10,
+    // backgroundColor:"#101010",
+    padding:10,
   },
 });

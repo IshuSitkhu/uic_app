@@ -1,4 +1,5 @@
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRef, useState } from "react";
 import {
   Dimensions,
@@ -76,7 +77,7 @@ const Explore = () => {
 
         <View style={styles.categoryContainer}>
           <CategoryButton
-            icon="clipboard-list"
+            icon="clipboard-edit-outline"
             title="Blogs"
             active={selectedCategory === "blogs"}
             // onPress={() => setSelectedCategory("blogs")}
@@ -84,7 +85,7 @@ const Explore = () => {
           />
 
           <CategoryButton
-            icon="praying-hands"
+            icon="hands-pray"
             title="Prayers"
             active={selectedCategory === "prayers"}
             onPress={() => handleCategoryPress("prayers")}
@@ -97,12 +98,12 @@ const Explore = () => {
             onPress={() => handleCategoryPress("songs")}
           />
 
-          <CategoryButton
+          {/* <CategoryButton
             icon="question"
             title="Questions"
             active={selectedCategory === "questions"}
             onPress={() => handleCategoryPress("questions")}
-          />
+          /> */}
         </View>
 
         {/* SELECTED CONTENT */}
@@ -153,9 +154,9 @@ const CategoryButton = ({ icon, title, active, onPress }) => {
       onPress={onPress}
       style={[styles.categoryButton, active && styles.categoryButtonActive]}
     >
-      <FontAwesome5
+      <MaterialCommunityIcons
         name={icon}
-        size={14}
+        size={17}
         color={active ? "#fff" : COLORS.primary}
       />
 

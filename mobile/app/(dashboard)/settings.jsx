@@ -14,8 +14,10 @@ import {
 import { COLORS } from "../../constants/colors";
 import { useAuth } from "../../context/AuthContext";
 import API_URL from "../../services/api";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const Settings = () => {
+  const insets = useSafeAreaInsets();
   const { logout } = useAuth();
 
   const handleLogout = async () => {
@@ -66,8 +68,14 @@ const Settings = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F9F7FB" }}>
-      <View style={styles.screen}>
+    <View
+          style={[
+            styles.screen,
+            {
+              paddingTop: insets.top,
+            },
+          ]}
+        >
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.content}
@@ -257,7 +265,6 @@ const Settings = () => {
           </Pressable>
         </ScrollView>
       </View>
-    </SafeAreaView>
   );
 };
 
@@ -270,16 +277,13 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    paddingHorizontal: 20,
-    paddingBottom: 45,
+    margin:10,
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingTop: 25,
-    paddingBottom: 28,
   },
 
   backButton: {
@@ -364,7 +368,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
     marginLeft: 5,
     marginBottom: 9,
-    marginTop: 4,
+    marginTop: 10,
   },
 
   section: {

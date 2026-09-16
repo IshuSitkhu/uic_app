@@ -149,16 +149,13 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    paddingHorizontal: 20,
-    paddingBottom: 45,
+    margin:10,
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingTop: 25,
-    paddingBottom: 28,
   },
 
   backButton: {
@@ -226,12 +223,13 @@ const styles = StyleSheet.create({
 
   listContainer: {
     gap: 12,
+    marginTop:20,
   },
 
   verseCard: {
     backgroundColor: "#FFFFFF",
     borderRadius: 14,
-    padding: 16,
+    padding: 10,
 
     shadowColor: "#000",
     shadowOffset: {
@@ -248,40 +246,38 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     flexDirection: "row",
     alignItems: "center",
+    
   },
 
   reference: {
-    marginVertical: 8,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "700",
     color: COLORS.secondary,
   },
 
   translation: {
-    marginTop: 7,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "600",
     color: COLORS.secondary,
   },
 
   verseText: {
-    // height:60,
-    marginTop: 12,
-    fontSize: 17,
-    lineHeight: 27,
+    marginLeft:6,
+    marginTop: 6,
+    maxWidth:280,
+    fontSize: 14,
+    lineHeight: 17,
     color: "#333",
-    // backgroundColor:COLORS.primary,
   },
 
   verseContent: {
     flexDirection: "row",
     alignItems: "center",
-    //   marginTop: 18,
   },
 
   verseTextContainer: {
     flex: 1,
-    paddingRight: 10,
+    marginTop:10,
     flexDirection: "row",
   },
 });

@@ -676,11 +676,20 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 12,
     padding: 12,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+
+    elevation: 2,
   },
 
   prayerContent: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "center",    
   },
 
   prayerImageContainer: {
@@ -701,26 +710,27 @@ const styles = StyleSheet.create({
     marginLeft: 14,
     justifyContent: "center",
     minWidth: 0,
+    maxWidth:210,
+    backgroundColor:"#fff"
+    
   },
 
   prayerTopRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 5,
+
   },
 
   prayerTitle: {
     flex: 1,
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "600",
     color: "#222",
     marginRight: 10,
   },
 
   saveButton: {
-    width: 34,
-    height: 34,
     borderRadius: 17,
     alignItems: "center",
     justifyContent: "center",
@@ -748,7 +758,15 @@ const styles = StyleSheet.create({
   like: {
     flexDirection: "row",
     alignItems: "center",
-    color: COLORS.primary,
+    justifyContent: "center",
+
+    paddingRight: 20,
+    paddingVertical: 10,
+
+    minHeight: 44,
+    minWidth: 70,
+
+    borderRadius: 8,
   },
 
   likes: {

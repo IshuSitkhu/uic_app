@@ -142,7 +142,7 @@ const You = () => {
         </View>
 
         <View style={styles.profileSection}>
-          {/* AVATAR */}
+
           <View style={styles.avatarOuter}>
             <View style={styles.avatar}>
               <Text style={styles.avatarText}>
@@ -151,7 +151,6 @@ const You = () => {
             </View>
           </View>
 
-          {/* PROFILE INFO */}
           <View style={styles.profileInfo}>
             <Text style={styles.name}>{user.name}</Text>
 
@@ -228,6 +227,7 @@ const You = () => {
           <Pressable
             style={({ pressed }) => [
               styles.savedButton,
+              styles.blog,
               pressed && { opacity: 0.7 },
             ]}
             onPress={() => router.push("/saved-blog")}
@@ -243,17 +243,7 @@ const You = () => {
           <Pressable
             style={({ pressed }) => [
               styles.savedButton,
-              pressed && { opacity: 0.7 },
-            ]}
-            onPress={() => router.push("/saved-song")}
-          >
-            <MaterialCommunityIcons name="music" size={34} color="#3D7DA8" />
-
-            <Text style={styles.savedText}>Song</Text>
-          </Pressable>
-          <Pressable
-            style={({ pressed }) => [
-              styles.savedButton,
+              styles.prayer,
               pressed && { opacity: 0.7 },
             ]}
             onPress={() => router.push("/saved-prayer")}
@@ -266,10 +256,24 @@ const You = () => {
 
             <Text style={styles.savedText}>Prayer</Text>
           </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              styles.savedButton,
+              styles.music,
+              pressed && { opacity: 0.7 },
+            ]}
+            onPress={() => router.push("/saved-song")}
+          >
+            <MaterialCommunityIcons name="music" size={34} color="#3D7DA8" />
+
+            <Text style={styles.savedText}>Song</Text>
+          </Pressable>
+          
           
         </View>
 
-        <View style={styles.sectionHeader}>
+          {/* This is for version2 */}
+        {/* <View style={styles.sectionHeader}>
           <View>
             <Text style={styles.sectionTitle}>Your Space</Text>
             <Text style={styles.sectionDescription}>
@@ -310,7 +314,7 @@ const You = () => {
         </Pressable>
 
         <View style={styles.twoColumnRow}>
-          {/* WORSHIP */}
+
 
           <Pressable
             style={({ pressed }) => [
@@ -334,7 +338,7 @@ const You = () => {
             </View>
           </Pressable>
 
-          {/* BLOG */}
+
 
           <Pressable
             style={({ pressed }) => [
@@ -387,7 +391,7 @@ const You = () => {
           <View style={styles.questionArrow}>
             <Ionicons name="arrow-forward" size={20} color="#5A9C91" />
           </View>
-        </Pressable>
+        </Pressable> */}
 
         <View style={styles.sectionHeader}>
           <View>
@@ -400,7 +404,7 @@ const You = () => {
         </View>
 
         <View style={styles.bibleGrid}>
-          {/* HIGHLIGHTS */}
+
 
           <Pressable
             style={({ pressed }) => [
@@ -984,6 +988,15 @@ const styles = StyleSheet.create({
     elevation: 2,
 
     marginBottom: 15,
+  },
+  blog: {
+    backgroundColor: "#FFF4F5",
+  },
+  music: {
+    backgroundColor: "#F1F8FC",
+  },
+  prayer: {
+    backgroundColor: "#F7F2FC",
   },
 
   savedText: {

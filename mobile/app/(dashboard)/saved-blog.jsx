@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import { EvilIcons, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -291,6 +291,7 @@ const SavedBlog = () => {
                       {stripHtml(blog.blog)}
                     </Text>
 
+                    <View style={styles.bottomRow}>
                     <View style={styles.blogAuthorRow}>
                       <Ionicons
                         name="person-circle-outline"
@@ -298,21 +299,27 @@ const SavedBlog = () => {
                         color={COLORS.primary}
                       />
 
-                      <Text
-                        style={styles.blogAuthor}
-                        numberOfLines={1}
-                      >
-                        By{" "}
-                        {blog.userdetails?.name ||
-                          "Unknown"}
-                      </Text>
-
-                      <View style={styles.divider} />
-
-                      <Text style={styles.blogDate}>
-                        {blog.blog_date}
+                      <Text style={styles.blogAuthor}>
+                        By {blog.userdetails?.name || "Unknown"}
                       </Text>
                     </View>
+
+                    <View style={styles.divider} />
+
+                    <View style={styles.dateContainer}>
+                      <EvilIcons name="calendar" size={24} color={COLORS.primary} />
+
+                      <Text style={styles.blogDate}>
+                        {new Date(blog.blog_date).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </Text>
+                    </View>
+                    {/* <Text style={styles.blogDate}>{blog.blog_date}</Text> */}
+                  
+                  </View>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -333,15 +340,13 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    paddingHorizontal: 20,
-    paddingBottom: 45,
+    margin:10,
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 20,
   },
 
   backButton: {
@@ -423,23 +428,24 @@ const styles = StyleSheet.create({
 
   listContainer: {
     gap: 12,
-    paddingTop: 5,
+    marginTop: 20,
   },
 
   blogCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 14,
-    padding: 14,
+    backgroundColor: "#F9F7FB",
+    borderRadius: 16,
+    padding: 12,
 
-    shadowColor: "#000",
+    elevation: 3,
+
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
 
-    elevation: 2,
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    shadowColor: "#000",
   },
 
   blogContent: {
@@ -477,8 +483,7 @@ const styles = StyleSheet.create({
 
   categoryContainer: {
     backgroundColor: "#F4E0E0",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    padding:8,
     borderRadius: 10,
     flexDirection: "row",
     gap: 5,
@@ -514,10 +519,16 @@ const styles = StyleSheet.create({
     color: "#666",
   },
 
+  bottomRow:{
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent:"space-evenly",
+    marginTop:7,
+  },
+
   blogAuthorRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 10,
   },
 
   blogAuthor: {
@@ -532,6 +543,11 @@ const styles = StyleSheet.create({
     height: 12,
     backgroundColor: "#ccc",
     marginHorizontal: 8,
+  },
+  dateContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
   },
 
   blogDate: {

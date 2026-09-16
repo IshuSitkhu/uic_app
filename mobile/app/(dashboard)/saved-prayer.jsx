@@ -73,7 +73,7 @@ const SavedPrayer = () => {
           throw new Error("Authentication token not found.");
           }
 
-          const response = await fetch(`${API_URL}/prayers/{id}/favorite`, {
+          const response = await fetch(`${API_URL}/prayers/${prayerId}/favorite`, {
           method: "POST",
           headers: {
               Accept: "application/json",
@@ -94,8 +94,8 @@ const SavedPrayer = () => {
         // Since this is the Saved Prayers page,
         // removing favorite should remove the pryaer from this list.
         if (!data.is_favorited) {
-        setSavedSongs((previousPrayers) =>
-            previousPrayers.filter((prayer) => prayer.id !== prayerId)
+        setSavedPrayers((previousPrayers) =>
+            previousPrayers.filter((prayer) => Number(prayer.id)!== Number(prayerId))
         );
         }
     }catch(error){
@@ -195,7 +195,6 @@ const SavedPrayer = () => {
                     <TouchableOpacity
                     key={prayer.id}
                     style={styles.blogCard}
-                    activeOpacity={0.8}
                     >
                     <View style={styles.blogContent}>
                         <View style={styles.blogDetails}>
@@ -226,22 +225,26 @@ const SavedPrayer = () => {
                             </View>
 
                             <Pressable
-                                style={styles.saveButton}
-                                onPress={() => handleFavoritePrayer(prayer.id)}
-                                >
-                                <Ionicons
-                                    name="bookmark"
-                                    size={16}
-                                    color={COLORS.primary}
-                                />
+                              style={styles.saveButton}
+                              onPress={() => handleFavoritePrayer(prayer.id)}
+                              >
+                              <Ionicons
+                                name={
+                                  prayer.is_favorited
+                                    ? "bookmark"
+                                    : "bookmark-outline"
+                                }
+                                size={17}
+                                color={COLORS.primary}
+                              />
 
-                                <Text style={styles.blogDate}>
-                                    {prayer.is_favorited ? "Saved" : "Save"}
-                                </Text>
-                                </Pressable>
+                              <Text style={styles.blogDate}>
+                                  {prayer.is_favorited ? "Saved" : "Save"}
+                              </Text>
+                            </Pressable>
                         </View>
 
-                        <View style={{ paddingHorizontal: 12 }}>
+                        <View style={{ margin:10, }}>
                             <Text style={styles.blogTitle} numberOfLines={2}>
                                 {prayer.prayer_title}
                             </Text>
@@ -303,15 +306,13 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    paddingHorizontal: 20,
-    paddingBottom: 45,
+    margin:10,
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 20,
   },
 
   backButton: {
@@ -393,7 +394,23 @@ const styles = StyleSheet.create({
 
   listContainer: {
     gap: 12,
-    paddingTop: 5,
+    marginTop: 20,
+  },
+
+  blogCard: {
+    backgroundColor: "#F9F7FB",
+    borderRadius: 16,
+
+    elevation: 3,
+
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    shadowColor: "#000",
   },
 
 
@@ -402,12 +419,6 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
 
-  blogImageContainer: {
-    width: 105,
-    height: 145,
-    borderRadius: 12,
-    overflow: "hidden",
-  },
 
   blogImage: {
     width: "100%",
@@ -423,10 +434,8 @@ const styles = StyleSheet.create({
   blogTopRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "space-evenly",
     backgroundColor: "#EDE8F7",
-    paddingHorizontal: 20,
-    paddingVertical: 8,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
   },
@@ -434,6 +443,7 @@ const styles = StyleSheet.create({
   smallCategoryBadge: {
     flexDirection: "row",
     gap: 6,
+    padding: 10,
   },
 
   smallCategoryText: {
@@ -447,10 +457,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     gap: 4,
+    padding: 10,
   },
 
   blogTitle: {
-    marginVertical: 7,
     fontSize: 15,
     lineHeight: 20,
     fontWeight: "700",
@@ -461,16 +471,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 17,
     color: "#666",
-    // marginBottom: 10,
+    marginVertical:5,
   },
 
   blogAuthorRow: {
     flexDirection: "row",
     alignItems: "center",
+    gap:4,
   },
 
   blogAuthor: {
-    marginLeft: 4,
     fontSize: 12,
     color: COLORS.primary,
     fontWeight: "500",
@@ -480,13 +490,11 @@ const styles = StyleSheet.create({
   readFullBadge: {
     alignSelf: "flex-start",
     backgroundColor: COLORS.primary,
-    paddingHorizontal: 8,
-    paddingVertical: 5,
+    padding:8,
     borderRadius: 15,
     flexDirection: "row",
     alignItems: "center",
-
-    gap: 5,
+    gap: 12,
   },
 
   readFullText: {
@@ -512,7 +520,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 3,
-    marginVertical: 10,
+    padding:10,
   },
 });
 

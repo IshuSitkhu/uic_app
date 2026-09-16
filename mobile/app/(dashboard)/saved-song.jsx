@@ -331,15 +331,13 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    paddingHorizontal: 20,
-    paddingBottom: 45,
+    margin:10,
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 20,
   },
 
   backButton: {
@@ -421,17 +419,24 @@ const styles = StyleSheet.create({
 
   listContainer: {
     gap: 12,
-    paddingTop: 5,
+    marginTop: 20,
   },
 
   
   prayerCard: {
     backgroundColor: "#fff",
     borderRadius: 18,
-    // marginHorizontal: 16,
-    marginTop: 10,
-    marginBottom: 12,
     padding: 12,
+    elevation: 3,
+
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    shadowColor: "#000",
   },
 
   prayerContent: {

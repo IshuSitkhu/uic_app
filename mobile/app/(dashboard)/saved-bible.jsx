@@ -147,16 +147,14 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    paddingHorizontal: 20,
-    paddingBottom: 45,
+    margin:10,
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    // paddingTop: 15,
-    // paddingBottom: 28,
+
   },
 
   backButton: {
@@ -224,7 +222,7 @@ const styles = StyleSheet.create({
 
   listContainer: {
     gap: 12,
-    paddingTop:10,
+    marginTop:20,
   },
 
   verseCard: {
@@ -240,7 +238,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 5,
 
-    elevation: 2,
+    elevation: 3,
   },
 
   verseHeader: {

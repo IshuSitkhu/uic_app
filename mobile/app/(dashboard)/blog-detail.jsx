@@ -313,13 +313,15 @@ const BlogDetail = () => {
                 </Pressable>
 
                 <View style={styles.dateContainer}>
-                  <EvilIcons
-                    name="calendar"
-                    size={22}
-                    color={COLORS.secondary}
-                  />
+                  <EvilIcons name="calendar" size={24} color={COLORS.primary} />
 
-                  <Text style={styles.blogDate}>{blog.blog_date}</Text>
+                  <Text style={styles.blogDate}>
+                    {new Date(blog.blog_date).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </Text>
                 </View>
               </View>
 
@@ -418,7 +420,17 @@ const BlogDetail = () => {
 
                         <View style={styles.divider} />
 
-                        <Text style={styles.blogDate}>{item.blog_date}</Text>
+                        <View style={styles.dateContainer}>
+                          <EvilIcons name="calendar" size={19} color={COLORS.primary} />
+
+                          <Text style={styles.blogDate}>
+                            {new Date(item.blog_date).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </Text>
+                        </View>
                       </View>
                     </View>
                   </Pressable>
@@ -506,8 +518,7 @@ const styles = StyleSheet.create({
 
   featuredOverlay: {
     flex: 1,
-    paddingHorizontal: 18,
-    paddingVertical: 18,
+    padding:10,
     gap: 60,
   },
 
@@ -531,26 +542,28 @@ const styles = StyleSheet.create({
 
   smallCategoryBadge: {
     backgroundColor: "#F4E0E0",
-    paddingHorizontal: 9,
-    paddingVertical: 4,
     borderRadius: 15,
+    // padding :6,
   },
 
   smallCategoryText: {
-    fontSize: 10,
+    paddingHorizontal :10,
+    paddingVertical:4,
+    fontSize: 12,
     fontWeight: "600",
     color: "#C45A5A",
   },
 
   smallTypeBadge: {
     backgroundColor: "#d2f5df",
-    paddingHorizontal: 9,
-    paddingVertical: 4,
     borderRadius: 15,
+    // padding:5,
   },
 
   smallTypeText: {
-    fontSize: 10,
+    paddingHorizontal :10,
+    paddingVertical:4,
+    fontSize: 12,
     fontWeight: "600",
     color: "#0a963e",
   },
@@ -561,7 +574,7 @@ const styles = StyleSheet.create({
     borderRadius: 17,
     alignItems: "center",
     justifyContent: "center",
-    // backgroundColor: "#f3eff8",
+    backgroundColor: "#f3eff8",
   },
 
   saveText: {
@@ -581,9 +594,7 @@ const styles = StyleSheet.create({
   blogAuthorRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 10,
     justifyContent: "space-between",
-    paddingBottom: 5,
   },
 
   divider: {
@@ -670,7 +681,7 @@ const styles = StyleSheet.create({
   },
 
   inspirationTextContainer: {
-    paddingHorizontal: 14,
+    padding:10,
   },
 
   inspirationText: {
@@ -680,22 +691,21 @@ const styles = StyleSheet.create({
   },
 
   inspirationSubText: {
-    marginTop: 8,
-    // fontSize: 12,
-    lineHeight: 20,
+
+    fontSize: 12,
+    lineHeight: 17,
     // color: "#646262",
   },
 
   categoryBadge: {
     alignSelf: "flex-start",
     backgroundColor: "#F4E0E0",
-    paddingHorizontal: 5,
-    paddingVertical: 5,
+    padding:4,
     borderRadius: 20,
-    marginBottom: 8,
   },
 
   categoryText: {
+    paddingHorizontal:5,
     fontSize: 10,
     fontWeight: "600",
     color: "#C45A5A",

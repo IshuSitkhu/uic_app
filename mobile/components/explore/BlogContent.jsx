@@ -1,4 +1,4 @@
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { EvilIcons, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -53,11 +53,11 @@ const BlogContent = () => {
     }
   };
 
-useFocusEffect(
-  useCallback(() => {
-    fetchBlogs();
-  }, [])
-);
+  useFocusEffect(
+    useCallback(() => {
+      fetchBlogs();
+    }, [])
+  );
 
   const handleFavorite = async (blogId) => {
     try {
@@ -234,7 +234,7 @@ useFocusEffect(
                       <View style={styles.categoryContainer}>
                         <Ionicons
                           name="pricetag-outline"
-                          size={14}
+                          size={12}
                           color="#C45A5A"
                         />
                         <Text style={styles.smallCategoryText}>
@@ -270,21 +270,36 @@ useFocusEffect(
                     {stripHtml(blog.blog)}
                   </Text>
 
-                  <View style={styles.blogAuthorRow}>
-                    <Ionicons
-                      name="person-circle-outline"
-                      size={19}
-                      color={COLORS.primary}
-                    />
+                  <View style={styles.bottomRow}>
+                    <View style={styles.blogAuthorRow}>
+                      <Ionicons
+                        name="person-circle-outline"
+                        size={19}
+                        color={COLORS.primary}
+                      />
 
-                    <Text style={styles.blogAuthor}>
-                      By {blog.userdetails?.name || "Unknown"}
-                    </Text>
+                      <Text style={styles.blogAuthor}>
+                        By {blog.userdetails?.name || "Unknown"}
+                      </Text>
+                    </View>
 
                     <View style={styles.divider} />
 
-                    <Text style={styles.blogDate}>{blog.blog_date}</Text>
+                    <View style={styles.dateContainer}>
+                      <EvilIcons name="calendar" size={24} color={COLORS.primary} />
+
+                      <Text style={styles.blogDate}>
+                        {new Date(blog.blog_date).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </Text>
+                    </View>
+                    {/* <Text style={styles.blogDate}>{blog.blog_date}</Text> */}
+                  
                   </View>
+                  
                 </View>
               </View>
             </Pressable>
@@ -453,15 +468,12 @@ const styles = StyleSheet.create({
   },
 
   smallCategoryBadge: {
-    // backgroundColor: "#F4E0E0",
-    // paddingHorizontal: 9,
-    // paddingVertical: 4,
+
     borderRadius: 15,
   },
   categoryContainer: {
     backgroundColor: "#F4E0E0",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    padding:8,
     borderRadius: 10,
     flexDirection: "row",
     gap: 5,
@@ -497,10 +509,17 @@ const styles = StyleSheet.create({
     color: "#666",
   },
 
+  bottomRow:{
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent:"space-evenly",
+    marginTop:7,
+  },
+
   blogAuthorRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 10,
+    
   },
 
   blogAuthor: {
@@ -515,6 +534,12 @@ const styles = StyleSheet.create({
     height: 12,
     backgroundColor: "#ccc",
     marginHorizontal: 8,
+  },
+
+  dateContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
   },
 
   blogDate: {

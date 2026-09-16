@@ -638,6 +638,15 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 12,
     padding: 12,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+
+    elevation: 2,
   },
 
   prayerContent: {
@@ -663,26 +672,25 @@ const styles = StyleSheet.create({
     marginLeft: 14,
     justifyContent: "center",
     minWidth: 0,
+    maxWidth:210,
+    backgroundColor:"#fff"
   },
 
   prayerTopRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 5,
   },
 
   prayerTitle: {
     flex: 1,
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "600",
     color: "#222",
     marginRight: 10,
   },
 
   saveButton: {
-    width: 34,
-    height: 34,
     borderRadius: 17,
     alignItems: "center",
     justifyContent: "center",
@@ -696,7 +704,7 @@ const styles = StyleSheet.create({
   prayerAuthor: {
     fontSize: 12,
     color: "#666",
-    marginLeft: 5,
+    marginLeft: 6,
     color: COLORS.primary,
   },
 
@@ -753,19 +761,6 @@ const styles = StyleSheet.create({
     color: "#685ac4",
   },
 
-  prayerAuthorRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  divider: {
-    width: 1,
-    height: 14,
-
-    backgroundColor: "#D0CCD6",
-
-    marginHorizontal: 9,
-  },
 
   //popular
   horizontalCards: {
