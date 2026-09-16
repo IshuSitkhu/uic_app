@@ -3,6 +3,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router } from "expo-router";
 import {
   ActivityIndicator,
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -12,7 +13,7 @@ import {
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { COLORS } from "../../../constants/colors";
 import { useAuth } from "../../../context/AuthContext";
@@ -25,6 +26,38 @@ const You = () => {
   const [friendsCount, setFriendsCount] = useState(0);
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
+
+  const [profileImage, setProfileImage] = useState(null);
+
+  const fetchProfileImage = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      if (!token) {
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/auth/user`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        const imageUrl = data.user?.profile?.profile_pic || null;
+
+        console.log("PROFILE IMAGE URL:", imageUrl);
+
+        setProfileImage(imageUrl);
+      }
+    } catch (error) {
+      console.log("Error fetching profile image:", error);
+    }
+  };
+
 
   const fetchSocialCounts = async () => {
     try {
@@ -56,6 +89,7 @@ const You = () => {
   useFocusEffect(
     useCallback(() => {
       fetchSocialCounts();
+      fetchProfileImage();
     }, []),
   );
 
@@ -144,15 +178,25 @@ const You = () => {
         <View style={styles.profileSection}>
 
           <View style={styles.avatarOuter}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>
-                {user.name?.charAt(0).toUpperCase()}
-              </Text>
+              
+                {profileImage ? (
+                  <Image
+                    source={{ uri: profileImage }}
+                    style={styles.profileImage}
+                  />
+                ) : (
+                  <View style={styles.avatar}>
+                  <Text style={styles.avatarText}>
+                    {user?.name?.charAt(0).toUpperCase()}
+                  </Text>
+                   </View>
+                )}
+             
             </View>
-          </View>
 
           <View style={styles.profileInfo}>
             <Text style={styles.name}>{user.name}</Text>
+            
 
             <Text style={styles.username}>@{user.username}</Text>
 
@@ -476,11 +520,11 @@ const You = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#F9F7FB",
   },
 
   contentContainer: {
-    paddingHorizontal: 20,
-    // paddingBottom: 30,
+    margin:10,
   },
 
   loadingContainer: {
@@ -494,9 +538,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-
-    paddingTop: 18,
-    paddingBottom: 15,
+    marginHorizontal:10,
   },
 
   title: {
@@ -537,29 +579,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
 
+
+
   avatarOuter: {
     width: 126,
     height: 126,
-
     borderRadius: 63,
-
-    backgroundColor: "#EEE8F5",
-
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  profileImage: {
+    width: 108,
+    height: 108,
+    borderRadius: 54,
   },
 
   avatar: {
     width: 108,
     height: 108,
-
     borderRadius: 54,
-
     backgroundColor: COLORS.primary,
-
     alignItems: "center",
     justifyContent: "center",
-
     borderWidth: 4,
     borderColor: "#FFFFFF",
 
@@ -662,13 +704,13 @@ const styles = StyleSheet.create({
   },
 
   sectionHeader: {
-    marginTop: 17,
-    marginBottom: 13,
+    margin:10,
   },
 
   sectionTitle: {
     fontSize: 18,
     fontWeight: "700",
+    marginTop:10,
 
     color: "#30263D",
 
@@ -986,8 +1028,6 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
 
     elevation: 2,
-
-    marginBottom: 15,
   },
   blog: {
     backgroundColor: "#FFF4F5",

@@ -284,6 +284,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    marginHorizontal:10,
   },
 
   backButton: {
@@ -376,6 +377,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: "hidden",
     marginBottom: 25,
+    marginHorizontal:10,
 
     borderWidth: 1,
     borderColor: "#F0F0F2",
@@ -443,6 +445,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderRadius: 20,
     paddingHorizontal: 16,
+    marginHorizontal:10,
 
     flexDirection: "row",
     alignItems: "center",

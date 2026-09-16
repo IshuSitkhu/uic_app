@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { router } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
 import { useEffect, useState } from "react";
 import {
     ActivityIndicator,
@@ -18,8 +19,10 @@ import {
 } from "react-native";
 import { COLORS } from "../../constants/colors";
 import API_URL from "../../services/api";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const EditProfile = () => {
+   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -31,7 +34,6 @@ const EditProfile = () => {
   const [dob, setDob] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  // UI only
   const [profileImage, setProfileImage] = useState(null);
 
   useEffect(() => {
@@ -47,7 +49,7 @@ const EditProfile = () => {
         return;
       }
 
-      const response = await fetch(`${API_URL}/auth/me`, {
+      const response = await fetch(`${API_URL}/auth/user`, {
         headers: {
           Accept: "application/json",
           Authorization: `Bearer ${token}`,
@@ -66,6 +68,7 @@ const EditProfile = () => {
         setGender(user.profile?.gender || "");
         setAddress(user.profile?.address || "");
         setDob(user.profile?.dob || "");
+        setProfileImage(user.profile?.profile_pic || null);
       }
     } catch (error) {
       console.log("Fetch profile error:", error);
@@ -74,27 +77,110 @@ const EditProfile = () => {
     }
   };
 
+  const handlePickImage = async () => {
+    try {
+      const permission =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (!permission.granted) {
+        console.log("Permission to access photos was denied");
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled) {
+        setProfileImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.log("Image picker error:", error);
+    }
+  };
+
+  // const handleSave = async () => {
+  //   try {
+  //     setSaving(true);
+
+  //     const token = await AsyncStorage.getItem("token");
+
+  //     const response = await fetch(`${API_URL}/auth/profile`, {
+  //       method: "PUT",
+  //       headers: {
+  //         Accept: "application/json",
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //       body: JSON.stringify({
+  //         username,
+  //         phone_number: mobileNumber,
+  //         email,
+  //         gender,
+  //         address,
+  //         dob: dob || null,
+  //       }),
+  //     });
+
+  //     const data = await response.json();
+
+  //     if (response.ok) {
+  //       console.log("Profile updated:", data);
+
+  //       router.back();
+  //     } else {
+  //       console.log("Update failed:", data);
+  //     }
+  //   } catch (error) {
+  //     console.log("Update profile error:", error);
+  //   } finally {
+  //     setSaving(false);
+  //   }
+  // };
+
+
+  // UI only
+  
   const handleSave = async () => {
     try {
       setSaving(true);
 
       const token = await AsyncStorage.getItem("token");
 
+      const formData = new FormData();
+
+      formData.append("_method", "PUT");
+      formData.append("username", username);
+      formData.append("phone_number", mobileNumber);
+      formData.append("email", email);
+      formData.append("gender", gender);
+      formData.append("address", address);
+      formData.append("dob", dob || "");
+
+      // Add profile image only if a new local image was selected
+      if (profileImage && !profileImage.startsWith("http")) {
+        const filename = profileImage.split("/").pop();
+
+        const match = /\.(\w+)$/.exec(filename || "");
+        const type = match ? `image/${match[1]}` : "image/jpeg";
+
+        formData.append("profile_pic", {
+          uri: profileImage,
+          name: filename || "profile.jpg",
+          type,
+        });
+      }
+
       const response = await fetch(`${API_URL}/auth/profile`, {
-        method: "PUT",
+        method: "POST",
         headers: {
           Accept: "application/json",
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          username,
-          phone_number: mobileNumber,
-          email,
-          gender,
-          address,
-          dob: dob || null,
-        }),
+        body: formData,
       });
 
       const data = await response.json();
@@ -113,7 +199,6 @@ const EditProfile = () => {
     }
   };
 
-  // UI only
   const handleDeleteAccount = () => {
     console.log("Delete account clicked");
   };
@@ -127,7 +212,14 @@ const EditProfile = () => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F9F7FB" }}>
+    <View
+        style={{
+          flex: 1,
+          backgroundColor: "#F9F7FB",
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
+        }}
+      >
       <View style={styles.screen}>
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -160,12 +252,18 @@ const EditProfile = () => {
                 </View>
               )}
 
-              <TouchableOpacity style={styles.cameraButton} activeOpacity={0.8}>
+              <TouchableOpacity
+                style={styles.cameraButton}
+                activeOpacity={0.8}
+                onPress={handlePickImage}
+              >
                 <Ionicons name="camera" size={19} color="#fff" />
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.changePhotoText}>Change profile photo</Text>
+            <TouchableOpacity onPress={handlePickImage}>
+              <Text style={styles.changePhotoText}>Change profile photo</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.section}>
@@ -282,15 +380,9 @@ const EditProfile = () => {
             disabled={saving}
           >
             {saving ? (
-              <ActivityIndicator size="small" color={COLORS.secondary} />
+              <ActivityIndicator size="small" color="#fff" />
             ) : (
               <>
-                <Ionicons
-                  name="checkmark-circle-outline"
-                  size={21}
-                  color="#fff"
-                />
-
                 <Text style={styles.saveButtonText}>Save Changes</Text>
               </>
             )}
@@ -331,7 +423,7 @@ const EditProfile = () => {
           </View>
         </ScrollView>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -344,8 +436,7 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    paddingHorizontal: 20,
-    paddingBottom: 50,
+    margin:10,
   },
 
   loadingContainer: {
@@ -359,8 +450,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingTop: 25,
-    paddingBottom: 20,
   },
 
   backButton: {

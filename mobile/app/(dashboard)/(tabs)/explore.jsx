@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../../constants/colors";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import BlogContent from "../../../components/explore/BlogContent";
 import PrayerContent from "../../../components/explore/PrayerContent";
@@ -21,6 +22,7 @@ import SongContent from "../../../components/explore/SongContent";
 const screenWidth = Dimensions.get("window").width;
 
 const Explore = () => {
+    const insets = useSafeAreaInsets();
   const [selectedCategory, setSelectedCategory] = useState("blogs");
 
   // const renderContent = () => {
@@ -58,53 +60,62 @@ const Explore = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: "#F9F7FB",
+        paddingTop: insets.top,
+        // paddingBottom: insets.bottom,
+      }}
+    >
       <ScrollView
+        style={styles.container}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingBottom: Platform.OS === "ios" ? 50 : 5,
+          
         }}
       >
         <View style={styles.header}>
             <Text style={styles.title}>Explore</Text>
         </View>
 
-          
+        <View style={{marginHorizontal:20, gap:4,}}>
           <Text style={styles.subtitle}>
             Growth in faith. Be inspired. Walk with God.
           </Text>
+          <View style={styles.categoryContainer}>
+            <CategoryButton
+              icon="clipboard-edit-outline"
+              title="Blogs"
+              active={selectedCategory === "blogs"}
+              // onPress={() => setSelectedCategory("blogs")}
+              onPress={() => handleCategoryPress("blogs")}
+            />
 
+            <CategoryButton
+              icon="hands-pray"
+              title="Prayers"
+              active={selectedCategory === "prayers"}
+              onPress={() => handleCategoryPress("prayers")}
+            />
 
-        <View style={styles.categoryContainer}>
-          <CategoryButton
-            icon="clipboard-edit-outline"
-            title="Blogs"
-            active={selectedCategory === "blogs"}
-            // onPress={() => setSelectedCategory("blogs")}
-            onPress={() => handleCategoryPress("blogs")}
-          />
+            <CategoryButton
+              icon="music"
+              title="Songs"
+              active={selectedCategory === "songs"}
+              onPress={() => handleCategoryPress("songs")}
+            />
 
-          <CategoryButton
-            icon="hands-pray"
-            title="Prayers"
-            active={selectedCategory === "prayers"}
-            onPress={() => handleCategoryPress("prayers")}
-          />
-
-          <CategoryButton
-            icon="music"
-            title="Songs"
-            active={selectedCategory === "songs"}
-            onPress={() => handleCategoryPress("songs")}
-          />
-
-          {/* <CategoryButton
-            icon="question"
-            title="Questions"
-            active={selectedCategory === "questions"}
-            onPress={() => handleCategoryPress("questions")}
-          /> */}
+            {/* <CategoryButton
+              icon="question"
+              title="Questions"
+              active={selectedCategory === "questions"}
+              onPress={() => handleCategoryPress("questions")}
+            /> */}
+          </View>
         </View>
+        
 
         {/* SELECTED CONTENT */}
         {/* <View style={styles.content}>
@@ -144,7 +155,7 @@ const Explore = () => {
           </ScrollView>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -179,9 +190,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-
-    paddingTop: 18,
-    // paddingBottom: 15,
+    margin:10,
   },
 
   // exploreTitle:{
@@ -193,25 +202,19 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#211D26",
     letterSpacing: -0.6,
-    marginLeft:25,
+    marginHorizontal:12,
   },
 
   subtitle: {
-    marginHorizontal: 25,
     fontSize: 14,
     color: "#777",
-    // marginVertical: 10,
   },
 
   categoryContainer: {
     flexDirection: "row",
-    paddingHorizontal: 10,
-    // gap: 2,
     backgroundColor: "#F9F7FB",
-    paddingVertical: 10,
-    //
     borderRadius: 50,
-    marginHorizontal: 8,
+
   },
 
   categoryButton: {
@@ -220,7 +223,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
 
-    paddingVertical: 8,
+    paddingVertical: 10,
     // paddingHorizontal: 12,
     borderRadius: 25,
 
@@ -243,7 +246,7 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    paddingTop: 20,
+    paddingTop: 10,
   },
 
   page: {

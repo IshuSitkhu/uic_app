@@ -18,7 +18,7 @@ export default function DashboardLayout() {
             <Stack.Screen name="song-list"   options={{ headerShown: false,  }}/>
             <Stack.Screen name="full-song"   options={{ headerShown: false,  }}/>
             <Stack.Screen name="connections"   options={{ headerShown: false,  }}/>
-            <Stack.Screen name="saved"   options={{ headerShown: false,  }}/>
+            {/* <Stack.Screen name="saved"   options={{ headerShown: false,  }}/> */}
             <Stack.Screen name="saved-bible"   options={{ headerShown: false,  }}/>
             <Stack.Screen name="saved-blog"   options={{ headerShown: false,  }}/>
             <Stack.Screen name="saved-prayer"   options={{ headerShown: false,  }}/>

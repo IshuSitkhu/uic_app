@@ -454,8 +454,6 @@ export default BlogDetail;
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    // paddingTop: 10,
-    // paddingBottom: 50,
     backgroundColor: "#F9F7FB",
   },
 

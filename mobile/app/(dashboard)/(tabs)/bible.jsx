@@ -2026,15 +2026,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#222",
-    marginBottom: 14,
-    marginTop: 8,
   },
 
   arrange: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 28,
+    marginBottom: 10,
     paddingHorizontal: 4,
   },
 
