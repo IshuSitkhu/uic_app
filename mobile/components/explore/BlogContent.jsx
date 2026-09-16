@@ -1,6 +1,6 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -20,10 +20,10 @@ import API_URL from "../../services/api";
 const BlogContent = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [favoriteStatus, setFavoriteStatus] = useState({});
 
   const fetchBlogs = async () => {
     try {
+      setLoading(true);
       const token = await AsyncStorage.getItem("token");
 
       const response = await fetch(`${API_URL}/blogs`, {
@@ -37,7 +37,7 @@ const BlogContent = () => {
 
       const data = await response.json();
 
-      console.log("BLOG API RESPONSE:", data);
+      console.log("BLOG API RESPONSE:", JSON.stringify(data.blogs?.data || [], null, 2));
 
       if (!response.ok) {
         throw new Error(data.message || "Failed to fetch blogs");
@@ -46,14 +46,6 @@ const BlogContent = () => {
       const fetchedBlogs = data.blogs?.data || [];
 
       setBlogs(fetchedBlogs);
-
-      const favoriteMap = {};
-
-      fetchedBlogs.forEach((blog) => {
-        favoriteMap[Number(blog.id)] = blog.is_favorited;
-      });
-
-      setFavoriteStatus(favoriteMap);
     } catch (error) {
       console.error("Error fetching blogs:", error.message);
     } finally {
@@ -61,9 +53,11 @@ const BlogContent = () => {
     }
   };
 
-  useEffect(() => {
+useFocusEffect(
+  useCallback(() => {
     fetchBlogs();
-  }, []);
+  }, [])
+);
 
   const handleFavorite = async (blogId) => {
     try {
@@ -72,7 +66,7 @@ const BlogContent = () => {
       if (!token) {
         Alert.alert(
           "Login Required",
-          "Please login first to save this prayer.",
+          "Please login first to save this blog.",
           [
             {
               text: "Cancel",
@@ -104,10 +98,16 @@ const BlogContent = () => {
         throw new Error(data.message || "Failed to update favorite");
       }
 
-      setFavoriteStatus((prev) => ({
-        ...prev,
-        [blogId]: data.is_favorited,
-      }));
+      setBlogs((previousBlogs) =>
+        previousBlogs.map((blog) =>
+          Number(blog.id) === Number(blogId)
+            ? {
+                ...blog,
+                is_favorited: data.is_favorited,
+              }
+            : blog
+        )
+      );
       Toast.show({
         type: "success",
         text1: data.is_favorited ? "Blog Saved" : "Blog Unsaved",
@@ -255,11 +255,7 @@ const BlogContent = () => {
                       }}
                     >
                       <Ionicons
-                        name={
-                          favoriteStatus[Number(blog.id)]
-                            ? "bookmark"
-                            : "bookmark-outline"
-                        }
+                        name={blog.is_favorited ? "bookmark" : "bookmark-outline"}
                         size={17}
                         color={COLORS.primary}
                       />

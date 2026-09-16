@@ -27,62 +27,12 @@ const BlogDetail = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   //FavoriteBlog
-  const [favoriteStatus, setFavoriteStatus] = useState({});
   const [isFavorited, setIsFavorited] = useState(false);
-
-  const handleFavorite = async (blogId) => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-
-      if (!token) {
-        Alert.alert("Error", "Please login first.");
-        return;
-      }
-
-      const response = await fetch(`${API_URL}/blogs/${blogId}/favorite`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await response.json();
-
-      console.log("FAVORITE RESPONSE:", response.status, data);
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to update favorite");
-      }
-
-      setFavoriteStatus((prev) => ({
-        ...prev,
-        [blogId]: data.is_favorited,
-      }));
-
-      if (Number(blogId) === Number(id)) {
-        setIsFavorited(data.is_favorited);
-      }
-
-      Toast.show({
-        type: "success",
-        text1: data.is_favorited ? "Blog Saved" : "Blog Unsaved",
-        position: "top",
-      });
-    } catch (error) {
-      console.error("Favorite error:", error.message);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Failed to update favorite.",
-        position: "top",
-      });
-    }
-  };
 
   useEffect(() => {
     const fetchBlog = async () => {
       try {
+        setLoading(true);
         const token = await AsyncStorage.getItem("token");
 
         const response = await fetch(`${API_URL}/blogs/${id}`, {
@@ -131,16 +81,7 @@ const BlogDetail = () => {
         }
 
         const fetchedBlogs = data.blogs?.data || [];
-
         setBlogs(fetchedBlogs);
-
-        const favoriteMap = {};
-
-        fetchedBlogs.forEach((blog) => {
-          favoriteMap[blog.id] = blog.is_favorited;
-        });
-
-        setFavoriteStatus(favoriteMap);
       } catch (error) {
         console.error("Error fetching blogs:", error.message);
       }
@@ -151,6 +92,75 @@ const BlogDetail = () => {
       fetchBlogs();
     }
   }, [id]);
+
+    const handleFavorite = async (blogId) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      if (!token) {
+        Alert.alert(
+          "Login Required",
+          "Please login first to save this Blog.",
+          [
+            {
+              text: "Cancel",
+              style: "cancel",
+            },
+            {
+              text: "OK",
+              onPress: () => router.push("/(auth)/login"),
+            },
+          ]
+        );
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/blogs/${blogId}/favorite`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      console.log("FAVORITE Blog detail RESPONSE:", response.status, data);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update favorite");
+      }
+
+      setBlogs((previousBlogs) =>
+        previousBlogs.map((blog) =>
+          Number(blog.id) === Number(blogId)
+            ? {
+                ...blog,
+                is_favorited: data.is_favorited,
+              }
+            : blog
+        )
+      );
+
+      if (Number(blogId) === Number(id)) {
+        setIsFavorited(data.is_favorited);
+      }
+
+      Toast.show({
+        type: "success",
+        text1: data.is_favorited ? "Blog Saved" : "Blog Unsaved",
+        position: "top",
+      });
+    } catch (error) {
+      console.error("Favorite blog detail error:", error.message);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to update favorite.",
+        position: "top",
+      });
+    }
+  };
 
   const popularBlogs = blogs
     .filter((item) => item.id !== Number(id))
@@ -271,10 +281,6 @@ const BlogDetail = () => {
                     size={22}
                     color="#4D3C78"
                   />
-
-                  {/* <Text style={styles.saveText}>
-                    {isFavorited ? "Saved" : "Save"}
-                  </Text> */}
                 </Pressable>
               </View>
 
@@ -381,11 +387,7 @@ const BlogDetail = () => {
                           }}
                         >
                           <Ionicons
-                            name={
-                              favoriteStatus[item.id]
-                                ? "bookmark"
-                                : "bookmark-outline"
-                            }
+                            name={item.is_favorited ? "bookmark" : "bookmark-outline"}
                             size={22}
                             color="#4D3C78"
                           />
