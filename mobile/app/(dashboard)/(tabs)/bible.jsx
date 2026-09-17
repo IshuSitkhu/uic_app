@@ -852,6 +852,7 @@ const Bible = () => {
           </TouchableOpacity>
         </View>
       </View>
+      
       <View style={styles.versesContainer}>
         {selectedVerse && !readAllVerses ? (
           <>
@@ -1575,7 +1576,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 5,
     height: 65,
-    backgroundColor: "#F9F7FB",
+    backgroundColor: "#fcfbfc",
     borderTopWidth: 0,
   },
 
@@ -1867,7 +1868,8 @@ const styles = StyleSheet.create({
   },
 
   versesContainer: {
-    marginTop: 10,
+
+    backgroundColor:"#F9F7FB"
   },
 
   chapterReference: {

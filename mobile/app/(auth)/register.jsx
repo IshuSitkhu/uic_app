@@ -127,7 +127,7 @@ const Register = () => {
 
               <View style={authStyles.logoCircle}>
                 <Image
-                  source={require("../../assets/images/icon.png")}
+                  source={require("../../assets/images/uiclogo.png")}
                   style={authStyles.logo}
                 />
               </View>

@@ -35,7 +35,7 @@ const Home = () => {
         <View style={styles.header}>
           <View style={styles.logoContainer}>
             <Image
-              source={require("../../../assets/images/quoteimg.png")}
+              source={require("../../../assets/images/uiclogo.png")}
               style={styles.logo}
             />
 

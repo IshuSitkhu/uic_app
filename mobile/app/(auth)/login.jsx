@@ -68,23 +68,25 @@ const Login = () => {
         }, 1500);
 
         // ACCOUNT WAITING FOR ADMIN APPROVAL
-      } else if (
-        response.status === 403 &&
-        data.message === "Your account is awaiting administrator approval."
-      ) {
-        Toast.show({
-          type: "info",
-          text1: "Approval Pending",
-          text2: "Your account is waiting for administrator approval.",
-          position: "top",
-        });
+      } 
+      // else if (
+      //   response.status === 403 &&
+      //   data.message === "Your account is awaiting administrator approval."
+      // ) {
+      //   Toast.show({
+      //     type: "info",
+      //     text1: "Approval Pending",
+      //     text2: "Your account is waiting for administrator approval.",
+      //     position: "top",
+      //   });
 
-        setTimeout(() => {
-          router.replace("/(auth)/pending-approval");
-        }, 1200);
+      //   setTimeout(() => {
+      //     router.replace("/(auth)/pending-approval");
+      //   }, 1200);
 
-        // OTP NOT VERIFIED
-      } else if (
+      //   // OTP NOT VERIFIED
+      // } 
+      else if (
         response.status === 403 &&
         data.message === "Please verify your OTP before logging in."
       ) {
@@ -153,7 +155,7 @@ const Login = () => {
               </TouchableOpacity>
               <View style={authStyles.logoCircle}>
                 <Image
-                  source={require("../../assets/images/icon.png")}
+                  source={require("../../assets/images/uiclogo.png")}
                   style={authStyles.logo}
                 />
               </View>

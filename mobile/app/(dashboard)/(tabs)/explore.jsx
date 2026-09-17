@@ -149,9 +149,9 @@ const Explore = () => {
               <SongContent />
             </View>
 
-            <View style={styles.page}>
+            {/* <View style={styles.page}>
               <QuestionContent />
-            </View>
+            </View> */}
           </ScrollView>
         </View>
       </ScrollView>

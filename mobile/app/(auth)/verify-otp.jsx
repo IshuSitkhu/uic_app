@@ -75,7 +75,7 @@ const VerifyOtp = () => {
 
         setTimeout(() => {
           if (isRegistration) {
-            router.replace("/(auth)/pending-approval");
+            router.push("/(auth)/login");
           } else {
             router.replace({
               pathname: "/(auth)/reset-password",

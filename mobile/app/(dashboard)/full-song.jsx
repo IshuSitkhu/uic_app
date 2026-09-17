@@ -23,6 +23,9 @@ import { useWindowDimensions } from "react-native";
 import { COLORS } from "../../constants/colors";
 import API_URL from "../../services/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { File, Paths } from "expo-file-system";
+
+import * as Sharing from "expo-sharing";
 
 const FullSong = () => {
   const insets = useSafeAreaInsets();
@@ -190,6 +193,55 @@ const FullSong = () => {
     }
   }
 
+const handleDownloadPdf = async () => {
+  try {
+    const pdfUrl =
+      activeTab === "lyrics"
+        ? `${API_URL}/songs/${id}/download`
+        : `${API_URL}/songs/${id}/download-chords`;
+
+    console.log("ACTIVE TAB:", activeTab);
+    console.log("PDF URL:", pdfUrl);
+
+    //gives the current time as a number.
+    const timestamp = Date.now();
+    const songTitle = song?.song_title || "song";
+    const cleanTitle = songTitle.replace(/[^a-zA-Z0-9-_ ]/g, "");
+
+    const fileName =
+      activeTab === "lyrics"
+        ? `${cleanTitle}_lyrics_${timestamp}.pdf`
+        : `${cleanTitle}_chords_${timestamp}.pdf`;
+
+    const destinationFile = new File(
+      Paths.document,
+      fileName
+    );
+
+    const file = await File.downloadFileAsync(
+      pdfUrl,
+      destinationFile
+    );
+
+    console.log("PDF SAVED:", file.uri);
+
+    const isAvailable = await Sharing.isAvailableAsync();
+
+    if (isAvailable) {
+      await Sharing.shareAsync(file.uri, {
+        mimeType: "application/pdf",
+        dialogTitle: "Save PDF",
+      });
+    } else {
+      Alert.alert("Download Complete", "PDF has been saved.");
+    }
+  } catch (error) {
+    console.log("PDF DOWNLOAD ERROR:", error);
+    Alert.alert("Download Failed", "Could not download the PDF.");
+  }
+};
+
+
   const getCategoryName = (type) => {
     if (type === "hymn" || type === "chorus") {
       return "Hymn/Chorus";
@@ -342,10 +394,10 @@ const FullSong = () => {
                   />
                   <Text style={styles.smalllanguageText}>{song.favorite_count ?? 0}</Text>
                 </Pressable>
-                <View style={styles.languageContainer}>
+                <Pressable style={styles.languageContainer} onPress={handleDownloadPdf}>
                   <AntDesign name="download" size={17} color={COLORS.primary} />
                   <Text style={styles.smalllanguageText}>PDF</Text>
-                </View>
+                </Pressable>
               </View>
             </View>
           </View>
