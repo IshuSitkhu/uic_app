@@ -32,81 +32,136 @@ const Register = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  const handleRegister = async () => {
-    try {
-      setLoading(true);
+const handleRegister = async () => {
+  try {
+    setLoading(true);
 
-      const response = await fetch(`${API_URL}/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          username,
-          phone_number: mobileNumber,
-          email,
-          password,
-          password_confirmation: confirmPassword,
-        }),
-      });
+    const response = await fetch(`${API_URL}/auth/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        username,
+        phone_number: mobileNumber,
+        email,
+        password,
+        password_confirmation: confirmPassword,
+      }),
+    });
 
-      const data = await response.json();
-      if (response.ok) {
-        Toast.show({
-          type: "success",
-          text1: "Registration Successful",
-          text2: "Your account has been created.",
-          position: "top",
-        });
+    const data = await response.json();
 
-        console.log("Registration successful:", data);
-
-        // setTimeout(() => {
-        //     router.push("/(auth)/login");
-        // }, 1500);
-
-        setTimeout(() => {
-          router.replace({
-            pathname: "/(auth)/verify-otp",
-            params: {
-              email: email.trim(),
-              purpose: "registration",
-            },
-          });
-        }, 1500);
-      } else {
-        Toast.show({
-          type: "error",
-          text1: "Registration Failed",
-          text2: data.message || "Please check your information.",
-          position: "top",
-        });
-
-        console.log("Registration failed:", data);
-      }
-    } catch (error) {
-      console.log(error);
-
+    if (response.ok) {
       Toast.show({
-        type: "error",
-        text1: "Something went wrong",
-        text2: "Unable to connect to the server.",
+        type: "success",
+        text1: "Registration Successful",
+        text2: "Your account has been created.",
         position: "top",
       });
-    } finally {
-      setLoading(false);
+
+      console.log("Registration successful:", data);
+
+      setTimeout(() => {
+        router.replace({
+          pathname: "/(auth)/verify-otp",
+          params: {
+            email: email.trim(),
+            purpose: "registration",
+          },
+        });
+      }, 1500);
+
+    } else if (response.status === 422) {
+      setErrors(data.errors || {});
+
+      if (errors?.name) {
+        Toast.show({
+          type: "error",
+          text1: "Name Error",
+          text2: errors.name[0],
+          position: "top",
+        });
+
+      } else if (errors?.username) {
+        Toast.show({
+          type: "error",
+          text1: "Username Error",
+          text2: errors.username[0],
+          position: "top",
+        });
+
+      } else if (errors?.email) {
+        Toast.show({
+          type: "error",
+          text1: "Email Error",
+          text2: errors.email[0],
+          position: "top",
+        });
+
+      } else if (errors?.phone_number) {
+        Toast.show({
+          type: "error",
+          text1: "Phone Number Error",
+          text2: errors.phone_number[0],
+          position: "top",
+        });
+
+      } else if (errors?.password) {
+        Toast.show({
+          type: "error",
+          text1: "Password Error",
+           text2: errors.password.join("\n"),
+          position: "top",
+        });
+
+      } else if (errors?.password_confirmation) {
+        Toast.show({
+          type: "error",
+          text1: "Password Confirmation",
+          text2: errors.password_confirmation[0],
+          position: "top",
+        });
+      }
+
+      console.log("Registration validation errors:", data);
+
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Registration Failed",
+        text2: data.message || "Please check your information.",
+        position: "top",
+      });
+
+      console.log("Registration failed:", data);
     }
-  };
+
+  } catch (error) {
+    console.log("Registration error:", error);
+
+    Toast.show({
+      type: "error",
+      text1: "Something went wrong",
+      text2: "Unable to connect to the server.",
+      position: "top",
+    });
+
+  } finally {
+    setLoading(false);
+  }
+};
+
   return (
     <>
       <SafeAreaView style={{ flex: 1, backgroundColor: "#F9F7FB" }}>
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={{ flex: 1 }}
         >
           <ScrollView
@@ -163,6 +218,11 @@ const Register = () => {
                     onChangeText={setName}
                   />
                 </View>
+                {errors.name && (
+                  <Text style={authStyles.errorText}>
+                    * {errors.name[0]}
+                  </Text>
+                )}
               </View>
 
               <View style={authStyles.inputContainer}>
@@ -177,6 +237,11 @@ const Register = () => {
                     onChangeText={setUsername}
                   />
                 </View>
+                {errors.username && (
+                  <Text style={authStyles.errorText}>
+                    * {errors.username[0]}
+                  </Text>
+                )}
               </View>
 
               <View style={authStyles.inputContainer}>
@@ -195,6 +260,11 @@ const Register = () => {
                     onChangeText={setMobileNumber}
                   />
                 </View>
+                {errors.phone_number && (
+                  <Text style={authStyles.errorText}>
+                    * {errors.phone_number[0]}
+                  </Text>
+                )}
               </View>
 
               <View style={authStyles.inputContainer}>
@@ -209,6 +279,11 @@ const Register = () => {
                     onChangeText={setEmail}
                   />
                 </View>
+                {errors.email && (
+                  <Text style={authStyles.errorText}>
+                    * {errors.email[0]}
+                  </Text>
+                )}
               </View>
 
               <View style={authStyles.inputContainer}>
@@ -232,6 +307,14 @@ const Register = () => {
                     />
                   </Pressable>
                 </View>
+                {errors.password && (
+                  <Text style={authStyles.errorText}>
+                    * {errors.password
+                      .filter((error) => !error.includes("confirmation"))
+                      .map((error) => `* ${error}`)
+                      .join("\n")}
+                  </Text>
+                )}
               </View>
 
               <View style={authStyles.inputContainer}>
@@ -258,6 +341,15 @@ const Register = () => {
                     />
                   </Pressable>
                 </View>
+                {errors.password && errors.password.some((error) =>
+                  error.includes("confirmation")
+                ) && (
+                  <Text style={authStyles.errorText}>
+                    * {errors.password.find((error) =>
+                      error.includes("confirmation")
+                    )}
+                  </Text>
+                )}
               </View>
 
               <TouchableOpacity

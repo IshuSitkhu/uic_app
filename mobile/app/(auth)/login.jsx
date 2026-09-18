@@ -19,8 +19,12 @@ import { COLORS } from "../../constants/colors";
 import { useAuth } from "../../context/AuthContext";
 import API_URL from "../../services/api";
 import authStyles from "../../styles/authStyles";
+import { useLocalSearchParams } from "expo-router";
 
 const Login = () => {
+  const { fromOtp } = useLocalSearchParams();
+
+console.log("LOGIN MOUNTED - fromOtp:", fromOtp);
   const { login } = useAuth();
   // const insets = useSafeAreaInsets();
   const [email, setEmail] = useState("");
@@ -63,9 +67,10 @@ const Login = () => {
         console.log("Login successful:", data);
         console.log("ACCESS TOKEN:", data.access_token);
 
-        setTimeout(() => {
-          router.replace("/home");
-        }, 1500);
+        // setTimeout(() => {
+        //   router.replace("/home");
+        // }, 1500);
+        router.replace("/home");
 
         // ACCOUNT WAITING FOR ADMIN APPROVAL
       } 
@@ -136,7 +141,7 @@ const Login = () => {
     <>
       <SafeAreaView style={{ flex: 1, backgroundColor: "#F9F7FB" }}>
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={{ flex: 1 }}
         >
           <ScrollView
@@ -177,7 +182,6 @@ const Login = () => {
               </View>
             </View>
 
-            {/* Form Section */}
             <View style={authStyles.form}>
               <View style={authStyles.inputContainer}>
                 <Text style={authStyles.label}>Email</Text>

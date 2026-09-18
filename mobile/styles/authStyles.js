@@ -229,6 +229,12 @@ const authStyles = StyleSheet.create({
     // Android shadow
     elevation: 2,
   },
+
+  errorText: {
+  color: "red",
+  fontSize: 12,
+  marginTop: 5,
+},
 });
 
 export default authStyles;

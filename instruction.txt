@@ -40,3 +40,9 @@ cat eas.json
 eas build --platform android --profile development
 
 to run using an EAS development build :npx expo start --dev-client
+
+//
+npx expo install expo-image-picker
+laravel:php artisan storage:link
+
+Download the PDF and keep it inside the app so the user can open it later without internet.->>>>>>npx expo install expo-file-system

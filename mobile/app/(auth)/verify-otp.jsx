@@ -73,19 +73,24 @@ const VerifyOtp = () => {
 
         console.log("OTP verified:", data);
 
-        setTimeout(() => {
-          if (isRegistration) {
-            router.push("/(auth)/login");
-          } else {
-            router.replace({
-              pathname: "/(auth)/reset-password",
-              params: {
-                email,
-                otp: otp.trim(),
-              },
-            });
-          }
-        }, 1200);
+        if (isRegistration) {
+          console.log("NAVIGATING TO LOGIN FROM OTP");
+
+          router.replace({
+            pathname: "/(auth)/login",
+            params: {
+              fromOtp: "true",
+            },
+          });
+        } else {
+          router.replace({
+            pathname: "/(auth)/reset-password",
+            params: {
+              email,
+              otp: otp.trim(),
+            },
+          });
+        }
       } else {
         Toast.show({
           type: "error",
